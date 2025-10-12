@@ -1,0 +1,58 @@
+.preview-player {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 36px;
+  height: 36px;
+  pointer-events: none;
+}
+
+.preview-player.playing {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.preview-player .play-button {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+
+.preview-player .play-button img {
+  width: 28px;
+  height: 28px;
+  filter: invert(1);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.preview-player .play-button:hover img {
+  transform: scale(1.15);
+  filter: invert(1) blur(1px);
+}
+
+.preview-player .mask {
+  position: absolute;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.preview-player .mask .sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  z-index: 9999;
+}

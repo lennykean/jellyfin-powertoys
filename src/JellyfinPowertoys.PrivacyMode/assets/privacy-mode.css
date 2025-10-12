@@ -1,0 +1,30 @@
+.powertoysPrivacyMode .cardScalable {
+  overflow: hidden;
+}
+.powertoysPrivacyMode.noReveal .cardScalable .cardImageContainer,
+.powertoysPrivacyMode .cardScalable:not(:hover) .cardImageContainer {
+  filter: blur(2em);
+}
+.powertoysPrivacyMode .backdropImage {
+  filter: blur(5em);
+}
+.powertoysPrivacyMode.noReveal .cardText,
+.powertoysPrivacyMode.noReveal .detailSection,
+.powertoysPrivacyMode.noReveal .infoText,
+.powertoysPrivacyMode.noReveal .itemMiscInfo,
+.powertoysPrivacyMode.noReveal .sectionTitle,
+.powertoysPrivacyMode .cardText:not(:hover),
+.powertoysPrivacyMode .detailSection:not(:hover),
+.powertoysPrivacyMode .infoText:not(:hover),
+.powertoysPrivacyMode .itemMiscInfo:not(:hover),
+.powertoysPrivacyMode .sectionTitle:not(:hover) {
+  filter: blur(0.25em);
+}
+.powertoysPrivacyMode .cardScalable:hover .cardImageContainer,
+.powertoysPrivacyMode .cardText:hover,
+.powertoysPrivacyMode .detailSection:hover,
+.powertoysPrivacyMode .infoText:hover,
+.powertoysPrivacyMode .itemMiscInfo:hover,
+.powertoysPrivacyMode .sectionTitle:hover {
+  transition: filter 1.5s;
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Thumbnail Previews</title>
+  </head>
+  <body>
+    <div id="ThumbnailPreviewsConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button">
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>Thumbnail Previews</h1>
+          <p>This plugin adds thumbnail previews using videos.</p>
+          <div class="fieldDescription" style="margin-bottom: 1.5em; padding: 0.75em; background-color: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107">
+            <strong>Note:</strong> This plugin requires Trickplay to be enabled on the Jellyfin server. Thumbnail previews will <i>not</i> be available for media items without
+            trickplay data.
+          </div>
+
+          <form id="ThumbnailPreviewsConfigForm" novalidate>
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="PreviewDuration">Preview Duration (milliseconds)</label>
+              <input id="PreviewDuration" name="PreviewDuration" type="number" min="0" step="1000" is="emby-input" />
+              <div class="fieldDescription">
+                Duration of thumbnail previews
+                <br />
+              </div>
+            </div>
+
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="FrameMinDuration">Frame Minimum Duration (milliseconds)</label>
+              <input id="FrameMinDuration" name="FrameMinDuration" type="number" min="0" step="100" is="emby-input" />
+              <div class="fieldDescription">Minimum duration of each frame in a preview</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="inputLabel inputLabelUnfocused" for="LoopPreview">Loop Preview</label>
+              <label class="emby-checkbox-label">
+                <input id="LoopPreview" name="LoopPreview" type="checkbox" is="emby-checkbox" />
+                <span>Enable looping</span>
+              </label>
+              <div class="fieldDescription">When enabled, thumbnail previews will loop continuously until clicked</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="inputLabel inputLabelUnfocused" for="AllResolutions">Preview Resolution</label>
+              <label class="emby-checkbox-label">
+                <input id="AllResolutions" name="AllResolutions" type="checkbox" is="emby-checkbox" />
+                <span>Any Resolution</span>
+              </label>
+              <div class="fieldDescription">When enabled, thumbnail previews will use the first available resolution</div>
+            </div>
+
+            <div class="inputContainer" id="ResolutionsContainer">
+              <label class="inputLabel inputLabelUnfocused" for="Resolutions">Resolutions (comma-separated)</label>
+              <input id="Resolutions" name="Resolutions" type="text" is="emby-input" />
+              <div class="fieldDescription">List of resolutions (e.g., 1080,720,320) to use for thumbnail previews, in priority order</div>
+            </div>
+
+            <div>
+              <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                <span>Save</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        var ThumbnailPreviewsConfig = {
+          pluginUniqueId: "6a65ce4e-fb35-4e99-8f37-02bc3979fe7e",
+        };
+
+        function updateResolutionsVisibility() {
+          var allResolutions = document.querySelector("#AllResolutions").checked;
+          var resolutionsContainer = document.querySelector("#ResolutionsContainer");
+          var resolutionsInput = document.querySelector("#Resolutions");
+
+          if (allResolutions) {
+            resolutionsContainer.style.display = "none";
+            resolutionsInput.disabled = true;
+            resolutionsInput.value = "";
+          } else {
+            resolutionsContainer.style.display = "block";
+            resolutionsInput.disabled = false;
+          }
+        }
+
+        document.querySelector("#ThumbnailPreviewsConfigPage").addEventListener("pageshow", function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(ThumbnailPreviewsConfig.pluginUniqueId)
+            .then(function (config) {
+              document.querySelector("#PreviewDuration").value = config.PreviewDuration || 10000;
+              document.querySelector("#FrameMinDuration").value = config.FrameMinDuration || 400;
+              document.querySelector("#LoopPreview").checked = config.LoopPreview || false;
+
+              var allResolutions = !config.Resolutions || config.Resolutions === null;
+              document.querySelector("#AllResolutions").checked = allResolutions;
+              document.querySelector("#Resolutions").value = config.Resolutions || "";
+
+              updateResolutionsVisibility();
+              Dashboard.hideLoadingMsg();
+            })
+            .catch(function (error) {
+              console.error("Configuration load error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#AllResolutions").addEventListener("change", updateResolutionsVisibility);
+
+        document.querySelector("#ThumbnailPreviewsConfigForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          var previewDurationInput = document.querySelector("#PreviewDuration");
+          var previewDuration = parseInt(previewDurationInput.value);
+
+          if (isNaN(previewDuration) || previewDuration <= 0) {
+            previewDurationInput.setCustomValidity("Preview duration must be greater than 0");
+            previewDurationInput.reportValidity();
+            return false;
+          }
+
+          previewDurationInput.setCustomValidity("");
+
+          var frameMinDurationInput = document.querySelector("#FrameMinDuration");
+          var frameMinDuration = parseInt(frameMinDurationInput.value);
+
+          if (isNaN(frameMinDuration) || frameMinDuration <= 0) {
+            frameMinDurationInput.setCustomValidity("Frame minimum duration must be greater than 0");
+            frameMinDurationInput.reportValidity();
+            return false;
+          }
+
+          frameMinDurationInput.setCustomValidity("");
+
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(ThumbnailPreviewsConfig.pluginUniqueId).then(function (config) {
+            config.PreviewDuration = previewDuration;
+            config.FrameMinDuration = frameMinDuration;
+            config.LoopPreview = document.querySelector("#LoopPreview").checked;
+
+            var allResolutions = document.querySelector("#AllResolutions").checked;
+            if (allResolutions) {
+              config.Resolutions = null;
+            } else {
+              config.Resolutions = document.querySelector("#Resolutions").value.trim() || null;
+            }
+
+            ApiClient.updatePluginConfiguration(ThumbnailPreviewsConfig.pluginUniqueId, config)
+              .then(function (result) {
+                Dashboard.processPluginConfigurationUpdateResult(result);
+              })
+              .catch(function (error) {
+                console.error("Configuration save error:", error);
+                Dashboard.hideLoadingMsg();
+              });
+          });
+
+          return false;
+        });
+      </script>
+    </div>
+  </body>
+</html>

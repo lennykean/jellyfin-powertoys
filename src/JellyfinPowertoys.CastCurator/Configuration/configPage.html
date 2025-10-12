@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Cast Curator</title>
+    <style>
+      .regex-error {
+        border-color: #ff4444 !important;
+        box-shadow: 0 0 3px rgba(255, 68, 68, 0.5) !important;
+      }
+      .regex-valid {
+        border-color: #44aa44 !important;
+        box-shadow: 0 0 3px rgba(68, 170, 68, 0.5) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="CastCuratorConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>Cast Curator</h1>
+          <p>Automatically organize your library by cast and crew members.</p>
+
+          <form id="CastCuratorConfigForm">
+            <h2>Metadata</h2>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="OverwriteMetadata" name="OverwriteMetadata" type="checkbox" is="emby-checkbox" />
+                <span>Overwrite metadata</span>
+              </label>
+              <div class="fieldDescription">
+                Force overwrite metadata every time sync runs
+                <br />
+              </div>
+            </div>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="FetchMissingMetadata" name="FetchMissingMetadata" type="checkbox" is="emby-checkbox" />
+                <span>Fetch missing metadata</span>
+              </label>
+              <div class="fieldDescription">
+                Force fetching missing metadata during sync
+                <br />
+                <small><strong>Warning:</strong> This can impact performance during sync operations</small>
+              </div>
+            </div>
+            <h2>Filters</h2>
+            <p>Use filters to control which cast and crew members are included.</p>
+            <hr />
+            <h3>Cast and Crew</h3>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="AllPeople" name="AllPeople" type="checkbox" is="emby-checkbox" />
+                <span>Everyone</span>
+              </label>
+              <div class="fieldDescription">All cast and crew members</div>
+            </div>
+            <div id="peopleFilters">
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyName" type="checkbox" is="emby-checkbox" />
+                    <span>Any Name</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew with any name
+                    <br />
+                    <small>(i.e. Adam Sandler, Christopher McDonald, etc.)</small>
+                  </div>
+                </div>
+                <div id="PersonNameFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="PersonNameFilter">Name Filter</label>
+                  <input id="PersonNameFilter" name="PersonNameFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew with names matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyRoleType" type="checkbox" is="emby-checkbox" />
+                    <span>Any Role Type</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew with any role type
+                    <br />
+                    <small>(i.e. Actor, Director, Writer, etc.)</small>
+                  </div>
+                </div>
+                <div id="PersonRoleTypeFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="PersonRoleTypeFilter">Role Type Filter</label>
+                  <input id="PersonRoleTypeFilter" name="PersonRoleTypeFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew with role types matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyRole" type="checkbox" is="emby-checkbox" />
+                    <span>Any Role</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew with any role
+                    <br />
+                    <small>(i.e. Happy Gilmore, Shooter McGavin, etc.)</small>
+                  </div>
+                </div>
+                <div id="PersonRoleFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="PersonRoleFilter">Role Filter</label>
+                  <input id="PersonRoleFilter" name="PersonRoleFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew with roles matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyDescription" type="checkbox" is="emby-checkbox" />
+                    <span>Any Overview</span>
+                  </label>
+                  <div class="fieldDescription">Cast and crew with any overview</div>
+                </div>
+                <div id="PersonOverviewFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="PersonOverviewFilter">Overview Filter</label>
+                  <input id="PersonOverviewFilter" name="PersonOverviewFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew with overviews matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <h3>Media Items</h3>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="AllItems" name="AllItems" type="checkbox" is="emby-checkbox" />
+                <span>All Media Items</span>
+              </label>
+              <div class="fieldDescription">Cast and crew for all media items</div>
+            </div>
+            <div id="itemFilters">
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemName" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Name</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew for any media item name
+                    <br />
+                    <small>(i.e. Happy Gilmore, Billy Madison, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemNameFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemNameFilter">Name Filter</label>
+                  <input id="ItemNameFilter" name="ItemNameFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew for media items with names matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemType" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Type</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew for any media item type
+                    <br />
+                    <small>(i.e. Movie, Series, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemTypeFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemTypeFilter">Type Filter</label>
+                  <input id="ItemTypeFilter" name="ItemTypeFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew for media items with types matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemGenre" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Genre</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew for media items with any genre
+                    <br />
+                    <small>(i.e. Comedy, Drama, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemGenreFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemGenreFilter">Genre Filter</label>
+                  <input id="ItemGenreFilter" name="ItemGenreFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew for media items with genres matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemOverview" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Overview</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Cast and crew for media items with any overview
+                    <br />
+                  </div>
+                </div>
+                <div id="ItemOverviewFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemOverviewFilter">Overview Filter</label>
+                  <input id="ItemOverviewFilter" name="ItemOverviewFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only cast and crew for media items with overviews matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                <span>Save</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        var CastCuratorConfig = {
+          pluginUniqueId: "c797039e-7640-45bb-a83f-7976220285dc",
+        };
+
+        function togglePeopleFilters() {
+          var allPeopleChecked = document.querySelector("#AllPeople").checked;
+          var peopleFilters = document.querySelector("#peopleFilters");
+          peopleFilters.style.display = allPeopleChecked ? "none" : "block";
+        }
+
+        function toggleItemFilters() {
+          var allItemsChecked = document.querySelector("#AllItems").checked;
+          var itemFilters = document.querySelector("#itemFilters");
+          itemFilters.style.display = allItemsChecked ? "none" : "block";
+        }
+
+        function toggleSpecificFilter(checkboxId, containerId) {
+          var checkbox = document.querySelector("#" + checkboxId);
+          var container = document.querySelector("#" + containerId);
+          container.style.display = checkbox.checked ? "none" : "block";
+
+          if (checkbox.checked) {
+            var input = container.querySelector("input[type='text']");
+            if (input) {
+              input.value = ".*";
+              input.setCustomValidity("");
+              input.classList.remove("regex-error", "regex-valid");
+            }
+          }
+        }
+
+        function validateRegex(input) {
+          if (!input.value) {
+            input.setCustomValidity("");
+            input.classList.remove("regex-error", "regex-valid");
+            return;
+          }
+
+          try {
+            new RegExp(input.value);
+            input.setCustomValidity("");
+            input.classList.remove("regex-error");
+            input.classList.add("regex-valid");
+          } catch (e) {
+            input.setCustomValidity("Invalid expression: " + e.message);
+            input.classList.remove("regex-valid");
+            input.classList.add("regex-error");
+          }
+        }
+
+        function setupRegexValidation() {
+          var regexInputs = [
+            "#PersonRoleTypeFilter",
+            "#PersonRoleFilter",
+            "#PersonNameFilter",
+            "#PersonOverviewFilter",
+            "#ItemNameFilter",
+            "#ItemOverviewFilter",
+            "#ItemTypeFilter",
+            "#ItemGenreFilter",
+          ];
+
+          regexInputs.forEach(function (selector) {
+            var input = document.querySelector(selector);
+            input.addEventListener("input", function () {
+              validateRegex(input);
+            });
+            input.addEventListener("blur", function () {
+              validateRegex(input);
+            });
+          });
+        }
+
+        function setupFilterToggles() {
+          document.querySelector("#MatchAnyRoleType").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyRoleType", "PersonRoleTypeFilterContainer");
+          });
+          document.querySelector("#MatchAnyRole").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyRole", "PersonRoleFilterContainer");
+          });
+          document.querySelector("#MatchAnyName").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyName", "PersonNameFilterContainer");
+          });
+          document.querySelector("#MatchAnyDescription").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyDescription", "PersonOverviewFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemName").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemName", "ItemNameFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemOverview").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemOverview", "ItemOverviewFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemType").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemType", "ItemTypeFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemGenre").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemGenre", "ItemGenreFilterContainer");
+          });
+        }
+
+        document.querySelector("#CastCuratorConfigPage").addEventListener("pageshow", function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(CastCuratorConfig.pluginUniqueId)
+            .then(function (config) {
+              document.querySelector("#OverwriteMetadata").checked = config.OverwriteMetadata !== false;
+              document.querySelector("#FetchMissingMetadata").checked = config.FetchMissingMetadata !== false;
+              document.querySelector("#AllPeople").checked = config.AllPeople;
+              document.querySelector("#AllItems").checked = config.AllItems;
+
+              var personRoleTypePattern = config.PersonRoleTypeFilter || ".*";
+              var personRolePattern = config.PersonRoleFilter || ".*";
+              var personNamePattern = config.PersonNameFilter || ".*";
+              var personOverviewPattern = config.PersonOverviewFilter || ".*";
+
+              document.querySelector("#PersonRoleTypeFilter").value = personRoleTypePattern;
+              document.querySelector("#PersonRoleFilter").value = personRolePattern;
+              document.querySelector("#PersonNameFilter").value = personNamePattern;
+              document.querySelector("#PersonOverviewFilter").value = personOverviewPattern;
+
+              document.querySelector("#MatchAnyRoleType").checked = personRoleTypePattern === ".*";
+              document.querySelector("#MatchAnyRole").checked = personRolePattern === ".*";
+              document.querySelector("#MatchAnyName").checked = personNamePattern === ".*";
+              document.querySelector("#MatchAnyDescription").checked = personOverviewPattern === ".*";
+
+              var itemNamePattern = config.ItemNameFilter || ".*";
+              var itemOverviewPattern = config.ItemOverviewFilter || ".*";
+              var itemTypePattern = config.ItemTypeFilter || ".*";
+              var itemGenrePattern = config.ItemGenreFilter || ".*";
+
+              document.querySelector("#ItemNameFilter").value = itemNamePattern;
+              document.querySelector("#ItemOverviewFilter").value = itemOverviewPattern;
+              document.querySelector("#ItemTypeFilter").value = itemTypePattern;
+              document.querySelector("#ItemGenreFilter").value = itemGenrePattern;
+
+              document.querySelector("#MatchAnyItemName").checked = itemNamePattern === ".*";
+              document.querySelector("#MatchAnyItemOverview").checked = itemOverviewPattern === ".*";
+              document.querySelector("#MatchAnyItemType").checked = itemTypePattern === ".*";
+              document.querySelector("#MatchAnyItemGenre").checked = itemGenrePattern === ".*";
+
+              document.querySelector("#AllPeople").addEventListener("change", togglePeopleFilters);
+              document.querySelector("#AllItems").addEventListener("change", toggleItemFilters);
+              setupFilterToggles();
+              setupRegexValidation();
+
+              var regexInputs = [
+                "#PersonRoleTypeFilter",
+                "#PersonRoleFilter",
+                "#PersonNameFilter",
+                "#PersonOverviewFilter",
+                "#ItemNameFilter",
+                "#ItemOverviewFilter",
+                "#ItemTypeFilter",
+                "#ItemGenreFilter",
+              ];
+              regexInputs.forEach(function (selector) {
+                validateRegex(document.querySelector(selector));
+              });
+
+              togglePeopleFilters();
+              toggleItemFilters();
+              toggleSpecificFilter("MatchAnyRoleType", "PersonRoleTypeFilterContainer");
+              toggleSpecificFilter("MatchAnyRole", "PersonRoleFilterContainer");
+              toggleSpecificFilter("MatchAnyName", "PersonNameFilterContainer");
+              toggleSpecificFilter("MatchAnyDescription", "PersonOverviewFilterContainer");
+              toggleSpecificFilter("MatchAnyItemName", "ItemNameFilterContainer");
+              toggleSpecificFilter("MatchAnyItemOverview", "ItemOverviewFilterContainer");
+              toggleSpecificFilter("MatchAnyItemType", "ItemTypeFilterContainer");
+              toggleSpecificFilter("MatchAnyItemGenre", "ItemGenreFilterContainer");
+
+              Dashboard.hideLoadingMsg();
+            })
+            .catch(function (error) {
+              console.error("Configuration load error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#CastCuratorConfigForm").addEventListener("submit", function (e) {
+          var regexInputs = [
+            "#PersonRoleTypeFilter",
+            "#PersonRoleFilter",
+            "#PersonNameFilter",
+            "#PersonOverviewFilter",
+            "#ItemNameFilter",
+            "#ItemOverviewFilter",
+            "#ItemTypeFilter",
+            "#ItemGenreFilter",
+          ];
+
+          var hasInvalidRegex = false;
+          regexInputs.forEach(function (selector) {
+            var input = document.querySelector(selector);
+            var container = input.closest(".inputContainer");
+            if (container && container.style.display !== "none") {
+              validateRegex(input);
+              if (!input.checkValidity()) {
+                hasInvalidRegex = true;
+              }
+            }
+          });
+
+          if (hasInvalidRegex) {
+            e.preventDefault();
+            return false;
+          }
+
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(CastCuratorConfig.pluginUniqueId).then(function (config) {
+            config.OverwriteMetadata = document.querySelector("#OverwriteMetadata").checked;
+            config.FetchMissingMetadata = document.querySelector("#FetchMissingMetadata").checked;
+            config.AllPeople = document.querySelector("#AllPeople").checked;
+            config.AllItems = document.querySelector("#AllItems").checked;
+
+            var personRoleTypePattern = document.querySelector("#MatchAnyRoleType").checked ? ".*" : document.querySelector("#PersonRoleTypeFilter").value || ".*";
+            var personRolePattern = document.querySelector("#MatchAnyRole").checked ? ".*" : document.querySelector("#PersonRoleFilter").value || ".*";
+            var personNamePattern = document.querySelector("#MatchAnyName").checked ? ".*" : document.querySelector("#PersonNameFilter").value || ".*";
+            var personOverviewPattern = document.querySelector("#MatchAnyDescription").checked ? ".*" : document.querySelector("#PersonOverviewFilter").value || ".*";
+
+            config.PersonRoleTypeFilter = personRoleTypePattern;
+            config.PersonRoleFilter = personRolePattern;
+            config.PersonNameFilter = personNamePattern;
+            config.PersonOverviewFilter = personOverviewPattern;
+
+            var itemNamePattern = document.querySelector("#MatchAnyItemName").checked ? ".*" : document.querySelector("#ItemNameFilter").value || ".*";
+            var itemOverviewPattern = document.querySelector("#MatchAnyItemOverview").checked ? ".*" : document.querySelector("#ItemOverviewFilter").value || ".*";
+            var itemTypePattern = document.querySelector("#MatchAnyItemType").checked ? ".*" : document.querySelector("#ItemTypeFilter").value || ".*";
+            var itemGenrePattern = document.querySelector("#MatchAnyItemGenre").checked ? ".*" : document.querySelector("#ItemGenreFilter").value || ".*";
+
+            config.ItemNameFilter = itemNamePattern;
+            config.ItemOverviewFilter = itemOverviewPattern;
+            config.ItemTypeFilter = itemTypePattern;
+            config.ItemGenreFilter = itemGenrePattern;
+
+            ApiClient.updatePluginConfiguration(CastCuratorConfig.pluginUniqueId, config)
+              .then(function (result) {
+                Dashboard.processPluginConfigurationUpdateResult(result);
+              })
+              .catch(function (error) {
+                console.error("Configuration save error:", error);
+                Dashboard.hideLoadingMsg();
+              });
+          });
+
+          e.preventDefault();
+          return false;
+        });
+      </script>
+    </div>
+  </body>
+</html>

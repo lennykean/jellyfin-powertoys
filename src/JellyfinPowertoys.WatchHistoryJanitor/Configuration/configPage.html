@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Watch History Janitor</title>
+    <style>
+      .regex-error {
+        border-color: #ff4444 !important;
+        box-shadow: 0 0 3px rgba(255, 68, 68, 0.5) !important;
+      }
+      .regex-valid {
+        border-color: #44aa44 !important;
+        box-shadow: 0 0 3px rgba(68, 170, 68, 0.5) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="WatchHistoryJanitorConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>Watch History Janitor</h1>
+          <p>This plugin cleans up the "Continue Watching" history after a specified time period</p>
+
+          <form id="WatchHistoryJanitorConfigForm">
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="Enabled" name="Enabled" type="checkbox" is="emby-checkbox" />
+                <span>Enable</span>
+              </label>
+              <div class="fieldDescription">Enable the plugins daily cleanup task</div>
+            </div>
+
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused">Expire After</label>
+              <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px">
+                <div style="display: flex; flex-direction: column; align-items: center">
+                  <input id="ExpireAfterDays" name="ExpireAfterDays" type="number" min="0" max="365" is="emby-input" style="width: 80px" />
+                  <small>Days</small>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center">
+                  <input id="ExpireAfterHours" name="ExpireAfterHours" type="number" min="0" max="23" is="emby-input" style="width: 80px" />
+                  <small>Hours</small>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center">
+                  <input id="ExpireAfterMinutes" name="ExpireAfterMinutes" type="number" min="0" max="59" is="emby-input" style="width: 80px" />
+                  <small>Minutes</small>
+                </div>
+              </div>
+              <div class="fieldDescription">Time period after which items will be removed from continue watching history</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="AllUsers" name="AllUsers" type="checkbox" is="emby-checkbox" />
+                <span>All Users</span>
+              </label>
+              <div class="fieldDescription">Clean up continue watching history for all users</div>
+            </div>
+
+            <div id="usernameFilterContainer" class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="UsernameFilter">Username Filter</label>
+              <input id="UsernameFilter" name="UsernameFilter" type="text" is="emby-input" />
+              <div class="fieldDescription">
+                Only clean up continue watching history for usernames matching the expression
+                <br />
+                <small>Regular expression</small>
+              </div>
+            </div>
+            <div>
+              <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                <span>Save</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        var WatchHistoryJanitorConfig = {
+          pluginUniqueId: "5513dce4-a436-495c-8925-30845bf2c1dd",
+        };
+
+        function toggleUsernameFilter() {
+          var allUsersChecked = document.querySelector("#AllUsers").checked;
+          var usernameFilterContainer = document.querySelector("#usernameFilterContainer");
+          usernameFilterContainer.style.display = allUsersChecked ? "none" : "block";
+        }
+
+        function validateRegex(input) {
+          if (!input.value) {
+            input.setCustomValidity("");
+            input.classList.remove("regex-error", "regex-valid");
+            return;
+          }
+
+          try {
+            new RegExp(input.value);
+            input.setCustomValidity("");
+            input.classList.remove("regex-error");
+            input.classList.add("regex-valid");
+          } catch (e) {
+            input.setCustomValidity("Invalid regular expression: " + e.message);
+            input.classList.remove("regex-valid");
+            input.classList.add("regex-error");
+          }
+        }
+
+        document.querySelector("#WatchHistoryJanitorConfigPage").addEventListener("pageshow", function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(WatchHistoryJanitorConfig.pluginUniqueId)
+            .then(function (config) {
+              document.querySelector("#Enabled").checked = config.Enabled !== false;
+              document.querySelector("#AllUsers").checked = config.AllUsers !== false;
+
+              var days = 30,
+                hours = 0,
+                minutes = 0;
+              if (config.ExpireAfter) {
+                var timeSpanMatch = config.ExpireAfter.match(/^(\d+)\.(\d{2}):(\d{2}):(\d{2})$/);
+                if (timeSpanMatch) {
+                  days = parseInt(timeSpanMatch[1]);
+                  hours = parseInt(timeSpanMatch[2]);
+                  minutes = parseInt(timeSpanMatch[3]);
+                } else {
+                  var noDaysMatch = config.ExpireAfter.match(/^(\d{2}):(\d{2}):(\d{2})$/);
+                  if (noDaysMatch) {
+                    days = 0;
+                    hours = parseInt(noDaysMatch[1]);
+                    minutes = parseInt(noDaysMatch[2]);
+                  } else {
+                    var parsed = parseInt(config.ExpireAfter);
+                    if (!isNaN(parsed)) {
+                      days = parsed;
+                    }
+                  }
+                }
+              }
+              document.querySelector("#ExpireAfterDays").value = days;
+              document.querySelector("#ExpireAfterHours").value = hours;
+              document.querySelector("#ExpireAfterMinutes").value = minutes;
+
+              var usernameFilter = config.UsernameFilter || ".*";
+              document.querySelector("#UsernameFilter").value = usernameFilter;
+
+              document.querySelector("#AllUsers").addEventListener("change", toggleUsernameFilter);
+
+              var usernameFilterInput = document.querySelector("#UsernameFilter");
+              usernameFilterInput.addEventListener("input", function () {
+                validateRegex(usernameFilterInput);
+              });
+              usernameFilterInput.addEventListener("blur", function () {
+                validateRegex(usernameFilterInput);
+              });
+
+              validateRegex(usernameFilterInput);
+              toggleUsernameFilter();
+
+              Dashboard.hideLoadingMsg();
+            })
+            .catch(function (error) {
+              console.error("Configuration load error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#WatchHistoryJanitorConfigForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          var usernameFilterInput = document.querySelector("#UsernameFilter");
+          var usernameFilterContainer = document.querySelector("#usernameFilterContainer");
+
+          if (usernameFilterContainer.style.display !== "none") {
+            validateRegex(usernameFilterInput);
+            if (!usernameFilterInput.checkValidity()) {
+              return false;
+            }
+          }
+
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(WatchHistoryJanitorConfig.pluginUniqueId).then(function (config) {
+            config.Enabled = document.querySelector("#Enabled").checked;
+            config.AllUsers = document.querySelector("#AllUsers").checked;
+
+            var days = parseInt(document.querySelector("#ExpireAfterDays").value) || 0;
+            var hours = parseInt(document.querySelector("#ExpireAfterHours").value) || 0;
+            var minutes = parseInt(document.querySelector("#ExpireAfterMinutes").value) || 0;
+
+            if (days === 0 && hours === 0 && minutes === 0) {
+              minutes = 1;
+            }
+
+            var hoursStr = hours.toString().padStart(2, "0");
+            var minutesStr = minutes.toString().padStart(2, "0");
+            config.ExpireAfter = days + "." + hoursStr + ":" + minutesStr + ":00";
+
+            config.UsernameFilter = document.querySelector("#UsernameFilter").value || ".*";
+
+            ApiClient.updatePluginConfiguration(WatchHistoryJanitorConfig.pluginUniqueId, config)
+              .then(function (result) {
+                Dashboard.processPluginConfigurationUpdateResult(result);
+              })
+              .catch(function (error) {
+                console.error("Configuration save error:", error);
+                Dashboard.hideLoadingMsg();
+              });
+          });
+
+          return false;
+        });
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Studio Curator - Jellyfin Powertoys</title>
+    <style>
+      .regex-error {
+        border-color: #ff4444 !important;
+        box-shadow: 0 0 3px rgba(255, 68, 68, 0.5) !important;
+      }
+      .regex-valid {
+        border-color: #44aa44 !important;
+        box-shadow: 0 0 3px rgba(68, 170, 68, 0.5) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="StudioCuratorConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>Studio Curator</h1>
+          <p>Automatically organize your library by studio.</p>
+
+          <form id="StudioCuratorConfigForm">
+            <h2>Metadata</h2>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="OverwriteMetadata" name="OverwriteMetadata" type="checkbox" is="emby-checkbox" />
+                <span>Overwrite metadata</span>
+              </label>
+              <div class="fieldDescription">
+                Force overwrite metadata every time sync runs
+                <br />
+              </div>
+            </div>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="FetchMissingMetadata" name="FetchMissingMetadata" type="checkbox" is="emby-checkbox" />
+                <span>Fetch missing metadata</span>
+              </label>
+              <div class="fieldDescription">
+                Force fetching missing metadata during sync
+                <br />
+                <small><strong>Warning:</strong> This can impact performance during sync operations</small>
+              </div>
+            </div>
+            <h2>Filters</h2>
+            <p>Use filters to control which studios and items are included.</p>
+            <hr />
+            <h3>Studios</h3>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="AllStudios" name="AllStudios" type="checkbox" is="emby-checkbox" />
+                <span>All Studios</span>
+              </label>
+              <div class="fieldDescription">All studios</div>
+            </div>
+            <div id="studioFilters">
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyStudioName" type="checkbox" is="emby-checkbox" />
+                    <span>Any Studio Name</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Studios with any name
+                    <br />
+                    <small>(i.e. Warner Bros., Universal Pictures, etc.)</small>
+                  </div>
+                </div>
+                <div id="StudioNameFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="StudioNameFilter">Name Filter</label>
+                  <input id="StudioNameFilter" name="StudioNameFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios with names matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyStudioOverview" type="checkbox" is="emby-checkbox" />
+                    <span>Any Overview</span>
+                  </label>
+                  <div class="fieldDescription">Studios with any overview</div>
+                </div>
+                <div id="StudioOverviewFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="StudioOverviewFilter">Overview Filter</label>
+                  <input id="StudioOverviewFilter" name="StudioOverviewFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios with overviews matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <h3>Media Items</h3>
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="emby-checkbox-label">
+                <input id="AllItems" name="AllItems" type="checkbox" is="emby-checkbox" />
+                <span>All Media Items</span>
+              </label>
+              <div class="fieldDescription">Studios for all media items</div>
+            </div>
+            <div id="itemFilters">
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemName" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Name</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Studios for any media item name
+                    <br />
+                    <small>(i.e. Happy Gilmore, Billy Madison, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemNameFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemNameFilter">Name Filter</label>
+                  <input id="ItemNameFilter" name="ItemNameFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios for media items with names matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemType" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Type</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Studios for any media item type
+                    <br />
+                    <small>(i.e. Movie, Series, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemTypeFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemTypeFilter">Type Filter</label>
+                  <input id="ItemTypeFilter" name="ItemTypeFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios for media items with types matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemGenre" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Genre</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Studios for media items with any genre
+                    <br />
+                    <small>(i.e. Comedy, Drama, etc.)</small>
+                  </div>
+                </div>
+                <div id="ItemGenreFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemGenreFilter">Genre Filter</label>
+                  <input id="ItemGenreFilter" name="ItemGenreFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios for media items with genres matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+              <div class="inputContainer">
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                  <label class="emby-checkbox-label">
+                    <input id="MatchAnyItemOverview" type="checkbox" is="emby-checkbox" />
+                    <span>Any Media Item Overview</span>
+                  </label>
+                  <div class="fieldDescription">
+                    Studios for media items with any overview
+                    <br />
+                  </div>
+                </div>
+                <div id="ItemOverviewFilterContainer" class="inputContainer">
+                  <label class="inputLabel inputLabelUnfocused" for="ItemOverviewFilter">Overview Filter</label>
+                  <input id="ItemOverviewFilter" name="ItemOverviewFilter" type="text" is="emby-input" />
+                  <div class="fieldDescription">
+                    Only studios for media items with overviews matching the expression
+                    <br />
+                    <small>Regular expression</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                <span>Save</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        var StudioCuratorConfig = {
+          pluginUniqueId: "ac5bb0cf-9de9-4c42-b72f-c59d1edbb6ae",
+        };
+
+        function toggleStudioFilters() {
+          var allStudiosChecked = document.querySelector("#AllStudios").checked;
+          var studioFilters = document.querySelector("#studioFilters");
+          studioFilters.style.display = allStudiosChecked ? "none" : "block";
+        }
+
+        function toggleItemFilters() {
+          var allItemsChecked = document.querySelector("#AllItems").checked;
+          var itemFilters = document.querySelector("#itemFilters");
+          itemFilters.style.display = allItemsChecked ? "none" : "block";
+        }
+
+        function toggleSpecificFilter(checkboxId, containerId) {
+          var checkbox = document.querySelector("#" + checkboxId);
+          var container = document.querySelector("#" + containerId);
+          container.style.display = checkbox.checked ? "none" : "block";
+
+          if (checkbox.checked) {
+            var input = container.querySelector("input[type='text']");
+            if (input) {
+              input.value = ".*";
+              input.setCustomValidity("");
+              input.classList.remove("regex-error", "regex-valid");
+            }
+          }
+        }
+
+        function validateRegex(input) {
+          if (!input.value) {
+            input.setCustomValidity("");
+            input.classList.remove("regex-error", "regex-valid");
+            return;
+          }
+
+          try {
+            new RegExp(input.value);
+            input.setCustomValidity("");
+            input.classList.remove("regex-error");
+            input.classList.add("regex-valid");
+          } catch (e) {
+            input.setCustomValidity("Invalid expression: " + e.message);
+            input.classList.remove("regex-valid");
+            input.classList.add("regex-error");
+          }
+        }
+
+        function setupRegexValidation() {
+          var regexInputs = ["#StudioNameFilter", "#StudioOverviewFilter", "#ItemNameFilter", "#ItemOverviewFilter", "#ItemTypeFilter", "#ItemGenreFilter"];
+
+          regexInputs.forEach(function (selector) {
+            var input = document.querySelector(selector);
+            input.addEventListener("input", function () {
+              validateRegex(input);
+            });
+            input.addEventListener("blur", function () {
+              validateRegex(input);
+            });
+          });
+        }
+
+        function setupFilterToggles() {
+          document.querySelector("#MatchAnyStudioName").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyStudioName", "StudioNameFilterContainer");
+          });
+          document.querySelector("#MatchAnyStudioOverview").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyStudioOverview", "StudioOverviewFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemName").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemName", "ItemNameFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemOverview").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemOverview", "ItemOverviewFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemType").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemType", "ItemTypeFilterContainer");
+          });
+          document.querySelector("#MatchAnyItemGenre").addEventListener("change", function () {
+            toggleSpecificFilter("MatchAnyItemGenre", "ItemGenreFilterContainer");
+          });
+        }
+
+        document.querySelector("#StudioCuratorConfigPage").addEventListener("pageshow", function () {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(StudioCuratorConfig.pluginUniqueId)
+            .then(function (config) {
+              document.querySelector("#OverwriteMetadata").checked = config.OverwriteMetadata !== false;
+              document.querySelector("#FetchMissingMetadata").checked = config.FetchMissingMetadata !== false;
+              document.querySelector("#AllStudios").checked = config.AllStudios;
+              document.querySelector("#AllItems").checked = config.AllItems;
+
+              var studioNamePattern = config.StudioNameFilter || ".*";
+              var studioOverviewPattern = config.StudioOverviewFilter || ".*";
+
+              document.querySelector("#StudioNameFilter").value = studioNamePattern;
+              document.querySelector("#StudioOverviewFilter").value = studioOverviewPattern;
+
+              document.querySelector("#MatchAnyStudioName").checked = studioNamePattern === ".*";
+              document.querySelector("#MatchAnyStudioOverview").checked = studioOverviewPattern === ".*";
+
+              var itemNamePattern = config.ItemNameFilter || ".*";
+              var itemOverviewPattern = config.ItemOverviewFilter || ".*";
+              var itemTypePattern = config.ItemTypeFilter || ".*";
+              var itemGenrePattern = config.ItemGenreFilter || ".*";
+
+              document.querySelector("#ItemNameFilter").value = itemNamePattern;
+              document.querySelector("#ItemOverviewFilter").value = itemOverviewPattern;
+              document.querySelector("#ItemTypeFilter").value = itemTypePattern;
+              document.querySelector("#ItemGenreFilter").value = itemGenrePattern;
+
+              document.querySelector("#MatchAnyItemName").checked = itemNamePattern === ".*";
+              document.querySelector("#MatchAnyItemOverview").checked = itemOverviewPattern === ".*";
+              document.querySelector("#MatchAnyItemType").checked = itemTypePattern === ".*";
+              document.querySelector("#MatchAnyItemGenre").checked = itemGenrePattern === ".*";
+
+              document.querySelector("#AllStudios").addEventListener("change", toggleStudioFilters);
+              document.querySelector("#AllItems").addEventListener("change", toggleItemFilters);
+              setupFilterToggles();
+              setupRegexValidation();
+
+              var regexInputs = ["#StudioNameFilter", "#StudioOverviewFilter", "#ItemNameFilter", "#ItemOverviewFilter", "#ItemTypeFilter", "#ItemGenreFilter"];
+              regexInputs.forEach(function (selector) {
+                validateRegex(document.querySelector(selector));
+              });
+
+              toggleStudioFilters();
+              toggleItemFilters();
+              toggleSpecificFilter("MatchAnyStudioName", "StudioNameFilterContainer");
+              toggleSpecificFilter("MatchAnyStudioOverview", "StudioOverviewFilterContainer");
+              toggleSpecificFilter("MatchAnyItemName", "ItemNameFilterContainer");
+              toggleSpecificFilter("MatchAnyItemOverview", "ItemOverviewFilterContainer");
+              toggleSpecificFilter("MatchAnyItemType", "ItemTypeFilterContainer");
+              toggleSpecificFilter("MatchAnyItemGenre", "ItemGenreFilterContainer");
+
+              Dashboard.hideLoadingMsg();
+            })
+            .catch(function (error) {
+              console.error("Configuration load error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#StudioCuratorConfigForm").addEventListener("submit", function (e) {
+          var regexInputs = ["#StudioNameFilter", "#StudioOverviewFilter", "#ItemNameFilter", "#ItemOverviewFilter", "#ItemTypeFilter", "#ItemGenreFilter"];
+
+          var hasInvalidRegex = false;
+          regexInputs.forEach(function (selector) {
+            var input = document.querySelector(selector);
+            var container = input.closest(".inputContainer");
+            if (container && container.style.display !== "none") {
+              validateRegex(input);
+              if (!input.checkValidity()) {
+                hasInvalidRegex = true;
+              }
+            }
+          });
+
+          if (hasInvalidRegex) {
+            e.preventDefault();
+            return false;
+          }
+
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(StudioCuratorConfig.pluginUniqueId).then(function (config) {
+            config.OverwriteMetadata = document.querySelector("#OverwriteMetadata").checked;
+            config.FetchMissingMetadata = document.querySelector("#FetchMissingMetadata").checked;
+            config.AllStudios = document.querySelector("#AllStudios").checked;
+            config.AllItems = document.querySelector("#AllItems").checked;
+
+            var studioNamePattern = document.querySelector("#MatchAnyStudioName").checked ? ".*" : document.querySelector("#StudioNameFilter").value || ".*";
+            var studioOverviewPattern = document.querySelector("#MatchAnyStudioOverview").checked ? ".*" : document.querySelector("#StudioOverviewFilter").value || ".*";
+
+            config.StudioNameFilter = studioNamePattern;
+            config.StudioOverviewFilter = studioOverviewPattern;
+
+            var itemNamePattern = document.querySelector("#MatchAnyItemName").checked ? ".*" : document.querySelector("#ItemNameFilter").value || ".*";
+            var itemOverviewPattern = document.querySelector("#MatchAnyItemOverview").checked ? ".*" : document.querySelector("#ItemOverviewFilter").value || ".*";
+            var itemTypePattern = document.querySelector("#MatchAnyItemType").checked ? ".*" : document.querySelector("#ItemTypeFilter").value || ".*";
+            var itemGenrePattern = document.querySelector("#MatchAnyItemGenre").checked ? ".*" : document.querySelector("#ItemGenreFilter").value || ".*";
+
+            config.ItemNameFilter = itemNamePattern;
+            config.ItemOverviewFilter = itemOverviewPattern;
+            config.ItemTypeFilter = itemTypePattern;
+            config.ItemGenreFilter = itemGenrePattern;
+
+            ApiClient.updatePluginConfiguration(StudioCuratorConfig.pluginUniqueId, config)
+              .then(function (result) {
+                Dashboard.processPluginConfigurationUpdateResult(result);
+              })
+              .catch(function (error) {
+                console.error("Configuration save error:", error);
+                Dashboard.hideLoadingMsg();
+              });
+          });
+
+          e.preventDefault();
+          return false;
+        });
+      </script>
+    </div>
+  </body>
+</html>

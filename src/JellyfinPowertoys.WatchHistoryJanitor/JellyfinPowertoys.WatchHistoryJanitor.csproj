@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jellyfin.Controller" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\configPage.html" />
+  </ItemGroup>
+
+</Project>
