@@ -1,0 +1,87 @@
+name: Release
+on:
+  push:
+    tags:
+    - v*
+jobs:
+  release:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 8.0.x
+    - name: Set environment variables
+      run: |
+        VERSION=${{ github.ref_name }}
+        VERSION_NUM=${VERSION#v}
+        echo "VERSION_NUM=${VERSION_NUM}" >> $GITHUB_ENV
+        echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
+      working-directory: .
+    - run: dotnet restore
+    - run: dotnet build --no-restore -c Release
+    - uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+    - name: Zip, upload and update manifest
+      run: |
+        declare -A plugins=(
+          ["c797039e-7640-45bb-a83f-7976220285dc"]="JellyfinPowertoys.CastCurator"
+          ["ac5bb0cf-9de9-4c42-b72f-c59d1edbb6ae"]="JellyfinPowertoys.StudioCurator"
+          ["c03a2469-eed0-4107-95b1-6dfda14fb0fc"]="JellyfinPowertoys.PrivacyMode"
+          ["f0194bb3-788d-43b8-96c9-bb32f996db4a"]="JellyfinPowertoys.RemoteTrailers"
+          ["6a65ce4e-fb35-4e99-8f37-02bc3979fe7e"]="JellyfinPowertoys.ThumbnailPreviews"
+          ["5513dce4-a436-495c-8925-30845bf2c1dd"]="JellyfinPowertoys.WatchHistoryJanitor"
+        )
+
+        CHANGELOG=$(git log -1 --pretty=%B)
+
+        for guid in "${!plugins[@]}"; do
+          plugin="${plugins[$guid]}"
+
+          # Create zip
+          cd src/${plugin}/bin/Release/net8.0
+          zip ${plugin}.zip ${plugin}.dll
+          cd ../../../../..
+
+          gh release upload "${{ github.ref_name }}" "src/${plugin}/bin/Release/net8.0/${plugin}.zip"
+
+          checksum=$(md5sum "src/${plugin}/bin/Release/net8.0/${plugin}.zip" | awk '{print $1}')
+          source_url="https://github.com/${REPO}/releases/download/${{ github.ref_name }}/${plugin}.zip"
+
+          jq --arg guid "$guid" \
+             --arg version "$VERSION_NUM" \
+             --arg checksum "$checksum" \
+             --arg sourceUrl "$source_url" \
+             --arg changelog "$CHANGELOG" \
+             --arg targetAbi "10.8.0.0" \
+             --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             'map(if .guid == $guid then
+               .versions = [{
+                 version: $version,
+                 changelog: $changelog,
+                 targetAbi: $targetAbi,
+                 sourceUrl: $sourceUrl,
+                 checksum: $checksum,
+                 timestamp: $timestamp
+               }] + .versions
+             else . end)' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
+        done
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      working-directory: .
+    - uses: stefanzweifel/git-auto-commit-action@v7
+      with:
+        commit_message: "Update manifest for release ${{ github.ref_name }}"
+        branch: main
+        push_options: '--force'

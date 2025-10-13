@@ -1,0 +1,62 @@
+[
+  {
+    "category": "General",
+    "guid": "c797039e-7640-45bb-a83f-7976220285dc",
+    "name": "Cast Curator",
+    "description": "Automatically organize your library by cast and crew members.",
+    "owner": "lennykean",
+    "overview": "Automatically organize your library by cast and crew members.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  },
+  {
+    "category": "General",
+    "guid": "ac5bb0cf-9de9-4c42-b72f-c59d1edbb6ae",
+    "name": "Studio Curator",
+    "description": "Automatically organize your library by studio.",
+    "owner": "lennykean",
+    "overview": "Automatically organize your library by studio.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  },
+  {
+    "category": "General",
+    "guid": "c03a2469-eed0-4107-95b1-6dfda14fb0fc",
+    "name": "Privacy Mode",
+    "description": "Adds a privacy mode that hides content when activated.",
+    "owner": "lennykean",
+    "overview": "Adds a privacy mode that hides content when activated.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  },
+  {
+    "category": "General",
+    "guid": "f0194bb3-788d-43b8-96c9-bb32f996db4a",
+    "name": "Remote Trailers",
+    "description": "Enables playback of remote trailers from any source.",
+    "owner": "lennykean",
+    "overview": "Enables playback of remote trailers from any source.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  },
+  {
+    "category": "General",
+    "guid": "6a65ce4e-fb35-4e99-8f37-02bc3979fe7e",
+    "name": "Thumbnail Previews",
+    "description": "Adds thumbnail previews using videos.",
+    "owner": "lennykean",
+    "overview": "Adds thumbnail previews using videos.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  },
+  {
+    "category": "General",
+    "guid": "5513dce4-a436-495c-8925-30845bf2c1dd",
+    "name": "Watch History Janitor",
+    "description": "Cleans up the \"Continue Watching\" history after a specified time period.",
+    "owner": "lennykean",
+    "overview": "Cleans up the \"Continue Watching\" history after a specified time period.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
+  }
+]
