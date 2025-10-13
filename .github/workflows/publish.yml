@@ -64,7 +64,7 @@ jobs:
              --arg checksum "$checksum" \
              --arg sourceUrl "$source_url" \
              --arg changelog "$CHANGELOG" \
-             --arg targetAbi "10.8.0.0" \
+             --arg targetAbi "10.9.0.0" \
              --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
              'map(if .guid == $guid then
                .versions = [{
