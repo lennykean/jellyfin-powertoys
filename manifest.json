@@ -7,7 +7,16 @@
     "owner": "lennykean",
     "overview": "Automatically organize your library by cast and crew members.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "d4058ab606c1150cdd6ef7c222a46316",
+        "timestamp": "2025-10-13T07:13:22Z"
+      }
+    ]
   },
   {
     "category": "General",
@@ -17,7 +26,16 @@
     "owner": "lennykean",
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "55eccdc1bcf002be3a410077878df6ee",
+        "timestamp": "2025-10-13T07:13:24Z"
+      }
+    ]
   },
   {
     "category": "General",
@@ -27,7 +45,16 @@
     "owner": "lennykean",
     "overview": "Adds a privacy mode that hides content when activated.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "0d6666e70a281774e2ed8ab0fdb3c064",
+        "timestamp": "2025-10-13T07:13:23Z"
+      }
+    ]
   },
   {
     "category": "General",
@@ -37,7 +64,16 @@
     "owner": "lennykean",
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "937fcd6e95d1a575c612f1c4cdb12c20",
+        "timestamp": "2025-10-13T07:13:27Z"
+      }
+    ]
   },
   {
     "category": "General",
@@ -47,7 +83,16 @@
     "owner": "lennykean",
     "overview": "Adds thumbnail previews using videos.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "4a7cba04b289b81949e1fdff313f3043",
+        "timestamp": "2025-10-13T07:13:26Z"
+      }
+    ]
   },
   {
     "category": "General",
@@ -57,6 +102,15 @@
     "owner": "lennykean",
     "overview": "Cleans up the \"Continue Watching\" history after a specified time period.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "add publish workflow",
+        "targetAbi": "10.8.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.0.0.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "f0d301d52ba886587a08bd8faa135291",
+        "timestamp": "2025-10-13T07:13:25Z"
+      }
+    ]
   }
 ]
