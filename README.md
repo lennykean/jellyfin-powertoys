@@ -20,11 +20,20 @@ A collection of plugins to enhance Jellyfin media server with additional feature
 ## Plugins
 
 ### Thumbnail Previews
-**Adds thumbnail previews using videos.**
 
-- Creates thumbnail previews from video content
-- Configurable preview duration and frame timing
-- **Requires** trickplay image extraction to be enabled in library settings.
+**Adds thumbnail previews using trickplay images or trailers.**
+
+
+- **Slideshow Preview** - Cycles through trickplay images as an animated slideshow.
+- **Trailer Preview** - Plays a video trailer directly on the thumbnail.
+  - Uses local or remote trailers if available
+- **Hover Play** - Triggers previews or automatically on mouse hover
+
+---
+
+![Thumbnail Previews](screenshots/thumbnail-previews.gif)
+
+---
 
 ### Remote Trailers
 **Enables playback of remote trailers from any source.**
@@ -50,10 +59,14 @@ A collection of plugins to enhance Jellyfin media server with additional feature
 
 - Automatic cleanup of "Continue Watching" section
 - Customizable options control how long to keep history, and which users to target.
-
 ### Privacy Mode
+
 **Adds a privacy mode that hides content when activated.**
 
 - Adds a privacy blur to the Jellyfin interface
 - Optional reveal on hover
-- Toggle quickly via hotkeys
+- Toggle via hotkeys
+
+---
+
+![Privacy Mode](screenshots/privacy-mode.jpg)

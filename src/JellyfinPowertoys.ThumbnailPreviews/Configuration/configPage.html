@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -9,26 +9,23 @@
       <div data-role="content">
         <div class="content-primary">
           <h1>Thumbnail Previews</h1>
-          <p>This plugin adds thumbnail previews using videos.</p>
+          <p>Adds animated previews to media cards. Previews can use trickplay slideshows or video trailers.</p>
           <div class="fieldDescription" style="margin-bottom: 1.5em; padding: 0.75em; background-color: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107">
-            <strong>Note:</strong> This plugin requires Trickplay to be enabled on the Jellyfin server. Thumbnail previews will <i>not</i> be available for media items without
-            trickplay data.
+            <strong>Note:</strong> Slideshows require Trickplay to be enabled in your library settings. Trailer previews require local trailers or remote trailers that are
+            publically accessable.
           </div>
 
           <form id="ThumbnailPreviewsConfigForm" novalidate>
             <div class="inputContainer">
               <label class="inputLabel inputLabelUnfocused" for="PreviewDuration">Preview Duration (milliseconds)</label>
               <input id="PreviewDuration" name="PreviewDuration" type="number" min="0" step="1000" is="emby-input" />
-              <div class="fieldDescription">
-                Duration of thumbnail previews
-                <br />
-              </div>
+              <div class="fieldDescription">How long the slideshow plays before stopping</div>
             </div>
 
             <div class="inputContainer">
-              <label class="inputLabel inputLabelUnfocused" for="FrameMinDuration">Frame Minimum Duration (milliseconds)</label>
+              <label class="inputLabel inputLabelUnfocused" for="FrameMinDuration">Frame Duration (milliseconds)</label>
               <input id="FrameMinDuration" name="FrameMinDuration" type="number" min="0" step="100" is="emby-input" />
-              <div class="fieldDescription">Minimum duration of each frame in a preview</div>
+              <div class="fieldDescription">How long each frame is shown during a slideshow</div>
             </div>
 
             <div class="checkboxContainer checkboxContainer-withDescription">
@@ -37,7 +34,7 @@
                 <input id="LoopPreview" name="LoopPreview" type="checkbox" is="emby-checkbox" />
                 <span>Enable looping</span>
               </label>
-              <div class="fieldDescription">When enabled, thumbnail previews will loop continuously until clicked</div>
+              <div class="fieldDescription">Keep playing the preview until it's dismissed</div>
             </div>
 
             <div class="checkboxContainer checkboxContainer-withDescription">
@@ -46,13 +43,76 @@
                 <input id="AllResolutions" name="AllResolutions" type="checkbox" is="emby-checkbox" />
                 <span>Any Resolution</span>
               </label>
-              <div class="fieldDescription">When enabled, thumbnail previews will use the first available resolution</div>
+              <div class="fieldDescription">Use the first available trickplay resolution</div>
             </div>
 
             <div class="inputContainer" id="ResolutionsContainer">
               <label class="inputLabel inputLabelUnfocused" for="Resolutions">Resolutions (comma-separated)</label>
               <input id="Resolutions" name="Resolutions" type="text" is="emby-input" />
-              <div class="fieldDescription">List of resolutions (e.g., 1080,720,320) to use for thumbnail previews, in priority order</div>
+              <div class="fieldDescription">Preferred resolutions in priority order (e.g. 1080,720,320)</div>
+            </div>
+
+            <h2 style="margin-top: 2em">Trailer Previews</h2>
+            <p style="margin-bottom: 1em">Play video trailers on cards instead of trickplay slideshows.</p>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="inputLabel inputLabelUnfocused" for="ShowTrailerPreview">Show Trailer Preview</label>
+              <label class="emby-checkbox-label">
+                <input id="ShowTrailerPreview" name="ShowTrailerPreview" type="checkbox" is="emby-checkbox" />
+                <span>Enable trailer previews</span>
+              </label>
+              <div class="fieldDescription">Use trailers instead of slideshows when a playable trailer is available</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription" id="EnableTrailerLengthLimitContainer">
+              <label class="inputLabel inputLabelUnfocused" for="EnableTrailerLengthLimit">Limit Trailer Length</label>
+              <label class="emby-checkbox-label">
+                <input id="EnableTrailerLengthLimit" name="EnableTrailerLengthLimit" type="checkbox" is="emby-checkbox" />
+                <span>Enable length limit</span>
+              </label>
+              <div class="fieldDescription">Skip trailers longer than the maximum length below</div>
+            </div>
+
+            <div class="inputContainer" id="TrailerMaxLengthContainer">
+              <label class="inputLabel inputLabelUnfocused" for="TrailerMaxLengthSeconds">Maximum Trailer Length (seconds)</label>
+              <input id="TrailerMaxLengthSeconds" name="TrailerMaxLengthSeconds" type="number" min="10" step="10" is="emby-input" />
+              <div class="fieldDescription">Trailers longer than this are skipped (default: 60)</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription" id="OnlyShowSilentTrailersContainer">
+              <label class="inputLabel inputLabelUnfocused" for="OnlyShowSilentTrailers">Only Silent Trailers</label>
+              <label class="emby-checkbox-label">
+                <input id="OnlyShowSilentTrailers" name="OnlyShowSilentTrailers" type="checkbox" is="emby-checkbox" />
+                <span>Only show trailers without audio</span>
+              </label>
+              <div class="fieldDescription">Skip trailers that have an audio track</div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription" id="PlayTrailerAudioContainer">
+              <label class="inputLabel inputLabelUnfocused" for="PlayTrailerAudio">Play Trailer Audio</label>
+              <label class="emby-checkbox-label">
+                <input id="PlayTrailerAudio" name="PlayTrailerAudio" type="checkbox" is="emby-checkbox" />
+                <span>Enable audio playback</span>
+              </label>
+              <div class="fieldDescription">Unmute trailer audio (muted by default)</div>
+            </div>
+
+            <h2 style="margin-top: 2em">Hover Play</h2>
+            <p style="margin-bottom: 1em">Start previews automatically by hovering over an item.</p>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="inputLabel inputLabelUnfocused" for="EnableHoverPlay">Enable Hover Play</label>
+              <label class="emby-checkbox-label">
+                <input id="EnableHoverPlay" name="EnableHoverPlay" type="checkbox" is="emby-checkbox" />
+                <span>Auto-play on hover</span>
+              </label>
+              <div class="fieldDescription">Start previews after hovering over an item</div>
+            </div>
+
+            <div class="inputContainer" id="MouseLingerDelayContainer">
+              <label class="inputLabel inputLabelUnfocused" for="MouseLingerDelay">Mouse Linger Delay (milliseconds)</label>
+              <input id="MouseLingerDelay" name="MouseLingerDelay" type="number" min="500" max="10000" step="100" is="emby-input" />
+              <div class="fieldDescription">How long to hover before the preview starts (default: 800)</div>
             </div>
 
             <div>
@@ -83,6 +143,33 @@
           }
         }
 
+        function updateTrailerSettingsVisibility() {
+          var showTrailerPreview = document.querySelector("#ShowTrailerPreview").checked;
+          var enableLengthLimit = document.querySelector("#EnableTrailerLengthLimit").checked;
+
+          var trailerSettings = ["#EnableTrailerLengthLimitContainer", "#TrailerMaxLengthContainer", "#OnlyShowSilentTrailersContainer", "#PlayTrailerAudioContainer"];
+
+          trailerSettings.forEach(function (selector) {
+            var el = document.querySelector(selector);
+            if (el) {
+              el.style.display = showTrailerPreview ? "block" : "none";
+            }
+          });
+
+          var maxLengthContainer = document.querySelector("#TrailerMaxLengthContainer");
+          if (maxLengthContainer) {
+            maxLengthContainer.style.display = showTrailerPreview && enableLengthLimit ? "block" : "none";
+          }
+        }
+
+        function updateHoverPlayVisibility() {
+          var enableHoverPlay = document.querySelector("#EnableHoverPlay").checked;
+          var delayContainer = document.querySelector("#MouseLingerDelayContainer");
+          if (delayContainer) {
+            delayContainer.style.display = enableHoverPlay ? "block" : "none";
+          }
+        }
+
         document.querySelector("#ThumbnailPreviewsConfigPage").addEventListener("pageshow", function () {
           Dashboard.showLoadingMsg();
           ApiClient.getPluginConfiguration(ThumbnailPreviewsConfig.pluginUniqueId)
@@ -95,7 +182,18 @@
               document.querySelector("#AllResolutions").checked = allResolutions;
               document.querySelector("#Resolutions").value = config.Resolutions || "";
 
+              document.querySelector("#ShowTrailerPreview").checked = config.ShowTrailerPreview !== false;
+              document.querySelector("#EnableTrailerLengthLimit").checked = config.EnableTrailerLengthLimit !== false;
+              document.querySelector("#TrailerMaxLengthSeconds").value = config.TrailerMaxLengthSeconds || 60;
+              document.querySelector("#OnlyShowSilentTrailers").checked = config.OnlyShowSilentTrailers || false;
+              document.querySelector("#PlayTrailerAudio").checked = config.PlayTrailerAudio || false;
+
+              document.querySelector("#EnableHoverPlay").checked = config.EnableHoverPlay || false;
+              document.querySelector("#MouseLingerDelay").value = config.MouseLingerDelay || 800;
+
               updateResolutionsVisibility();
+              updateTrailerSettingsVisibility();
+              updateHoverPlayVisibility();
               Dashboard.hideLoadingMsg();
             })
             .catch(function (error) {
@@ -105,6 +203,10 @@
         });
 
         document.querySelector("#AllResolutions").addEventListener("change", updateResolutionsVisibility);
+
+        document.querySelector("#ShowTrailerPreview").addEventListener("change", updateTrailerSettingsVisibility);
+        document.querySelector("#EnableTrailerLengthLimit").addEventListener("change", updateTrailerSettingsVisibility);
+        document.querySelector("#EnableHoverPlay").addEventListener("change", updateHoverPlayVisibility);
 
         document.querySelector("#ThumbnailPreviewsConfigForm").addEventListener("submit", function (e) {
           e.preventDefault();
@@ -143,6 +245,14 @@
             } else {
               config.Resolutions = document.querySelector("#Resolutions").value.trim() || null;
             }
+
+            config.ShowTrailerPreview = document.querySelector("#ShowTrailerPreview").checked;
+            config.EnableTrailerLengthLimit = document.querySelector("#EnableTrailerLengthLimit").checked;
+            config.TrailerMaxLengthSeconds = parseInt(document.querySelector("#TrailerMaxLengthSeconds").value) || 60;
+            config.OnlyShowSilentTrailers = document.querySelector("#OnlyShowSilentTrailers").checked;
+            config.PlayTrailerAudio = document.querySelector("#PlayTrailerAudio").checked;
+            config.EnableHoverPlay = document.querySelector("#EnableHoverPlay").checked;
+            config.MouseLingerDelay = parseInt(document.querySelector("#MouseLingerDelay").value) || 800;
 
             ApiClient.updatePluginConfiguration(ThumbnailPreviewsConfig.pluginUniqueId, config)
               .then(function (result) {

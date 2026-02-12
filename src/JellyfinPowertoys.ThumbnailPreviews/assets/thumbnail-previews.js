@@ -9,11 +9,16 @@
  * @property {number} Interval
  * @property {string} VideoId
  *
+ * @typedef {Object} TrailerInfo
+ * @property {string} Url
+ * @property {string} Name
+ *
  * @typedef {Object} Item
  * @property {string} Id
  * @property {string} ServerId
  * @property {number} RunTimeTicks
  * @property {{[itemId: string]: {[resolution: string]: TrickplayMetadata}}} Trickplay
+ * @property {TrailerInfo[]} RemoteTrailers
  *
  * @typedef {Object} Credentials
  * @property {string} Id
@@ -27,6 +32,13 @@
  * @property {boolean} LoopPreview
  * @property {number} FrameMinDuration
  * @property {string | null | undefined} Resolutions
+ * @property {boolean} ShowTrailerPreview
+ * @property {boolean} EnableTrailerLengthLimit
+ * @property {number} TrailerMaxLengthSeconds
+ * @property {boolean} OnlyShowSilentTrailers
+ * @property {boolean} PlayTrailerAudio
+ * @property {boolean} EnableHoverPlay
+ * @property {number} MouseLingerDelay
  */
 
 (() => {
@@ -87,7 +99,7 @@
     const url = new URL(`${credentials.serverUrl}/Items`);
     url.searchParams.set("ServerId", serverId);
     url.searchParams.set("Ids", itemId);
-    url.searchParams.set("Fields", "Trickplay");
+    url.searchParams.set("Fields", "Trickplay,RemoteTrailers");
     url.searchParams.set("api_key", credentials.apiKey);
 
     const response = await fetch(url);
@@ -232,8 +244,8 @@
                 img.onload = () => resolve(img);
                 img.onerror = (err) => reject(err);
                 img.src = url;
-              })
-          )
+              }),
+          ),
       );
       const framesNeeded = Math.floor(settings.PreviewDuration / frameDuration);
       if (frameCount > framesNeeded) {
@@ -273,10 +285,263 @@
   }
 
   /**
-   * @param {Item} item
-   * @param {string} resolution
+   * @param {string} url
+   * @returns {boolean}
    */
-  async function createPlayer(item, resolution) {
+  function isValidUrl(url) {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * @param {string} url
+   * @param {Settings} settings
+   * @returns {Promise<{valid: boolean, duration?: number}>}
+   */
+  async function verifyTrailerUrl(url, settings) {
+    try {
+      const headResponse = await fetch(url, { method: "HEAD", mode: "cors" });
+      if (!headResponse.ok) {
+        return { valid: false };
+      }
+      const contentType = headResponse.headers.get("content-type") || "";
+      if (!contentType.startsWith("video/")) {
+        return { valid: false };
+      }
+    } catch (e) {
+      console.debug("HEAD check failed, falling back to video probe", e);
+    }
+
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.crossOrigin = "anonymous";
+
+      const cleanup = () => {
+        video.removeAttribute("src");
+        video.load();
+      };
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        resolve({ valid: false });
+      }, 15000);
+
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        clearTimeout(timeout);
+        cleanup();
+
+        if (settings.EnableTrailerLengthLimit && duration > settings.TrailerMaxLengthSeconds) {
+          resolve({ valid: false });
+          return;
+        }
+
+        resolve({ valid: true, duration });
+      };
+
+      video.onerror = () => {
+        clearTimeout(timeout);
+        cleanup();
+        resolve({ valid: false });
+      };
+
+      video.src = url;
+    });
+  }
+
+  /**
+   * @param {string} url
+   * @returns {Promise<boolean>}
+   */
+  function hasAudioTrack(url) {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.crossOrigin = "anonymous";
+
+      const cleanup = () => {
+        video.removeAttribute("src");
+        video.load();
+      };
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        resolve(true);
+      }, 10000);
+
+      video.onloadedmetadata = () => {
+        clearTimeout(timeout);
+
+        if (typeof video.audioTracks !== "undefined") {
+          const result = video.audioTracks.length > 0;
+          cleanup();
+          resolve(result);
+          return;
+        }
+
+        const captureStream = video.captureStream || video.mozCaptureStream;
+        if (captureStream) {
+          try {
+            const stream = captureStream.call(video);
+            const result = stream.getAudioTracks().length > 0;
+            stream.getTracks().forEach((t) => t.stop());
+            cleanup();
+            resolve(result);
+            return;
+          } catch (e) {
+            console.debug("captureStream audio check failed", e);
+          }
+        }
+
+        cleanup();
+        resolve(true);
+      };
+
+      video.onerror = () => {
+        clearTimeout(timeout);
+        cleanup();
+        resolve(true);
+      };
+
+      video.src = url;
+    });
+  }
+
+  /**
+   * @param {Item} item
+   * @param {Settings} settings
+   * @returns {Promise<string | null>}
+   */
+  async function getValidTrailerUrl(item, settings) {
+    if (!settings.ShowTrailerPreview) {
+      return null;
+    }
+
+    const credentials = getCredentials(item.ServerId);
+    if (!credentials) {
+      return null;
+    }
+
+    // Try local trailers
+    try {
+      const localTrailersUrl = `${credentials.serverUrl}/Users/${credentials.userId}/Items/${item.Id}/LocalTrailers?api_key=${credentials.apiKey}`;
+      const response = await fetch(localTrailersUrl);
+      if (response.ok) {
+        const localTrailers = await response.json();
+        for (const trailer of localTrailers) {
+          const durationTicks = trailer.RunTimeTicks ?? trailer.MediaSources?.[0]?.RunTimeTicks ?? 0;
+          const durationSeconds = durationTicks ? durationTicks / 10000000 : 0;
+          if (settings.EnableTrailerLengthLimit && durationSeconds > settings.TrailerMaxLengthSeconds) {
+            console.debug("Local trailer too long, skipping", { id: trailer.Id, duration: durationSeconds });
+            continue;
+          }
+          const mediaSourceId = trailer.MediaSources?.[0]?.Id ?? trailer.Id;
+          const container = trailer.MediaSources?.[0]?.Container ?? trailer.Container ?? "mp4";
+          const streamUrl = `${credentials.serverUrl}/Videos/${trailer.Id}/stream.${container}?Static=true&mediaSourceId=${mediaSourceId}&api_key=${credentials.apiKey}`;
+          console.debug("Found valid local trailer", { id: trailer.Id, name: trailer.Name, duration: durationSeconds, streamUrl });
+          return streamUrl;
+        }
+      }
+    } catch (err) {
+      console.debug("Local trailer check failed", err);
+    }
+
+    const trailers = item.RemoteTrailers || [];
+
+    for (const trailer of trailers) {
+      if (!trailer.Url || !isValidUrl(trailer.Url)) {
+        continue;
+      }
+
+      const verification = await verifyTrailerUrl(trailer.Url, settings);
+      if (!verification.valid) {
+        continue;
+      }
+
+      console.debug("Found valid trailer", { url: trailer.Url, duration: verification.duration });
+      return trailer.Url;
+    }
+
+    return null;
+  }
+
+  /**
+   * @param {Node} container
+   * @param {string} trailerUrl
+   * @param {Settings} settings
+   * @returns {Promise<boolean>}
+   */
+  async function playTrailerPreview(container, trailerUrl, settings) {
+    if (settings.OnlyShowSilentTrailers) {
+      const audioDetected = await hasAudioTrack(trailerUrl);
+      if (audioDetected) {
+        console.debug("Trailer has audio, skipping (OnlyShowSilentTrailers)", trailerUrl);
+        return false;
+      }
+    }
+
+    let cancel = false;
+    const cancelHandler = () => (cancel = true);
+
+    const videoContainer = document.createElement("div");
+    videoContainer.className = "trailer-container";
+
+    const video = document.createElement("video");
+    video.className = "trailer-video";
+    video.src = trailerUrl;
+    video.muted = !settings.PlayTrailerAudio;
+    video.loop = settings.LoopPreview;
+    video.playsInline = true;
+    if (!trailerUrl.startsWith(location.origin)) {
+      video.crossOrigin = "anonymous";
+    }
+
+    videoContainer.appendChild(video);
+    container.appendChild(videoContainer);
+    container.classList.add("playing");
+    container.classList.add("playing-trailer");
+    setTimeout(() => container.addEventListener("click", cancelHandler), 0);
+
+    try {
+      await video.play();
+
+      await new Promise((resolve) => {
+        const checkEnd = () => {
+          if (cancel || video.ended) {
+            resolve();
+          } else {
+            requestAnimationFrame(checkEnd);
+          }
+        };
+        video.addEventListener("ended", resolve, { once: true });
+        checkEnd();
+      });
+    } catch (error) {
+      console.error("Error playing trailer preview", error);
+    } finally {
+      video.pause();
+      video.src = "";
+      videoContainer.removeChild(video);
+      container.removeChild(videoContainer);
+      container.removeEventListener("click", cancelHandler);
+      container.classList.remove("playing");
+      container.classList.remove("playing-trailer");
+    }
+
+    return true;
+  }
+
+  /**
+   * @param {Item} item
+   * @param {string | null} resolution
+   * @param {string | null} trailerUrl
+   */
+  async function createPlayer(item, resolution, trailerUrl) {
     const container = document.createElement("div");
     container.className = "preview-player";
 
@@ -287,7 +552,13 @@
     const play = async () => {
       playButton.removeEventListener("click", play);
       try {
-        await playPreview(container, item, settings, resolution);
+        let played = false;
+        if (trailerUrl) {
+          played = await playTrailerPreview(container, trailerUrl, settings);
+        }
+        if (!played && resolution) {
+          await playPreview(container, item, settings, resolution);
+        }
       } finally {
         playButton.addEventListener("click", play);
       }
@@ -296,7 +567,8 @@
     container.appendChild(playButton);
 
     const icon = document.createElement("img");
-    icon.setAttribute("src", "https://unpkg.com/lucide-static@latest/icons/image-play.svg");
+    const iconName = trailerUrl ? "clapperboard" : "image-play";
+    icon.setAttribute("src", `https://unpkg.com/lucide-static@latest/icons/${iconName}.svg`);
     playButton.appendChild(icon);
 
     return container;
@@ -350,27 +622,91 @@
     const serverId = node.getAttribute("data-serverid");
 
     const item = await queryTrickplayMetadata(itemId, serverId);
-    if (!item?.Trickplay?.[itemId]) {
+    if (!item) {
       return;
     }
-    const settings = await getSettings(serverId);
-    let resolution;
-    if (settings.Resolutions) {
-      for (const key of settings.Resolutions.split(",").map((key) => key.trim())) {
-        if (item.Trickplay[item.Id][key]) {
-          resolution = key;
-          break;
-        }
-      }
-    } else {
-      resolution = Object.keys(item.Trickplay[item.Id])[0];
-    }
-    if (!resolution) {
-      return;
-    }
-    const playerContainer = await createPlayer(item, resolution);
 
+    const settings = await getSettings(serverId);
+
+    let trailerUrl = null;
+    try {
+      trailerUrl = await getValidTrailerUrl(item, settings);
+    } catch (err) {
+      console.debug("Trailer check failed", err);
+    }
+
+    let resolution = null;
+    if (item.Trickplay?.[itemId]) {
+      if (settings.Resolutions) {
+        for (const key of settings.Resolutions.split(",").map((key) => key.trim())) {
+          if (item.Trickplay[item.Id][key]) {
+            resolution = key;
+            break;
+          }
+        }
+      } else {
+        resolution = Object.keys(item.Trickplay[item.Id])[0];
+      }
+    }
+
+    if (!trailerUrl && !resolution) {
+      return;
+    }
+
+    const playerContainer = await createPlayer(item, resolution, trailerUrl);
     container.appendChild(playerContainer);
+
+    if (settings.EnableHoverPlay) {
+      let lingerTimeout = null;
+      let cooldownActive = false;
+      let cooldownTimer = null;
+      let mouseLeft = false;
+
+      const startCooldown = () => {
+        cooldownActive = true;
+        mouseLeft = false;
+        clearTimeout(cooldownTimer);
+        cooldownTimer = setTimeout(
+          () => {
+            if (mouseLeft) {
+              cooldownActive = false;
+            } else {
+              cooldownTimer = null;
+            }
+          },
+          (settings.MouseLingerDelay || 800) * 2,
+        );
+      };
+
+      const observer = new MutationObserver(() => {
+        if (!playerContainer.classList.contains("playing") && !cooldownActive) return;
+        if (!playerContainer.classList.contains("playing")) {
+          startCooldown();
+        }
+      });
+      observer.observe(playerContainer, { attributes: true, attributeFilter: ["class"] });
+
+      node.addEventListener("mouseenter", () => {
+        if (playerContainer.classList.contains("playing")) return;
+        if (cooldownActive) return;
+        lingerTimeout = setTimeout(() => {
+          playerContainer.querySelector(".play-button")?.click();
+        }, settings.MouseLingerDelay || 800);
+      });
+      node.addEventListener("mouseleave", () => {
+        if (lingerTimeout) {
+          clearTimeout(lingerTimeout);
+          lingerTimeout = null;
+        }
+        if (cooldownActive) {
+          if (!cooldownTimer) {
+            cooldownActive = false;
+          } else {
+            mouseLeft = true;
+          }
+        }
+      });
+    }
   }
 
   const querySelector = "[data-mediatype=Video]";
