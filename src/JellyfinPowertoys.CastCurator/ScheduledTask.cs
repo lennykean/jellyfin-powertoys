@@ -46,10 +46,11 @@ public class ScheduledTask(
         var itemRoleCache = new Dictionary<Guid, ILookup<string, PersonInfo>>();
 
         var peopleCollectionsFolder = await libraryManager.GetCustomCollectionsFolderAsync("People", appPaths.DataPath, libraryMonitor);
-        var people = libraryManager.GetPeopleItems(new() { }).ToDictionary(k => k.Name, v => v);
+        var people = libraryManager.GetPeopleItems(new() { }).GroupBy(x => x.Name).ToDictionary(g => g.Key, g => g.First());
         var collections = libraryManager.GetItemList(new() { ParentId = peopleCollectionsFolder.Id, })
             .OfType<BoxSet>()
-            .ToDictionary(k => k.Name, v => v);
+            .GroupBy(x => x.Name)
+            .ToDictionary(g => g.Key, g => g.First());
         var personCollections = (
             from name in people.Select(p => p.Key).Union(collections.Select(c => c.Key))
             let person = people.TryGetValue(name, out var p) ? p : null

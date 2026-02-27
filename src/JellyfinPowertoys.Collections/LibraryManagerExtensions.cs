@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -106,13 +107,14 @@ public static class LibraryManagerExtensions
             }, cancellationToken);
             await from.UpdateToRepositoryAsync(metadataUpdateType, cancellationToken);
         }
+        var imagesToRemove = new List<ItemImageInfo>();
         for (var i = 0; i < Math.Max(from.ImageInfos.Length, to.ImageInfos.Length); i++)
         {
             var fromImage = from.ImageInfos.Length > i ? from.ImageInfos[i] : null;
             var toImage = to.ImageInfos.Length > i ? to.ImageInfos[i] : null;
             if (toImage is not null && fromImage is null && force)
             {
-                to.RemoveImage(toImage);
+                imagesToRemove.Add(toImage);
                 updateType |= ItemUpdateType.ImageUpdate;
             }
             else if (fromImage is not null && (toImage is null || (force && (fromImage.Type != toImage?.Type || fromImage.Path != toImage?.Path))))
@@ -120,6 +122,10 @@ public static class LibraryManagerExtensions
                 to.SetImage(new() { Path = fromImage.Path, Type = fromImage.Type, }, i);
                 updateType |= ItemUpdateType.ImageUpdate;
             }
+        }
+        foreach (var image in imagesToRemove)
+        {
+            to.RemoveImage(image);
         }
         if (to.Overview is null || (force && from.Overview != to.Overview))
         {

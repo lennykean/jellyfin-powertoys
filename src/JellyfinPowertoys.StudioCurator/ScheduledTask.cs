@@ -45,10 +45,11 @@ public class ScheduledTask(
 
         var errors = new List<Exception>();
         var studioCollectionsFolder = await libraryManager.GetCustomCollectionsFolderAsync("Studios", appPaths.DataPath, libraryMonitor);
-        var studios = libraryManager.GetStudios(new() { }).Items.ToDictionary(k => k.Item.Name, v => (Studio)v.Item);
+        var studios = libraryManager.GetStudios(new() { }).Items.GroupBy(x => x.Item.Name).ToDictionary(g => g.Key, g => (Studio)g.First().Item);
         var collections = libraryManager.GetItemList(new() { ParentId = studioCollectionsFolder.Id, })
             .OfType<BoxSet>()
-            .ToDictionary(k => k.Name, v => v);
+            .GroupBy(x => x.Name)
+            .ToDictionary(g => g.Key, g => g.First());
         var studioCollections = (
             from name in studios.Select(p => p.Key).Union(collections.Select(c => c.Key))
             let studio = studios.TryGetValue(name, out var p) ? p : null
