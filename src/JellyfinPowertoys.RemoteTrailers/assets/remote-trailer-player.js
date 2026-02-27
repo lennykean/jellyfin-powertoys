@@ -51,14 +51,14 @@ class RemoteTrailerVideoPlayer {
       this.#player.addEventListener("ended", () => this.#events.trigger(this, "stopped"));
       this.#player.addEventListener("error", (error) => console.error("error playing trailer", options, error));
       await this.#appRouter.showVideoOsd();
-    });
+    }, { once: true });
     return this.#player.play();
   };
   stop = async (destroy) => {
+    this.#player?.pause();
     if (destroy) {
       this.destroy();
     }
-    this.#player?.pause();
   };
   currentTime = (value) => {
     if (this.#player && value != null) {

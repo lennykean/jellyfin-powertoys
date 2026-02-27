@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -22,7 +23,10 @@ namespace JellyfinPowertoys.RemoteTrailers
                 pluginsArray = [];
                 config["plugins"] = pluginsArray;
             }
-            pluginsArray.Add(pluginName);
+            if (!pluginsArray.Any(node => node?.GetValue<string>() == pluginName))
+            {
+                pluginsArray.Add(pluginName);
+            }
 
             using var buffer = new MemoryStream();
             using (var writer = new Utf8JsonWriter(buffer))
