@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "9ddfd51c88a286bc383d9dfca46b2319",
+        "timestamp": "2026-03-01T07:04:43Z"
+      },
+      {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
         "targetAbi": "10.9.0.0",
@@ -35,6 +43,14 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "66d7a8ad0ec3b9f194470ee5be4f7762",
+        "timestamp": "2026-03-01T07:04:44Z"
+      },
       {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
@@ -63,6 +79,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "99d6723d97c2f8b84600b5a37076019a",
+        "timestamp": "2026-03-01T07:04:44Z"
+      },
+      {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
         "targetAbi": "10.9.0.0",
@@ -89,6 +113,14 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "1be500f426aab15111eb8253b792dae5",
+        "timestamp": "2026-03-01T07:04:46Z"
+      },
       {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
@@ -117,6 +149,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "194bfbf813385d2e8b78bda572517a07",
+        "timestamp": "2026-03-01T07:04:46Z"
+      },
+      {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
         "targetAbi": "10.9.0.0",
@@ -143,6 +183,14 @@
     "overview": "Cleans up the \"Continue Watching\" history after a specified time period.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.1.0",
+        "changelog": "add config validation to watch history janitor",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.1.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "f45c22114080e3cab223e7a1849221de",
+        "timestamp": "2026-03-01T07:04:45Z"
+      },
       {
         "version": "1.1.0.0",
         "changelog": "add trailer previews and screenshots",
