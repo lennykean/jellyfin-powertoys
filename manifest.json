@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "8fecd87fcb1d6acdefafd6886257e259",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
         "version": "1.1.4.0",
         "changelog": "fix publish",
         "targetAbi": "10.9.0.0",
@@ -59,6 +67,14 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "7e912a28db713cbfdbbcfa7521c5fbfa",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
       {
         "version": "1.1.4.0",
         "changelog": "fix publish",
@@ -111,6 +127,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "cc0e431cb496e69d965d1f1d1adb9814",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
         "version": "1.1.4.0",
         "changelog": "fix publish",
         "targetAbi": "10.9.0.0",
@@ -161,6 +185,14 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "60fc10749ff28d3a6baaf6ec8aa8db8c",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
       {
         "version": "1.1.4.0",
         "changelog": "fix publish",
@@ -213,6 +245,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "811967bfd569bb7d71090e7100e0c0b2",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
         "version": "1.1.4.0",
         "changelog": "fix publish",
         "targetAbi": "10.9.0.0",
@@ -263,6 +303,14 @@
     "overview": "Cleans up the \"Continue Watching\" history after a specified time period.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "edcf0cac7e0248ac2715143917ffb01a",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
       {
         "version": "1.1.4.0",
         "changelog": "fix publish",
