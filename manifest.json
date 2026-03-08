@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "28edf02ad946ecf5af1b808f643cd939",
+        "timestamp": "2026-03-08T19:50:45Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -43,6 +51,14 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "202498659b57ade8d46d0f1c54c3f683",
+        "timestamp": "2026-03-08T19:50:47Z"
+      },
       {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
@@ -79,6 +95,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "f2558d9800ed458fd674b01670377244",
+        "timestamp": "2026-03-08T19:50:46Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -113,6 +137,14 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "bf8c783bf181acbb7af0843a694a5ba5",
+        "timestamp": "2026-03-08T19:50:49Z"
+      },
       {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
@@ -149,6 +181,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "ef8acc0349ccfc7220c35d100e8a13a4",
+        "timestamp": "2026-03-08T19:50:49Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -183,6 +223,14 @@
     "overview": "Cleans up the \"Continue Watching\" history after a specified time period.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "83b4aabf9f415a5058836335ba8b0bda",
+        "timestamp": "2026-03-08T19:50:48Z"
+      },
       {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
