@@ -14,13 +14,14 @@ jobs:
     - uses: actions/checkout@v5
     - uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
     - name: Set environment variables
       run: |
         VERSION=${{ github.ref_name }}
         VERSION_NUM=${VERSION#v}
         echo "VERSION_NUM=${VERSION_NUM}" >> $GITHUB_ENV
         echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
+        echo "TARGET_ABI=$(cat target_abi.txt | tr -d '[:space:]')" >> $GITHUB_ENV
       working-directory: .
     - run: dotnet restore
     - run: dotnet build --no-restore -c Release
@@ -50,13 +51,13 @@ jobs:
           plugin="${plugins[$guid]}"
 
           # Create zip
-          cd src/${plugin}/bin/Release/net8.0
+          cd src/${plugin}/bin/Release/net9.0
           zip ${plugin}.zip ${plugin}.dll
           cd ../../../../..
 
-          gh release upload "${{ github.ref_name }}" "src/${plugin}/bin/Release/net8.0/${plugin}.zip"
+          gh release upload "${{ github.ref_name }}" "src/${plugin}/bin/Release/net9.0/${plugin}.zip"
 
-          checksum=$(md5sum "src/${plugin}/bin/Release/net8.0/${plugin}.zip" | awk '{print $1}')
+          checksum=$(md5sum "src/${plugin}/bin/Release/net9.0/${plugin}.zip" | awk '{print $1}')
           source_url="https://github.com/${REPO}/releases/download/${{ github.ref_name }}/${plugin}.zip"
 
           jq --arg guid "$guid" \
@@ -64,7 +65,7 @@ jobs:
              --arg checksum "$checksum" \
              --arg sourceUrl "$source_url" \
              --arg changelog "$CHANGELOG" \
-             --arg targetAbi "10.9.0.0" \
+             --arg targetAbi "$TARGET_ABI" \
              --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
              'map(if .guid == $guid then
                .versions = [{

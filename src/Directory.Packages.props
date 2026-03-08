@@ -2,6 +2,6 @@
   <ItemGroup>
     <PackageVersion Include="HttpResponseTransformer" Version="0.1.2.11-prerelease" />
     <PackageVersion Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44" />
-    <PackageVersion Include="Jellyfin.Controller" Version="10.9.11" />
+    <PackageVersion Include="Jellyfin.Controller" Version="10.11.0" />
   </ItemGroup>
 </Project>

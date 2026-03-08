@@ -150,7 +150,7 @@ public class ScheduledTask(
     {
         yield return new()
         {
-            Type = TaskTriggerInfo.TriggerDaily,
+            Type = TaskTriggerInfoType.DailyTrigger,
             TimeOfDayTicks = 0,
         };
     }

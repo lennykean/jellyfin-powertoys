@@ -59,7 +59,7 @@ public class ScheduledTask(
             foreach (var item in libraryManager.GetItemList(new() { User = user, IsResumable = true }))
             {
                 var userItemData = userDataManager.GetUserData(user, item);
-                if (userItemData.LastPlayedDate < cutoff)
+                if (userItemData?.LastPlayedDate < cutoff)
                 {
                     logger.LogDebug(
                         "User {UserId} ({Username}) playback date {LastPlayedDate} for item {ItemId} ({ItemName}) is older than the cutoff, resetting it",
@@ -80,7 +80,7 @@ public class ScheduledTask(
     {
         yield return new()
         {
-            Type = TaskTriggerInfo.TriggerDaily,
+            Type = TaskTriggerInfoType.DailyTrigger,
             TimeOfDayTicks = 0,
         };
     }
