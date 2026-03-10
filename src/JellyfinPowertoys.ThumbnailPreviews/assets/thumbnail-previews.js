@@ -68,7 +68,7 @@
     const credentials = JSON.parse(storageItem);
 
     for (const server of credentials?.Servers ?? []) {
-      if (![server.ManualAddress, server.LocalAddress].includes(location.origin)) {
+      if (![server.ManualAddress, server.LocalAddress, server.RemoteAddress].includes(location.origin)) {
         continue;
       }
       if (server.Id !== serverId) {
@@ -76,7 +76,7 @@
       }
       return {
         serverId: server.Id,
-        serverUrl: server.ManualAddress || server.LocalAddress,
+        serverUrl: location.origin,
         apiKey: server.AccessToken,
         userId: server.UserId,
       };
@@ -100,9 +100,12 @@
     url.searchParams.set("ServerId", serverId);
     url.searchParams.set("Ids", itemId);
     url.searchParams.set("Fields", "Trickplay,RemoteTrailers");
-    url.searchParams.set("api_key", credentials.apiKey);
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `MediaBrowser Token="${credentials.apiKey}"`,
+      },
+    });
     if (!response.ok) {
       return;
     }
@@ -429,8 +432,10 @@
 
     // Try local trailers
     try {
-      const localTrailersUrl = `${credentials.serverUrl}/Users/${credentials.userId}/Items/${item.Id}/LocalTrailers?api_key=${credentials.apiKey}`;
-      const response = await fetch(localTrailersUrl);
+      const localTrailersUrl = `${credentials.serverUrl}/Users/${credentials.userId}/Items/${item.Id}/LocalTrailers`;
+      const response = await fetch(localTrailersUrl, {
+        headers: { Authorization: `MediaBrowser Token="${credentials.apiKey}"` },
+      });
       if (response.ok) {
         const localTrailers = await response.json();
         for (const trailer of localTrailers) {
@@ -583,7 +588,9 @@
     }
     const credentials = getCredentials(serverId);
     if (credentials) {
-      const response = await fetch(`${credentials.serverUrl}/Plugins/${PLUGIN_ID}/Configuration?api_key=${credentials.apiKey}`);
+      const response = await fetch(`${credentials.serverUrl}/Plugins/${PLUGIN_ID}/Configuration`, {
+        headers: { Authorization: `MediaBrowser Token="${credentials.apiKey}"` },
+      });
       if (response.ok) {
         _settings = await response.json();
       }

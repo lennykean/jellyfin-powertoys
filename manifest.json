@@ -9,6 +9,30 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "8fecd87fcb1d6acdefafd6886257e259",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "530e7712a35f14795aff264aef04cba1",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "28edf02ad946ecf5af1b808f643cd939",
+        "timestamp": "2026-03-08T19:50:45Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -43,6 +67,30 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "7e912a28db713cbfdbbcfa7521c5fbfa",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "8eeb737b4cb17f39a598b7d4bb6f2de1",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "202498659b57ade8d46d0f1c54c3f683",
+        "timestamp": "2026-03-08T19:50:47Z"
+      },
       {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
@@ -79,6 +127,30 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "cc0e431cb496e69d965d1f1d1adb9814",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "72e77b68472cbff4336ad45d04fa1fec",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "f2558d9800ed458fd674b01670377244",
+        "timestamp": "2026-03-08T19:50:46Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -113,6 +185,30 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "60fc10749ff28d3a6baaf6ec8aa8db8c",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "4bc2ff750820fc50b806875ef2799f9a",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "bf8c783bf181acbb7af0843a694a5ba5",
+        "timestamp": "2026-03-08T19:50:49Z"
+      },
       {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
@@ -149,6 +245,30 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "811967bfd569bb7d71090e7100e0c0b2",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "58031fe3d449f5ebb5c081bc76bee2b7",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "ef8acc0349ccfc7220c35d100e8a13a4",
+        "timestamp": "2026-03-08T19:50:49Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -184,6 +304,30 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.4.1",
+        "changelog": "set plugin assembly version",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.1/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "edcf0cac7e0248ac2715143917ffb01a",
+        "timestamp": "2026-03-08T21:00:18Z"
+      },
+      {
+        "version": "1.1.4.0",
+        "changelog": "fix publish",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.4.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "8a63c926868f51055c2c06c36e4d54fd",
+        "timestamp": "2026-03-08T20:42:34Z"
+      },
+      {
+        "version": "1.2.0.0",
+        "changelog": "upgrade to Jellyfin 10.11\n- Fixes #1",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.2.0.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "83b4aabf9f415a5058836335ba8b0bda",
+        "timestamp": "2026-03-08T19:50:48Z"
+      },
+      {
         "version": "1.1.1.0",
         "changelog": "add config validation to watch history janitor",
         "targetAbi": "10.9.0.0",
@@ -208,5 +352,15 @@
         "timestamp": "2025-10-13T07:13:25Z"
       }
     ]
+  },
+  {
+    "category": "General",
+    "guid": "36eb87e0-0373-423b-a547-2acb96e33430",
+    "name": "JellyTag",
+    "description": "Simplified tag management. Add, remove, and manage tags right from the context menu.",
+    "owner": "lennykean",
+    "overview": "Simplified tag management. Add, remove, and manage tags right from the context menu.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
   }
 ]

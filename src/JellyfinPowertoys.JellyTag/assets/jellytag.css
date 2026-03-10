@@ -1,0 +1,22 @@
+.jellytag-empty {
+  padding: 1em;
+  color: inherit;
+  opacity: 0.4;
+  font-size: 0.9em;
+}
+
+.jellytag-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.jellytag-input-row > .inputContainer {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.jellytag-dialog > .formDialogContent {
+  overflow-y: auto;
+}

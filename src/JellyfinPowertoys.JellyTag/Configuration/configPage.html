@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>JellyTag</title>
+  </head>
+  <body>
+    <div id="JellyTagConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-input">
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>JellyTag</h1>
+          <p>Simplified tag management. Add, remove, and manage tags right from the context menu.</p>
+
+          <h2>Quick Tags</h2>
+          <p>Define tags that appear as dedicated menu items for one-tap tagging.</p>
+
+          <div style="display: flex; align-items: flex-end; gap: 0.5em; margin-top: 1em">
+            <div class="inputContainer" style="flex: 1; margin-bottom: 0">
+              <label class="inputLabel" for="txtNewQuickTag">New quick tag</label>
+              <input is="emby-input" id="txtNewQuickTag" type="text" class="emby-input" />
+            </div>
+            <button is="emby-button" type="button" class="fab btnAddTextItem submit emby-button" id="btnAddQuickTag" title="Add">
+              <span class="material-icons add" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div id="quickTagsList" class="paperList" style="margin-top: 1em"></div>
+
+          <button is="emby-button" type="button" class="raised button-submit block emby-button" id="btnSaveQuickTags" style="margin-top: 1em">
+            <span>Save</span>
+          </button>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        const JellyTagConfig = {
+          pluginId: "36eb87e0-0373-423b-a547-2acb96e33430",
+          savedTags: [],
+          workingTags: [],
+        };
+
+        const renderQuickTags = () => {
+          const container = document.getElementById("quickTagsList");
+          container.innerHTML = "";
+
+          for (let i = 0; i < JellyTagConfig.workingTags.length; i++) {
+            const row = document.createElement("div");
+            row.className = "listItem";
+
+            const icon = document.createElement("span");
+            icon.className = "material-icons listItemIcon loyalty";
+            icon.setAttribute("aria-hidden", "true");
+            icon.style.backgroundColor = "rgba(255,255,255,0.1)";
+
+            const body = document.createElement("div");
+            body.className = "listItemBody";
+
+            const text = document.createElement("div");
+            text.className = "textValue";
+            text.textContent = JellyTagConfig.workingTags[i];
+            body.appendChild(text);
+
+            const index = i;
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.setAttribute("is", "paper-icon-button-light");
+            removeBtn.className = "btnRemoveFromEditorList autoSize paper-icon-button-light";
+            removeBtn.innerHTML = '<span class="material-icons delete" aria-hidden="true"></span>';
+            removeBtn.addEventListener("click", () => {
+              JellyTagConfig.workingTags.splice(index, 1);
+              renderQuickTags();
+              updateSaveButton();
+            });
+
+            row.appendChild(icon);
+            row.appendChild(body);
+            row.appendChild(removeBtn);
+            container.appendChild(row);
+          }
+        };
+
+        const updateSaveButton = () => {
+          const btn = document.getElementById("btnSaveQuickTags");
+          const sorted1 = JellyTagConfig.savedTags.slice().sort();
+          const sorted2 = JellyTagConfig.workingTags.slice().sort();
+          const same = JSON.stringify(sorted1) === JSON.stringify(sorted2);
+          btn.disabled = same;
+        };
+
+        const loadQuickTagsList = async () => {
+          try {
+            const config = await ApiClient.getPluginConfiguration(JellyTagConfig.pluginId);
+            JellyTagConfig.savedTags = (config.QuickTags || []).slice();
+            JellyTagConfig.workingTags = (config.QuickTags || []).slice();
+            renderQuickTags();
+            updateSaveButton();
+          } catch {
+            if (typeof Dashboard !== "undefined" && Dashboard.alert) {
+              Dashboard.alert("Failed to load configuration.");
+            }
+          }
+        };
+
+        let _jellyTagEventsBound = false;
+
+        document.querySelector("#JellyTagConfigPage").addEventListener("pageshow", () => {
+          loadQuickTagsList();
+
+          if (_jellyTagEventsBound) {
+            return;
+          }
+          _jellyTagEventsBound = true;
+
+          document.getElementById("btnAddQuickTag").addEventListener("click", () => {
+            const input = document.getElementById("txtNewQuickTag");
+            const tag = input.value.trim();
+            if (!tag) {
+              return;
+            }
+            const exists = JellyTagConfig.workingTags.some(t => t.toLowerCase() === tag.toLowerCase());
+            if (exists) {
+              if (typeof Dashboard !== "undefined" && Dashboard.alert) {
+                Dashboard.alert("Quick tag already exists.");
+              }
+              return;
+            }
+            JellyTagConfig.workingTags.push(tag);
+            input.value = "";
+            renderQuickTags();
+            updateSaveButton();
+          });
+
+          document.getElementById("txtNewQuickTag").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              document.getElementById("btnAddQuickTag").click();
+            }
+          });
+
+          document.getElementById("btnSaveQuickTags").addEventListener("click", async function () {
+            const btn = this;
+            btn.disabled = true;
+            try {
+              const config = await ApiClient.getPluginConfiguration(JellyTagConfig.pluginId);
+              config.QuickTags = JellyTagConfig.workingTags.slice();
+              await ApiClient.updatePluginConfiguration(JellyTagConfig.pluginId, config);
+              JellyTagConfig.savedTags = JellyTagConfig.workingTags.slice();
+              updateSaveButton();
+              if (typeof Dashboard !== "undefined" && Dashboard.alert) {
+                Dashboard.alert("Quick tags saved.");
+              }
+            } catch {
+              btn.disabled = false;
+              if (typeof Dashboard !== "undefined" && Dashboard.alert) {
+                Dashboard.alert("Failed to save quick tags.");
+              }
+            }
+          });
+        });
+      </script>
+    </div>
+  </body>
+</html>

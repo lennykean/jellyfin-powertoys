@@ -59,6 +59,21 @@ A collection of plugins to enhance Jellyfin media server with additional feature
 
 - Automatic cleanup of "Continue Watching" section
 - Customizable options control how long to keep history, and which users to target.
+
+### JellyTag
+
+**Simplified tag management. Add, remove, and manage tags right from the context menu.**
+
+- **Quick Tags** - Pin your most-used tags to the context menu for one-click tagging
+- **Add/Remove Tags** - Add new tags or remove existing ones right from the context menu
+- **Bulk Editing** - Select multiple items and edit all their tags at once
+
+---
+
+![JellyTag](screenshots/jellytag.gif)
+
+---
+
 ### Privacy Mode
 
 **Adds a privacy mode that hides content when activated.**
