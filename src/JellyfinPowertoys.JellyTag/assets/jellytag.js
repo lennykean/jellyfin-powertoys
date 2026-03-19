@@ -47,7 +47,7 @@
       }
       quickTags = (config && config.QuickTags) || [];
     } catch (e) {
-      console.warn("[JellyTag] Failed to load plugin config:", e);
+      console.error("[JellyTag] Failed to load plugin config:", e);
       quickTags = [];
     }
   }
@@ -625,7 +625,7 @@
 
   let quickTagInFlight = false;
 
-  async function injectMenuButtons(actionSheet) {
+  function injectMenuButtons(actionSheet) {
     if (actionSheet.hasAttribute(MARKER_ATTR)) {
       return;
     }
@@ -635,8 +635,11 @@
       actionSheet.setAttribute(MARKER_ATTR, "true");
 
       const capturedSingleId = getSingleItemId();
+      const selectedIds = getSelectedItemIds();
 
-      await loadQuickTags();
+      if (!capturedSingleId && selectedIds.length === 0) {
+        return;
+      }
 
       const buttons = actionSheet.querySelectorAll("button");
       let anchorButton = null;
@@ -787,9 +790,21 @@
       true,
     );
 
-    startObserver();
+    await loadQuickTags();
 
-    console.log("[JellyTag] Initialized.");
+    const originalPushState = history.pushState.bind(history);
+    history.pushState = function (...args) {
+      originalPushState(...args);
+      loadQuickTags();
+    };
+    const originalReplaceState = history.replaceState.bind(history);
+    history.replaceState = function (...args) {
+      originalReplaceState(...args);
+      loadQuickTags();
+    };
+    window.addEventListener("popstate", () => loadQuickTags());
+
+    startObserver();
   }
 
   if (document.readyState === "loading") {
