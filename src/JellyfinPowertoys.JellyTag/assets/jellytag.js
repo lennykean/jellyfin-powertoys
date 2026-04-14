@@ -607,7 +607,7 @@
   }
 
   function dismissActionSheet() {
-    const actionSheet = document.querySelector(".actionSheet");
+    const actionSheet = document.querySelector(".actionSheetContent");
     if (!actionSheet) {
       return;
     }
@@ -733,7 +733,7 @@
   }
 
   function tryInjectIntoActionSheets() {
-    const sheets = document.querySelectorAll(".actionSheet");
+    const sheets = document.querySelectorAll(".actionSheet, .actionSheetContent");
     for (const sheet of sheets) {
       injectMenuButtons(sheet);
     }
