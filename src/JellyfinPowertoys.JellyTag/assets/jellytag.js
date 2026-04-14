@@ -582,32 +582,27 @@
     }
   }
 
-  function createMenuButton(iconName, label, onClick) {
-    const btn = document.createElement("button");
-    btn.setAttribute("is", "paper-icon-button-light");
-    btn.className = "btnOption listItem listItem-button actionSheetMenuItem emby-button";
+function createMenuButton(iconName, label, onClick) {
+  const btn = document.createElement("button");
+  btn.setAttribute("is", "paper-icon-button-light");
+  btn.className = "btnOption listItem listItem-button actionSheetMenuItem emby-button paper-icon-button-light";
 
-    const icon = document.createElement("span");
-    icon.className = "actionsheetMenuItemIcon listItemIcon listItemIcon-transparent material-icons " + iconName;
+  btn.innerHTML = `
+    <span class="actionsheetMenuItemIcon listItemIcon listItemIcon-transparent material-icons ${iconName}"></span>
+    <span class="actionSheetItemText">${label}</span>
+  `;
 
-    const text = document.createElement("span");
-    text.className = "actionSheetItemText";
-    text.textContent = label;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  });
 
-    btn.appendChild(icon);
-    btn.appendChild(text);
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClick();
-    });
-
-    return btn;
-  }
+  return btn;
+}
 
   function dismissActionSheet() {
-    const actionSheet = document.querySelector(".actionSheet");
+    const actionSheet = document.querySelector(".actionSheetContent");
     if (!actionSheet) {
       return;
     }
@@ -733,7 +728,7 @@
   }
 
   function tryInjectIntoActionSheets() {
-    const sheets = document.querySelectorAll(".actionSheet");
+    const sheets = document.querySelectorAll(".actionSheetContent");
     for (const sheet of sheets) {
       injectMenuButtons(sheet);
     }
