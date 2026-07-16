@@ -40,7 +40,7 @@ public class ScheduledTask(
         var cutoff = DateTime.UtcNow - Plugin.Instance!.Configuration.ExpireAfter;
         var userFilter = new Regex(Plugin.Instance!.Configuration.UsernameFilter, RegexOptions.IgnoreCase);
         var users = (
-            from user in userManager.Users
+            from user in userManager.GetUsers()
             where userFilter.IsMatch(user.Username)
             select user).ToList();
 
