@@ -3,73 +3,63 @@
   const TAP_TIMEOUT = 300;
   const PRIVACY_MODE_CLASS = "powertoysPrivacyMode";
   const NO_REVEAL_CLASS = "noReveal";
+  const keys = ["KeyA", "KeyS", "KeyD", "KeyF", "KeyJ", "KeyK", "KeyL", "Semicolon"];
+  let firstTap = null;
+  let activationKey = null;
+  let hoverRevealKey = null;
 
-  async function listenForControlSequence(keys) {
-    while (true) {
-      const activationSequence = await listenForDoubleTap(keys);
-      if (!activationSequence || activationSequence.shiftKey) {
-        continue;
+  function onDoubleTap(event) {
+    if (!activationKey) {
+      if (!event.shiftKey) {
+        activationKey = event.code;
+        document.body.classList.add(PRIVACY_MODE_CLASS, NO_REVEAL_CLASS);
       }
-      document.body.classList.add(PRIVACY_MODE_CLASS, NO_REVEAL_CLASS);
-      while (true) {
-        let nextSequence = await listenForDoubleTap(keys);
-        if (!nextSequence) {
-          continue;
-        }
-        if (nextSequence.code !== activationSequence.code && !nextSequence.shiftKey) {
-          document.body.classList.remove(NO_REVEAL_CLASS);
-          let activateHoverRevealSequence = nextSequence;
-          while (true) {
-            nextSequence = await listenForDoubleTap(keys);
-            if (!nextSequence) {
-              continue;
-            }
-            if (nextSequence.code === activateHoverRevealSequence.code && nextSequence.shiftKey) {
-              document.body.classList.add(NO_REVEAL_CLASS);
-              break;
-            }
-            if (nextSequence.code === activationSequence.code && nextSequence.shiftKey) {
-              break;
-            }
-          }
-        }
-        if (nextSequence.code === activationSequence.code && nextSequence.shiftKey) {
-          document.body.classList.remove(PRIVACY_MODE_CLASS, NO_REVEAL_CLASS);
-          break;
-        }
-      }
-    }
-  }
-
-  async function listenForDoubleTap(keys) {
-    const keydown = await withTimeout(getNextKeydown(), TAP_TIMEOUT);
-    if (!keydown || !keys.includes(keydown.code)) {
       return;
     }
-    const secondKeydown = await withTimeout(getNextKeydown(), TAP_TIMEOUT);
-    if (!secondKeydown || secondKeydown.code !== keydown.code || secondKeydown.shiftKey !== keydown.shiftKey) {
+
+    if (event.shiftKey && event.code === activationKey) {
+      activationKey = null;
+      hoverRevealKey = null;
+      document.body.classList.remove(PRIVACY_MODE_CLASS, NO_REVEAL_CLASS);
+    } else if (hoverRevealKey) {
+      if (event.shiftKey && event.code === hoverRevealKey) {
+        hoverRevealKey = null;
+        document.body.classList.add(NO_REVEAL_CLASS);
+      }
+    } else if (!event.shiftKey && event.code !== activationKey) {
+      hoverRevealKey = event.code;
+      document.body.classList.remove(NO_REVEAL_CLASS);
+    }
+  }
+
+  document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (event.ctrlKey || event.altKey || event.metaKey || event.isComposing
+      || (target instanceof Element && (target.isContentEditable || target.closest("input, textarea, select")))) {
+      firstTap = null;
       return;
     }
-    return secondKeydown;
-  }
+    if (event.repeat) {
+      return;
+    }
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
+      return;
+    }
+    if (!keys.includes(event.code)) {
+      firstTap = null;
+      return;
+    }
 
-  function getNextKeydown() {
-    return new Promise((resolve) => {
-      const handler = (event) => {
-        if (event.target !== document.body) {
-          document.addEventListener("keydown", handler, { once: true });
-        } else {
-          resolve(event);
-        }
-      };
-      document.addEventListener("keydown", handler, { once: true });
-    });
-  }
+    const now = performance.now();
+    if (!firstTap || now - firstTap.time > TAP_TIMEOUT) {
+      firstTap = { code: event.code, shiftKey: event.shiftKey, time: now };
+      return;
+    }
 
-  function withTimeout(promise, timeout) {
-    const cancel = new Promise((resolve) => setTimeout(resolve, timeout));
-    return Promise.race([promise, cancel]);
-  }
-
-  listenForControlSequence(["KeyA", "KeyS", "KeyD", "KeyF", "KeyJ", "KeyK", "KeyL", "Semicolon"]);
+    if (firstTap.code === event.code && firstTap.shiftKey === event.shiftKey) {
+      onDoubleTap(event);
+    }
+    firstTap = null;
+  });
+  window.addEventListener("blur", () => { firstTap = null; });
 })();
