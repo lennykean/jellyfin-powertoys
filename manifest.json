@@ -10,7 +10,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "fix collections returning after deletion. collection saves finish before sync completes. collection-specific add/remove events are no longer emitted.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.CastCurator.zip",
         "checksum": "64791490c3b300f7a3b9908875e8f139",
@@ -18,7 +18,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.CastCurator.zip",
         "checksum": "67c07359182ce9fdcf99b4d7a08ed897",
@@ -26,7 +26,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.CastCurator.zip",
         "checksum": "75c5942a58d08b1c2d584f7302fac19a",
@@ -189,7 +189,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "fix collections returning after deletion. collection saves finish before sync completes. collection-specific add/remove events are no longer emitted.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.StudioCurator.zip",
         "checksum": "6c8eae74055387f820d75a3dd957963b",
@@ -197,7 +197,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.StudioCurator.zip",
         "checksum": "f78e57568cdf24054daba77e8740eb16",
@@ -205,7 +205,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.StudioCurator.zip",
         "checksum": "c41399d88c1a646d5934066bc9cb6bb4",
@@ -368,7 +368,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "fix shortcuts when buttons keep focus, including shift sequences, and update blur coverage.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.PrivacyMode.zip",
         "checksum": "5effe776ab39d3750371a4e81974838b",
@@ -376,7 +376,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.PrivacyMode.zip",
         "checksum": "ec413ce95fb1241fd649a11574e54d2f",
@@ -384,7 +384,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.PrivacyMode.zip",
         "checksum": "552245e504203e26317ec8491f189d40",
@@ -547,7 +547,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "fix native controls, settings, playback speed, playback info and cleanup for jellyfin 12.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.RemoteTrailers.zip",
         "checksum": "d6a8603099eaf0ad7fa064af62e2e443",
@@ -555,7 +555,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.RemoteTrailers.zip",
         "checksum": "d4835aa82bf102bcf4f643a0f4794f7d",
@@ -563,7 +563,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.RemoteTrailers.zip",
         "checksum": "4aa3e164d8a5d10de58b51c63b1e5b54",
@@ -726,7 +726,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "authenticated trickplay previews; fix preview settings for non-admin users, trailer fallback and cleanup. keep the original preview icons.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.ThumbnailPreviews.zip",
         "checksum": "ce6669f7727b1d352bdce477618161ca",
@@ -734,7 +734,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.ThumbnailPreviews.zip",
         "checksum": "f330e2fbb8e4fce00a60024dc5f66b48",
@@ -742,7 +742,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.ThumbnailPreviews.zip",
         "checksum": "141c2df019c4defee64d7ba2d1bfa25a",
@@ -905,7 +905,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "no plugin code changes.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
         "checksum": "cd928b82471e0daf16bdd6ccf1051815",
@@ -913,7 +913,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.WatchHistoryJanitor.zip",
         "checksum": "e34708f7a1186f9b51dc688c0fb068e2",
@@ -921,7 +921,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "no plugin code changes.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.WatchHistoryJanitor.zip",
         "checksum": "40f9b534e132639b8697f9d984bfc743",
@@ -1084,7 +1084,7 @@
     "versions": [
       {
         "version": "1.4.1.0",
-        "changelog": "update privacy mode for jellyfin 12",
+        "changelog": "fix season and bulk menu targeting and failed menu retries, and update the tag editor for jellyfin 12. native menus still work when overlapping requests leave the target uncertain; reload to restore tag actions.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.1.0/JellyfinPowertoys.JellyTag.zip",
         "checksum": "36f29bb2a355391c3286ec314f524f70",
@@ -1092,7 +1092,7 @@
       },
       {
         "version": "1.3.0.1",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "fix season and bulk menu targeting and failed menu retries. native menus still work when overlapping requests leave the target uncertain; reload to restore tag actions.",
         "targetAbi": "10.11.9.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.3.0.1/JellyfinPowertoys.JellyTag.zip",
         "checksum": "195f19d41daf89df8ada6d76ed1137da",
@@ -1100,7 +1100,7 @@
       },
       {
         "version": "1.1.7.2",
-        "changelog": "jellytag: fix season menus and failed menu retries",
+        "changelog": "fix season and bulk menu targeting and failed menu retries. native menus still work when overlapping requests leave the target uncertain; reload to restore tag actions.",
         "targetAbi": "10.9.0.0",
         "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.JellyTag.zip",
         "checksum": "779cf90ceaed47036f195f8c26816e1d",
