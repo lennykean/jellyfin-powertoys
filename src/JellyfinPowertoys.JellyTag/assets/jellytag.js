@@ -5,7 +5,12 @@
   const MARKER_ATTR = "data-jellytag-injected";
 
   let quickTags = [];
-  let lastMenuItemId = null;
+  let pendingMenuItemIds = null;
+  let awaitingMenuEvent = null;
+  let repeatedMenuRequest = false;
+  let menuContextAmbiguous = false;
+  let pendingMenuSession = null;
+  let pendingMenuServerId = null;
 
   function getCredentials() {
     const storageItem = localStorage.getItem("jellyfin_credentials");
@@ -86,18 +91,126 @@
     return ids;
   }
 
-  function getSingleItemId() {
-    const hash = window.location.hash || "";
-    const urlId = extractIdFromHref(hash);
-    if (urlId) {
-      return urlId;
-    }
+  function normalizeId(id) {
+    const value = (id || "").replace(/-/g, "");
+    return /^[a-f0-9]{32}$/i.test(value) ? value : null;
+  }
 
-    if (lastMenuItemId) {
-      return lastMenuItemId;
+  function getMenuItemIds(target, menuCommand = false) {
+    if (!target) {
+      return [];
     }
+    if (target.closest(".btnSelectionPanelOptions")) {
+      return getSelectedItemIds();
+    }
+    const menuButton = target.closest('[data-action="menu"], .btnMoreCommands');
+    if (!menuButton && !menuCommand) {
+      return [];
+    }
+    const card = (menuCommand ? target : menuButton).closest("[data-id]");
+    const cardId = normalizeId(card?.getAttribute("data-id"));
+    if (cardId) {
+      return [cardId];
+    }
+    if (menuCommand || !menuButton.matches(".btnMoreCommands")) {
+      return [];
+    }
+    const detailPage = menuButton.closest(".itemDetailPage");
+    if (!detailPage) {
+      return [];
+    }
+    const source = detailPage.querySelector(".selectSource");
+    const id = normalizeId(source?.value) || normalizeId(extractIdFromHref(window.location.hash));
+    return id ? [id] : [];
+  }
 
-    return null;
+  function getMenuSession() {
+    const client = window.ApiClient;
+    return { client, userId: client?.getCurrentUserId?.(), serverId: client?.serverId?.(), token: client?.accessToken?.() };
+  }
+
+  function isCurrentMenuSession(session) {
+    const current = getMenuSession();
+    return session && Object.keys(current).every((key) => current[key] === session[key]);
+  }
+
+  function requestMenu(ids, event) {
+    if (menuContextAmbiguous) {
+      return;
+    }
+    const session = getMenuSession();
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    let serverId;
+    if (target?.closest(".btnSelectionPanelOptions")) {
+      const servers = new Set([...document.querySelectorAll(".itemSelectionPanel input[type='checkbox']:checked, .chkItemSelect:checked, .itemSelectCheckbox:checked")]
+        .map((checkbox) => checkbox.closest("[data-serverid]")?.getAttribute("data-serverid")).filter(Boolean));
+      serverId = servers.size > 1 ? null : [...servers][0] || session.serverId;
+    } else {
+      const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
+      serverId = target?.closest("[data-serverid]")?.getAttribute("data-serverid") || params.get("serverId") || session.serverId;
+    }
+    if (awaitingMenuEvent) {
+      const sameTarget = ids.length && pendingMenuItemIds?.length
+        && ids.join(",") === pendingMenuItemIds.join(",")
+        && serverId && serverId === pendingMenuServerId
+        && isCurrentMenuSession(pendingMenuSession);
+      if (event.type === "command" && awaitingMenuEvent.type === "click" && awaitingMenuEvent.eventPhase !== 0
+        && sameTarget) {
+        return;
+      }
+      if (sameTarget) {
+        repeatedMenuRequest = true;
+        awaitingMenuEvent = event;
+      } else {
+        menuContextAmbiguous = true;
+        pendingMenuItemIds = null;
+        pendingMenuSession = null;
+      }
+      return;
+    }
+    awaitingMenuEvent = event;
+    pendingMenuItemIds = ids;
+    pendingMenuSession = session;
+    pendingMenuServerId = serverId;
+  }
+
+  function invalidateMenuContext() {
+    pendingMenuItemIds = null;
+    if (awaitingMenuEvent) {
+      repeatedMenuRequest = true;
+    }
+  }
+
+  function captureMenuEvent(event) {
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    if (event.type === "command") {
+      if (event.detail?.command === "menu") {
+        requestMenu(getMenuItemIds(target, true), event);
+      } else if (event.detail?.command === "back") {
+        invalidateMenuContext();
+      }
+    } else if (event.type === "contextmenu") {
+      const ids = getMenuItemIds(target, true);
+      const serverId = target?.closest("[data-serverid]")?.getAttribute("data-serverid") || getMenuSession().serverId;
+      if (awaitingMenuEvent && ids.length && pendingMenuItemIds?.length
+        && ids.join(",") === pendingMenuItemIds.join(",")
+        && serverId && serverId === pendingMenuServerId && isCurrentMenuSession(pendingMenuSession)) {
+        repeatedMenuRequest = true;
+      } else {
+        invalidateMenuContext();
+      }
+    } else if (event.type === "keydown" && event.key === "Escape") {
+      invalidateMenuContext();
+    } else if (event.type === "click" && target) {
+      const ids = getMenuItemIds(target);
+      const unownedMenu = target.closest(".btnToggleContextMenu")
+        || target.closest(".btnMore")?.closest(".formDialogHeader")?.parentElement?.querySelector(".editMetadataForm");
+      if (ids.length || unownedMenu || target.closest('[data-action="menu"], .btnMoreCommands, .btnSelectionPanelOptions')) {
+        requestMenu(ids, event);
+      } else if (!target.closest(".actionSheet")) {
+        invalidateMenuContext();
+      }
+    }
   }
 
   function cleanItemForUpdate(item) {
@@ -283,7 +396,6 @@
       this.dialog = document.createElement("div");
       this.dialog.className = "focuscontainer dialog dialog-fixedSize dialog-small formDialog opened jellytag-dialog";
 
-      // Header
       const header = document.createElement("div");
       header.className = "formDialogHeader";
 
@@ -629,14 +741,29 @@ function createMenuButton(iconName, label, onClick) {
     try {
       actionSheet.setAttribute(MARKER_ATTR, "true");
 
-      const capturedSingleId = getSingleItemId();
-      const selectedIds = getSelectedItemIds();
-
-      if (!capturedSingleId && selectedIds.length === 0) {
+      const buttons = actionSheet.querySelectorAll("button");
+      if (![...buttons].some((button) => ["multiSelect", "edit", "addtoplaylist", "playlist", "addtocollection", "editimages", "editsubtitles", "identify"].includes(button.getAttribute("data-id")))) {
+        return;
+      }
+      const itemIds = pendingMenuItemIds;
+      const session = pendingMenuSession;
+      if (menuContextAmbiguous || !isCurrentMenuSession(session)
+        || !pendingMenuServerId || pendingMenuServerId !== session.serverId) {
+        return;
+      }
+      if (!repeatedMenuRequest) {
+        awaitingMenuEvent = null;
+        pendingMenuItemIds = null;
+        pendingMenuSession = null;
+        pendingMenuServerId = null;
+      }
+      if (!itemIds?.length) {
+        return;
+      }
+      if (![...buttons].some((button) => ["edit", "addtoplaylist", "playlist", "addtocollection"].includes(button.getAttribute("data-id")))) {
         return;
       }
 
-      const buttons = actionSheet.querySelectorAll("button");
       let anchorButton = null;
 
       for (const btn of buttons) {
@@ -658,8 +785,9 @@ function createMenuButton(iconName, label, onClick) {
       const insertAfter = anchorButton || null;
 
       const tagDialogBtn = createMenuButton("local_offer", "Manage Tags", () => {
-        const multiIds = getSelectedItemIds();
-        const itemIds = multiIds.length > 0 ? multiIds : capturedSingleId ? [capturedSingleId] : [];
+        if (!isCurrentMenuSession(session)) {
+          return;
+        }
         dismissActionSheet();
         if (itemIds.length === 0) {
           showToast("No items found to tag.");
@@ -684,13 +812,14 @@ function createMenuButton(iconName, label, onClick) {
       let lastInserted = tagDialogBtn;
       for (const tag of quickTags) {
         const quickBtn = createMenuButton("loyalty", "+ " + tag, () => {
+          if (!isCurrentMenuSession(session)) {
+            return;
+          }
           if (quickTagInFlight) {
             showToast("Tagging in progress...");
             return;
           }
           quickTagInFlight = true;
-          const multiIds = getSelectedItemIds();
-          const itemIds = multiIds.length > 0 ? multiIds : capturedSingleId ? [capturedSingleId] : [];
           dismissActionSheet();
           if (itemIds.length === 0) {
             quickTagInFlight = false;
@@ -773,17 +902,11 @@ function createMenuButton(iconName, label, onClick) {
       return;
     }
 
-    document.addEventListener(
-      "click",
-      (e) => {
-        const menuBtn = e.target.closest('[data-action="menu"]');
-        if (menuBtn) {
-          const card = menuBtn.closest("[data-id]");
-          lastMenuItemId = card ? card.getAttribute("data-id") : null;
-        }
-      },
-      true,
-    );
+    for (const eventName of ["click", "command", "contextmenu", "keydown"]) {
+      document.addEventListener(eventName, captureMenuEvent, true);
+    }
+    window.addEventListener("hashchange", invalidateMenuContext);
+    window.addEventListener("popstate", invalidateMenuContext);
 
     await loadQuickTags();
 
