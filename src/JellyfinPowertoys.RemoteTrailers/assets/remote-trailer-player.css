@@ -9,6 +9,10 @@
   background: #000 !important;
 }
 
+.RemoteTrailersContainer-onTop {
+  z-index: 1000;
+}
+
 .RemoteTrailersContainer video {
   margin: 0 !important;
   padding: 0 !important;
