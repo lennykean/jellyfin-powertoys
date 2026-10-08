@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "75c5942a58d08b1c2d584f7302fac19a",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
+      {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
         "targetAbi": "12.1.0.0",
@@ -163,6 +171,14 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "c41399d88c1a646d5934066bc9cb6bb4",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
       {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
@@ -319,6 +335,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "552245e504203e26317ec8491f189d40",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
+      {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
         "targetAbi": "12.1.0.0",
@@ -473,6 +497,14 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "4aa3e164d8a5d10de58b51c63b1e5b54",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
       {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
@@ -629,6 +661,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "141c2df019c4defee64d7ba2d1bfa25a",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
+      {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
         "targetAbi": "12.1.0.0",
@@ -784,6 +824,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "40f9b534e132639b8697f9d984bfc743",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
+      {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
         "targetAbi": "12.1.0.0",
@@ -938,6 +986,14 @@
     "overview": "Simplified tag management. Add, remove, and manage tags right from the context menu.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.1.7.2",
+        "changelog": "jellytag: fix season menus and failed menu retries",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.1.7.2/JellyfinPowertoys.JellyTag.zip",
+        "checksum": "779cf90ceaed47036f195f8c26816e1d",
+        "timestamp": "2026-10-08T07:29:48Z"
+      },
       {
         "version": "1.4.0.0",
         "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
