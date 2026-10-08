@@ -3,125 +3,75 @@
 
   const PLUGIN_ID = "36eb87e0-0373-423b-a547-2acb96e33430";
   const MARKER_ATTR = "data-jellytag-injected";
-
-  let quickTags = [];
-  let pendingMenuItemIds = null;
+  const processingSheets = new WeakSet();
+  let pendingMenu = null;
   let awaitingMenuEvent = null;
   let repeatedMenuRequest = false;
   let menuContextAmbiguous = false;
   let pendingMenuSession = null;
-  let pendingMenuServerId = null;
-
-  function getCredentials() {
-    const storageItem = localStorage.getItem("jellyfin_credentials");
-    if (!storageItem) {
-      return null;
-    }
-    let credentials;
-    try {
-      credentials = JSON.parse(storageItem);
-    } catch (e) {
-      console.warn("[JellyTag] Failed to parse credentials from localStorage:", e);
-      return null;
-    }
-    for (const server of credentials?.Servers ?? []) {
-      if (![server.ManualAddress, server.LocalAddress, server.RemoteAddress].includes(location.origin)) {
-        continue;
-      }
-      return {
-        serverUrl: location.origin,
-        apiKey: server.AccessToken,
-      };
-    }
-    return null;
-  }
-
-  async function loadQuickTags() {
-    try {
-      const credentials = getCredentials();
-      let config = null;
-      if (credentials) {
-        const response = await fetch(`${credentials.serverUrl}/Plugins/${PLUGIN_ID}/Configuration`, {
-          headers: {
-            Authorization: `MediaBrowser Token="${credentials.apiKey}"`,
-          },
-        });
-        if (response.ok) {
-          config = await response.json();
-        }
-      }
-      quickTags = (config && config.QuickTags) || [];
-    } catch (e) {
-      console.error("[JellyTag] Failed to load plugin config:", e);
-      quickTags = [];
-    }
-  }
-
-  function extractIdFromHref(href) {
-    if (!href) {
-      return null;
-    }
-    const match = href.match(/[?&]id=([a-f0-9]+)/i);
-    return match ? match[1] : null;
-  }
-
-  function getSelectedItemIds() {
-    const ids = [];
-
-    const checkboxes = document.querySelectorAll(".itemSelectionPanel input[type='checkbox']:checked, .chkItemSelect:checked, .itemSelectCheckbox:checked");
-    for (const cb of checkboxes) {
-      const card = cb.closest("[data-id]");
-      if (card) {
-        const id = card.getAttribute("data-id");
-        if (id && !ids.includes(id)) {
-          ids.push(id);
-        }
-        continue;
-      }
-      const container = cb.closest(".card, .listItem, .cardBox");
-      if (container) {
-        const link = container.querySelector('a[data-action="link"], a[href*="id="]');
-        const extractedId = extractIdFromHref(link && link.getAttribute("href"));
-        if (extractedId && !ids.includes(extractedId)) {
-          ids.push(extractedId);
-        }
-      }
-    }
-
-    return ids;
-  }
+  let quickTagInFlight = false;
+  let toastTimer = null;
 
   function normalizeId(id) {
     const value = (id || "").replace(/-/g, "");
     return /^[a-f0-9]{32}$/i.test(value) ? value : null;
   }
 
-  function getMenuItemIds(target, menuCommand = false) {
+  function getRouteParams() {
+    const hash = window.location.hash;
+    const queryIndex = hash.indexOf("?");
+    return new URLSearchParams(queryIndex === -1 ? "" : hash.slice(queryIndex + 1));
+  }
+
+  function getSelectedItems() {
+    const items = new Map();
+    for (const checkbox of document.querySelectorAll(".itemSelectionPanel .chkItemSelect:checked")) {
+      const card = checkbox.closest("[data-id]");
+      const id = normalizeId(card?.getAttribute("data-id"));
+      if (id) {
+        items.set(id, { id, serverId: card.getAttribute("data-serverid"), element: card });
+      }
+    }
+    return [...items.values()];
+  }
+
+  function captureMenuContext(target, menuCommand = false) {
     if (!target) {
-      return [];
+      return null;
     }
-    if (target.closest(".btnSelectionPanelOptions")) {
-      return getSelectedItemIds();
+    const selectionButton = target.closest(".btnSelectionPanelOptions");
+    if (selectionButton) {
+      const selected = getSelectedItems();
+      if (!selected.length) {
+        return null;
+      }
+      const servers = new Set(selected.map((item) => item.serverId).filter(Boolean));
+      if (servers.size > 1) {
+        return null;
+      }
+      return { itemIds: selected.map((item) => item.id), serverId: selected[0].serverId, elements: selected.map((item) => item.element), selection: true };
     }
+
     const menuButton = target.closest('[data-action="menu"], .btnMoreCommands');
     if (!menuButton && !menuCommand) {
-      return [];
+      return null;
     }
     const card = (menuCommand ? target : menuButton).closest("[data-id]");
     const cardId = normalizeId(card?.getAttribute("data-id"));
     if (cardId) {
-      return [cardId];
+      return { itemIds: [cardId], serverId: card.getAttribute("data-serverid"), elements: [card], selection: false };
     }
     if (menuCommand || !menuButton.matches(".btnMoreCommands")) {
-      return [];
+      return null;
     }
     const detailPage = menuButton.closest(".itemDetailPage");
     if (!detailPage) {
-      return [];
+      return null;
     }
     const source = detailPage.querySelector(".selectSource");
-    const id = normalizeId(source?.value) || normalizeId(extractIdFromHref(window.location.hash));
-    return id ? [id] : [];
+    const params = getRouteParams();
+    const id = normalizeId(source?.value) || normalizeId(params.get("id"));
+    return id ? { itemIds: [id], serverId: params.get("serverId"), elements: [], selection: false } : null;
   }
 
   function getMenuSession() {
@@ -134,25 +84,16 @@
     return session && Object.keys(current).every((key) => current[key] === session[key]);
   }
 
-  function requestMenu(ids, event) {
+  function requestMenu(context, event) {
     if (menuContextAmbiguous) {
       return;
     }
     const session = getMenuSession();
-    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
-    let serverId;
-    if (target?.closest(".btnSelectionPanelOptions")) {
-      const servers = new Set([...document.querySelectorAll(".itemSelectionPanel input[type='checkbox']:checked, .chkItemSelect:checked, .itemSelectCheckbox:checked")]
-        .map((checkbox) => checkbox.closest("[data-serverid]")?.getAttribute("data-serverid")).filter(Boolean));
-      serverId = servers.size > 1 ? null : [...servers][0] || session.serverId;
-    } else {
-      const params = new URLSearchParams(window.location.hash.split("?")[1] || "");
-      serverId = target?.closest("[data-serverid]")?.getAttribute("data-serverid") || params.get("serverId") || session.serverId;
-    }
     if (awaitingMenuEvent) {
-      const sameTarget = ids.length && pendingMenuItemIds?.length
-        && ids.join(",") === pendingMenuItemIds.join(",")
-        && serverId && serverId === pendingMenuServerId
+      const sameTarget = context && pendingMenu
+        && context.itemIds.join(",") === pendingMenu.itemIds.join(",")
+        && context.serverId === pendingMenu.serverId
+        && context.selection === pendingMenu.selection
         && isCurrentMenuSession(pendingMenuSession);
       if (event.type === "command" && awaitingMenuEvent.type === "click" && awaitingMenuEvent.eventPhase !== 0
         && sameTarget) {
@@ -163,19 +104,18 @@
         awaitingMenuEvent = event;
       } else {
         menuContextAmbiguous = true;
-        pendingMenuItemIds = null;
+        pendingMenu = null;
         pendingMenuSession = null;
       }
       return;
     }
     awaitingMenuEvent = event;
-    pendingMenuItemIds = ids;
+    pendingMenu = context;
     pendingMenuSession = session;
-    pendingMenuServerId = serverId;
   }
 
   function invalidateMenuContext() {
-    pendingMenuItemIds = null;
+    pendingMenu = null;
     if (awaitingMenuEvent) {
       repeatedMenuRequest = true;
     }
@@ -185,16 +125,16 @@
     const target = event.target instanceof Element ? event.target : event.target?.parentElement;
     if (event.type === "command") {
       if (event.detail?.command === "menu") {
-        requestMenu(getMenuItemIds(target, true), event);
+        requestMenu(captureMenuContext(target, true), event);
       } else if (event.detail?.command === "back") {
         invalidateMenuContext();
       }
     } else if (event.type === "contextmenu") {
-      const ids = getMenuItemIds(target, true);
-      const serverId = target?.closest("[data-serverid]")?.getAttribute("data-serverid") || getMenuSession().serverId;
-      if (awaitingMenuEvent && ids.length && pendingMenuItemIds?.length
-        && ids.join(",") === pendingMenuItemIds.join(",")
-        && serverId && serverId === pendingMenuServerId && isCurrentMenuSession(pendingMenuSession)) {
+      const context = captureMenuContext(target, true);
+      if (awaitingMenuEvent && context && pendingMenu
+        && context.itemIds.join(",") === pendingMenu.itemIds.join(",")
+        && context.serverId === pendingMenu.serverId && context.selection === pendingMenu.selection
+        && isCurrentMenuSession(pendingMenuSession)) {
         repeatedMenuRequest = true;
       } else {
         invalidateMenuContext();
@@ -202,36 +142,47 @@
     } else if (event.type === "keydown" && event.key === "Escape") {
       invalidateMenuContext();
     } else if (event.type === "click" && target) {
-      const ids = getMenuItemIds(target);
+      const context = captureMenuContext(target);
       const unownedMenu = target.closest(".btnToggleContextMenu")
         || target.closest(".btnMore")?.closest(".formDialogHeader")?.parentElement?.querySelector(".editMetadataForm");
-      if (ids.length || unownedMenu || target.closest('[data-action="menu"], .btnMoreCommands, .btnSelectionPanelOptions')) {
-        requestMenu(ids, event);
+      if (context || unownedMenu || target.closest('[data-action="menu"], .btnMoreCommands, .btnSelectionPanelOptions')) {
+        requestMenu(context, event);
       } else if (!target.closest(".actionSheet")) {
         invalidateMenuContext();
       }
     }
   }
 
+  function getApiClient(context) {
+    const apiClient = window.ApiClient;
+    if (!apiClient || !apiClient.getCurrentUserId()) {
+      throw new Error("Sign in before editing tags.");
+    }
+    if (context.session && !isCurrentMenuSession(context.session)) {
+      throw new Error("Reopen the item menu after signing in.");
+    }
+    if (context.serverId && apiClient.serverId() !== context.serverId) {
+      throw new Error("Connect to this item's server before editing tags.");
+    }
+    return apiClient;
+  }
+
+  async function loadQuickTags(apiClient) {
+    try {
+      const config = await apiClient.getPluginConfiguration(PLUGIN_ID);
+      return [...new Set((config.QuickTags || []).filter((tag) => typeof tag === "string" && tag.trim()))];
+    } catch (error) {
+      console.warn("[JellyTag] Failed to load quick tags:", error);
+      return [];
+    }
+  }
+
   function cleanItemForUpdate(item) {
     const copy = JSON.parse(JSON.stringify(item));
     const fieldsToStrip = [
-      "Trickplay",
-      "TrickplayInfo",
-      "PlayAccess",
-      "People",
-      "Studios",
-      "GenreItems",
-      "TagItems",
-      "ArtistItems",
-      "AlbumArtists",
-      "MediaStreams",
-      "MediaSources",
-      "Chapters",
-      "RemoteTrailers",
-      "ImageTags",
-      "BackdropImageTags",
-      "ParentBackdropImageTags",
+      "Trickplay", "TrickplayInfo", "PlayAccess", "People", "Studios", "GenreItems", "TagItems",
+      "ArtistItems", "AlbumArtists", "MediaStreams", "MediaSources", "Chapters", "RemoteTrailers",
+      "ImageTags", "BackdropImageTags", "ParentBackdropImageTags",
     ];
     for (const field of fieldsToStrip) {
       delete copy[field];
@@ -239,694 +190,547 @@
     return copy;
   }
 
-  async function applyTagChanges(itemIds, tagsToAdd, tagsToRemove) {
-    const userId = ApiClient.getCurrentUserId();
-    const lowerRemove = tagsToRemove.map((t) => t.toLowerCase());
-    let successes = 0;
-    let failures = 0;
-    let forbidden = false;
-
+  async function applyTagChanges(context, tagsToAdd, tagsToRemove) {
+    const apiClient = getApiClient(context);
+    const userId = apiClient.getCurrentUserId();
+    const lowerRemove = tagsToRemove.map((tag) => tag.toLowerCase());
+    const result = { successes: 0, failures: 0, forbidden: false };
     async function processItem(id) {
       try {
-        const item = await ApiClient.getItem(userId, id);
-        item.Tags = item.Tags || [];
+        const item = await apiClient.getItem(userId, id);
+        item.Tags = (item.Tags || []).filter((tag) => !lowerRemove.includes(tag.toLowerCase()));
         for (const tag of tagsToAdd) {
-          if (!item.Tags.some((t) => t.toLowerCase() === tag.toLowerCase())) {
+          if (!item.Tags.some((current) => current.toLowerCase() === tag.toLowerCase())) {
             item.Tags.push(tag);
           }
         }
-        item.Tags = item.Tags.filter((t) => !lowerRemove.includes(t.toLowerCase()));
-        await ApiClient.updateItem(cleanItemForUpdate(item));
-        successes++;
-      } catch (e) {
-        if (e && (e.status === 403 || (e.response && e.response.status === 403))) {
-          forbidden = true;
-        }
-        console.error("[JellyTag] Failed to update item " + id + ":", e);
-        failures++;
+        await apiClient.updateItem(cleanItemForUpdate(item));
+        result.successes++;
+      } catch (error) {
+        result.forbidden ||= error?.status === 403 || error?.response?.status === 403;
+        result.failures++;
+        console.error("[JellyTag] Failed to update item " + id + ":", error);
       }
     }
-
-    for (let i = 0; i < itemIds.length; i += 5) {
-      const batch = itemIds.slice(i, i + 5);
-      await Promise.allSettled(batch.map((id) => processItem(id)));
-    }
-
-    if (forbidden) {
-      return { successes, failures, forbidden: true };
-    }
-    return { successes, failures, forbidden: false };
-  }
-
-  async function addTagToItems(itemIds, tagName) {
-    const result = await applyTagChanges(itemIds, [tagName], []);
-    if (result.forbidden) {
-      throw Object.assign(new Error("You don't have permission to edit tags."), { forbidden: true });
+    for (let i = 0; i < context.itemIds.length; i += 5) {
+      await Promise.all(context.itemIds.slice(i, i + 5).map(processItem));
     }
     return result;
   }
 
-  async function getTagInfo(itemIds) {
-    if (itemIds.length === 0) {
-      return { tags: [], counts: new Map() };
+  async function getTagInfo(context) {
+    const apiClient = getApiClient(context);
+    const items = [];
+    for (let i = 0; i < context.itemIds.length; i += 5) {
+      items.push(...await Promise.all(context.itemIds.slice(i, i + 5).map((id) => apiClient.getItem(apiClient.getCurrentUserId(), id))));
     }
-    const userId = ApiClient.getCurrentUserId();
-    const BATCH_SIZE = 5;
-    const allResults = [];
-    for (let i = 0; i < itemIds.length; i += BATCH_SIZE) {
-      const batch = itemIds.slice(i, i + BATCH_SIZE);
-      const results = await Promise.allSettled(batch.map((id) => ApiClient.getItem(userId, id)));
-      allResults.push(...results);
-    }
-    const tagMap = new Map();
-    for (const result of allResults) {
-      if (result.status !== "fulfilled") {
-        continue;
-      }
-      const tags = result.value.Tags || [];
-      for (const tag of tags) {
-        const lower = tag.toLowerCase();
-        if (tagMap.has(lower)) {
-          tagMap.get(lower).count++;
-        } else {
-          tagMap.set(lower, { name: tag, count: 1 });
+    const tags = new Map();
+    for (const item of items) {
+      const itemTags = new Set();
+      for (const tag of item.Tags || []) {
+        const key = tag.toLowerCase();
+        if (itemTags.has(key)) {
+          continue;
         }
+        itemTags.add(key);
+        const current = tags.get(key);
+        tags.set(key, { name: current?.name || tag, count: (current?.count || 0) + 1 });
       }
     }
-    const tags = [];
-    const counts = new Map();
-    for (const { name, count } of tagMap.values()) {
-      tags.push(name);
-      counts.set(name.toLowerCase(), count);
-    }
-    return { tags, counts };
-  }
-
-  function exitSelectionMode() {
-    const cancelBtn = document.querySelector(".btnCloseSelectionPanel");
-    if (cancelBtn) {
-      cancelBtn.click();
-    }
+    return { tags: [...tags.values()].map((tag) => tag.name), counts: new Map([...tags].map(([key, tag]) => [key, tag.count])), items };
   }
 
   function showToast(message) {
-    if (typeof require !== "undefined") {
-      try {
-        require(["toast"], function (toast) {
-          toast(message);
-        });
-        return;
-      } catch {}
+    let toast = document.querySelector(".jellytag-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "jellytag-toast";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      document.body.appendChild(toast);
     }
-    if (typeof Dashboard !== "undefined" && Dashboard.alert) {
-      Dashboard.alert(message);
+    toast.textContent = message;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.remove(), 5000);
+  }
+
+  function finishEditing(context) {
+    const containers = new Set();
+    for (const element of context.elements) {
+      const container = element.closest('[is="emby-itemscontainer"]');
+      if (typeof container?.notifyRefreshNeeded === "function") {
+        containers.add(container);
+      }
+    }
+    for (const container of containers) {
+      container.notifyRefreshNeeded(true);
+    }
+    for (const callback of [...(document._callbacks?.REFRESH_NEEDED || [])]) {
+      try {
+        callback.call(document, { type: "REFRESH_NEEDED" });
+      } catch (error) {
+        console.warn("[JellyTag] Failed to refresh the item view:", error);
+      }
+    }
+    if (context.selection) {
+      document.querySelector(".btnCloseSelectionPanel")?.click();
     }
   }
 
+  function resultMessage(result) {
+    if (result.forbidden) {
+      return "You don't have permission to edit tags.";
+    }
+    if (!result.failures) {
+      return "Tags saved.";
+    }
+    return result.successes ? "Saved tags for " + result.successes + " items; " + result.failures + " failed. Try saving again." : "Failed to save tags. Try again.";
+  }
+
+  function createButton(label, className, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
   class TagDialog {
-    constructor(itemIds) {
-      this.itemIds = itemIds;
-      this.totalItems = itemIds.length;
+    constructor(context) {
+      this.context = context;
       this.originalTags = [];
       this.currentTags = [];
       this.tagCounts = new Map();
       this.promotedTags = new Set();
-      this.overlay = null;
-      this.dialog = null;
-      this.input = null;
-      this.listEl = null;
-      this.saveBtn = null;
-      this.resetBtn = null;
-      this.addBtn = null;
+      this.saving = false;
+      this.loaded = false;
     }
 
     async open() {
-      const info = await getTagInfo(this.itemIds);
-      this.originalTags = [...info.tags];
-      this.currentTags = [...info.tags];
-      this.tagCounts = info.counts;
-
-      this._buildDOM();
+      this.previousFocus = document.activeElement;
+      this.buildDOM();
       document.body.appendChild(this.overlay);
-
-      setTimeout(() => this.input.focus(), 100);
-    }
-
-    _hasPendingChanges() {
-      if (this.promotedTags.size > 0) {
-        return true;
-      }
-      if (this.currentTags.length !== this.originalTags.length) {
-        return true;
-      }
-      const sorted1 = [...this.currentTags].sort();
-      const sorted2 = [...this.originalTags].sort();
-      return sorted1.some((t, i) => t !== sorted2[i]);
-    }
-
-    _buildDOM() {
-      this.overlay = document.createElement("div");
-      this.overlay.className = "dialogContainer";
-      this.overlay.addEventListener("mousedown", (e) => {
-        if (e.target === this.overlay) {
+      document.body.classList.add("jellytag-dialog-open");
+      this.onKeydown = (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
           this.close();
-        }
-      });
-
-      this.dialog = document.createElement("div");
-      this.dialog.className = "focuscontainer dialog dialog-fixedSize dialog-small formDialog opened jellytag-dialog";
-
-      const header = document.createElement("div");
-      header.className = "formDialogHeader";
-
-      const closeBtn = document.createElement("button");
-      closeBtn.type = "button";
-      closeBtn.setAttribute("is", "paper-icon-button-light");
-      closeBtn.className = "btnCancel autoSize paper-icon-button-light";
-      closeBtn.innerHTML = '<span class="material-icons arrow_back" aria-hidden="true"></span>';
-      closeBtn.addEventListener("click", () => this.close());
-
-      const title = document.createElement("h3");
-      title.className = "formDialogHeaderTitle";
-      title.textContent = "Manage Tags";
-
-      header.appendChild(closeBtn);
-      header.appendChild(title);
-
-      const content = document.createElement("div");
-      content.className = "formDialogContent";
-
-      const contentInner = document.createElement("div");
-      contentInner.className = "dialogContentInner";
-
-      const inputRow = document.createElement("div");
-      inputRow.className = "jellytag-input-row";
-
-      const inputContainer = document.createElement("div");
-      inputContainer.className = "inputContainer";
-
-      this.input = document.createElement("input");
-      this.input.setAttribute("is", "emby-input");
-      this.input.type = "text";
-      this.input.className = "emby-input";
-      this.input.setAttribute("label", "Tag");
-      this.input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          this._addCurrentInput();
-        }
-      });
-
-      const inputLabel = document.createElement("label");
-      inputLabel.className = "inputLabel";
-      inputLabel.textContent = "Tag";
-
-      inputContainer.appendChild(inputLabel);
-      inputContainer.appendChild(this.input);
-
-      this.addBtn = document.createElement("button");
-      this.addBtn.type = "button";
-      this.addBtn.setAttribute("is", "emby-button");
-      this.addBtn.className = "fab btnAddTextItem submit marginStart emby-button";
-      this.addBtn.title = "Add";
-      this.addBtn.innerHTML = '<span class="material-icons add" aria-hidden="true"></span>';
-      this.addBtn.addEventListener("click", () => this._addCurrentInput());
-
-      inputRow.appendChild(inputContainer);
-      inputRow.appendChild(this.addBtn);
-      contentInner.appendChild(inputRow);
-
-      this.listEl = document.createElement("div");
-      this.listEl.className = "paperList";
-      contentInner.appendChild(this.listEl);
-
-      content.appendChild(contentInner);
-
-      const footer = document.createElement("div");
-      footer.className = "formDialogFooter";
-
-      const cancelBtn = document.createElement("button");
-      cancelBtn.type = "button";
-      cancelBtn.setAttribute("is", "emby-button");
-      cancelBtn.className = "raised button-cancel block btnCancel formDialogFooterItem emby-button";
-      cancelBtn.textContent = "Cancel";
-      cancelBtn.addEventListener("click", () => this.close());
-
-      this.resetBtn = document.createElement("button");
-      this.resetBtn.type = "button";
-      this.resetBtn.setAttribute("is", "emby-button");
-      this.resetBtn.className = "raised button-reset block btnReset formDialogFooterItem emby-button";
-      this.resetBtn.textContent = "Reset";
-      this.resetBtn.addEventListener("click", () => this._reset());
-
-      this.saveBtn = document.createElement("button");
-      this.saveBtn.type = "button";
-      this.saveBtn.setAttribute("is", "emby-button");
-      this.saveBtn.className = "raised button-submit block btnSave formDialogFooterItem emby-button";
-      this.saveBtn.textContent = "Save";
-      this.saveBtn.addEventListener("click", () => this._save());
-
-      footer.appendChild(cancelBtn);
-      footer.appendChild(this.resetBtn);
-      footer.appendChild(this.saveBtn);
-
-      this.dialog.appendChild(header);
-      this.dialog.appendChild(content);
-      this.dialog.appendChild(footer);
-      this.overlay.appendChild(this.dialog);
-
-      this._renderList();
-      this._updateButtons();
-
-      this._escHandler = (e) => {
-        if (e.key === "Escape") {
-          this.close();
+        } else if (event.key === "Tab") {
+          const controls = [...this.dialog.querySelectorAll("button:not(:disabled), input:not(:disabled)")];
+          const first = controls[0];
+          const last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
         }
       };
-      document.addEventListener("keydown", this._escHandler);
+      this.onNavigation = () => this.close();
+      document.addEventListener("keydown", this.onKeydown, true);
+      window.addEventListener("hashchange", this.onNavigation);
+      window.addEventListener("popstate", this.onNavigation);
+      this.dialog.focus();
+      await this.load();
     }
 
-    _updateButtons() {
-      const hasChanges = this._hasPendingChanges();
-      if (this.saveBtn) {
-        this.saveBtn.disabled = !hasChanges;
-      }
-      if (this.resetBtn) {
-        this.resetBtn.disabled = !hasChanges;
-      }
-    }
-
-    _reset() {
-      this.currentTags = [...this.originalTags];
-      this.promotedTags.clear();
-      this._renderList();
-      this._updateButtons();
-    }
-
-    _isPartial(tag) {
-      if (this.totalItems <= 1) {
-        return false;
-      }
-      if (this.promotedTags.has(tag.toLowerCase())) {
-        return false;
-      }
-      if (!this.originalTags.some((t) => t.toLowerCase() === tag.toLowerCase())) {
-        return false;
-      }
-      return (this.tagCounts.get(tag.toLowerCase()) || 0) < this.totalItems;
-    }
-
-    _renderList() {
-      this.listEl.innerHTML = "";
-      if (this.currentTags.length === 0) {
-        const emptyMsg = document.createElement("div");
-        emptyMsg.className = "jellytag-empty";
-        emptyMsg.textContent = "No tags.";
-        this.listEl.appendChild(emptyMsg);
-        return;
-      }
-      const sorted = [...this.currentTags].sort((a, b) => a.localeCompare(b));
-      for (const tag of sorted) {
-        const item = document.createElement("div");
-        item.className = "listItem";
-        const partial = this._isPartial(tag);
-
-        const icon = document.createElement("span");
-        icon.className = "material-icons listItemIcon local_offer";
-        icon.setAttribute("aria-hidden", "true");
-
-        const promoted = this.totalItems > 1 && this.promotedTags.has(tag.toLowerCase());
-
-        if (partial) {
-          const count = this.tagCounts.get(tag.toLowerCase()) || 0;
-          icon.style.backgroundColor = "rgba(255,255,255,0.1)";
-          icon.style.opacity = "0.4";
-          icon.style.cursor = "pointer";
-          icon.title = "Applied to " + count + " of " + this.totalItems + " items";
-          icon.addEventListener("click", () => this._promoteTag(tag));
-        } else if (promoted) {
-          icon.style.backgroundColor = "rgba(255,255,255,0.1)";
-          icon.style.cursor = "pointer";
-          icon.title = "Tag will be applied to all items";
-          icon.addEventListener("click", () => this._demoteTag(tag));
-        } else {
-          icon.style.backgroundColor = "transparent";
+    async load() {
+      this.status.textContent = "Loading tags...";
+      this.retry.hidden = true;
+      try {
+        const info = await getTagInfo(this.context);
+        if (!this.overlay.isConnected) {
+          return;
         }
-
-        const body = document.createElement("div");
-        body.className = "listItemBody";
-        const textDiv = document.createElement("div");
-        textDiv.className = "textValue";
-        textDiv.textContent = tag;
-        body.appendChild(textDiv);
-
-        const removeBtn = document.createElement("button");
-        removeBtn.type = "button";
-        removeBtn.setAttribute("is", "paper-icon-button-light");
-        removeBtn.className = "btnRemoveFromEditorList autoSize paper-icon-button-light";
-        removeBtn.innerHTML = '<span class="material-icons delete" aria-hidden="true"></span>';
-        removeBtn.addEventListener("click", () => this._removeTag(tag));
-
-        item.appendChild(icon);
-        item.appendChild(body);
-        item.appendChild(removeBtn);
-        this.listEl.appendChild(item);
+        this.originalTags = [...info.tags];
+        this.currentTags = [...info.tags];
+        this.tagCounts = info.counts;
+        this.loaded = true;
+        this.subtitle.textContent = info.items.length === 1 ? info.items[0].Name + " · " + info.items[0].Type : info.items.length + " selected items";
+        this.status.textContent = "";
+        this.renderList();
+        this.updateButtons();
+        this.input.focus();
+      } catch (error) {
+        console.error("[JellyTag] Failed to load tags:", error);
+        this.status.textContent = "Couldn't load tags. Try again.";
+        this.retry.hidden = false;
       }
     }
 
-    _addCurrentInput() {
-      const val = this.input.value.trim();
-      if (!val) {
+    buildDOM() {
+      this.overlay = document.createElement("div");
+      this.overlay.className = "jellytag-overlay";
+      this.overlay.addEventListener("mousedown", (event) => {
+        if (event.target === this.overlay) {
+          this.close();
+        }
+      });
+      this.dialog = document.createElement("section");
+      this.dialog.className = "jellytag-dialog focuscontainer";
+      this.dialog.tabIndex = -1;
+      this.dialog.setAttribute("role", "dialog");
+      this.dialog.setAttribute("aria-modal", "true");
+      this.dialog.setAttribute("aria-labelledby", "jellytag-title");
+      const header = document.createElement("header");
+      header.className = "jellytag-header";
+      const heading = document.createElement("div");
+      const title = document.createElement("h2");
+      title.id = "jellytag-title";
+      title.textContent = "Manage tags";
+      this.subtitle = document.createElement("p");
+      this.subtitle.className = "jellytag-subtitle";
+      this.subtitle.textContent = this.context.itemIds.length + (this.context.itemIds.length === 1 ? " selected item" : " selected items");
+      heading.append(title, this.subtitle);
+      this.closeButton = createButton("×", "jellytag-icon-button", () => this.close());
+      this.closeButton.setAttribute("aria-label", "Close tag editor");
+      header.append(heading, this.closeButton);
+      const content = document.createElement("div");
+      content.className = "jellytag-content";
+      const label = document.createElement("label");
+      label.className = "jellytag-label";
+      label.htmlFor = "jellytag-input";
+      label.textContent = "Add a tag";
+      const row = document.createElement("div");
+      row.className = "jellytag-input-row";
+      this.input = document.createElement("input");
+      this.input.id = "jellytag-input";
+      this.input.type = "text";
+      this.input.placeholder = "Tag name";
+      this.input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          this.addInput();
+        }
+      });
+      this.addButton = createButton("Add", "jellytag-button jellytag-button-secondary", () => this.addInput());
+      row.append(this.input, this.addButton);
+      this.list = document.createElement("div");
+      this.list.className = "jellytag-list";
+      this.status = document.createElement("p");
+      this.status.className = "jellytag-status";
+      this.status.setAttribute("role", "status");
+      this.status.setAttribute("aria-live", "polite");
+      this.retry = createButton("Retry", "jellytag-button jellytag-button-secondary", () => this.load());
+      this.retry.hidden = true;
+      content.append(label, row, this.list, this.status, this.retry);
+      const footer = document.createElement("footer");
+      footer.className = "jellytag-footer";
+      this.cancelButton = createButton("Cancel", "jellytag-button jellytag-button-text", () => this.close());
+      this.resetButton = createButton("Reset", "jellytag-button jellytag-button-secondary", () => {
+        this.currentTags = [...this.originalTags];
+        this.promotedTags.clear();
+        this.status.textContent = "";
+        this.renderList();
+        this.updateButtons();
+      });
+      this.saveButton = createButton("Save tags", "jellytag-button jellytag-button-primary", () => this.save());
+      footer.append(this.cancelButton, this.resetButton, this.saveButton);
+      this.dialog.append(header, content, footer);
+      this.overlay.appendChild(this.dialog);
+      this.updateButtons();
+    }
+
+    changes() {
+      const add = this.currentTags.filter((tag) => this.promotedTags.has(tag.toLowerCase()) || !this.originalTags.some((original) => original.toLowerCase() === tag.toLowerCase()));
+      const remove = this.originalTags.filter((tag) => !this.currentTags.some((current) => current.toLowerCase() === tag.toLowerCase()));
+      return { add, remove };
+    }
+
+    updateButtons() {
+      const changes = this.changes();
+      const changed = changes.add.length > 0 || changes.remove.length > 0;
+      this.input.disabled = !this.loaded || this.saving;
+      this.addButton.disabled = !this.loaded || this.saving;
+      this.saveButton.disabled = !this.loaded || !changed || this.saving;
+      this.resetButton.disabled = !this.loaded || !changed || this.saving;
+      this.cancelButton.disabled = this.saving;
+      this.closeButton.disabled = this.saving;
+      this.saveButton.textContent = this.saving ? "Saving..." : "Save tags";
+      for (const button of this.list.querySelectorAll("button")) {
+        button.disabled = this.saving;
+      }
+    }
+
+    renderList() {
+      this.list.replaceChildren();
+      if (!this.currentTags.length) {
+        const empty = document.createElement("p");
+        empty.className = "jellytag-empty";
+        empty.textContent = "No tags. Add one above to get started.";
+        this.list.appendChild(empty);
+      }
+      for (const tag of [...this.currentTags].sort((a, b) => a.localeCompare(b))) {
+        const key = tag.toLowerCase();
+        const count = this.tagCounts.get(key) || 0;
+        const promoted = this.promotedTags.has(key);
+        const partial = count > 0 && count < this.context.itemIds.length;
+        const row = document.createElement("div");
+        row.className = "jellytag-tag-row";
+        const text = document.createElement("span");
+        text.className = "jellytag-tag-name";
+        text.textContent = tag;
+        row.appendChild(text);
+        if (partial) {
+          const promote = createButton(promoted ? "Will apply to all" : count + " of " + this.context.itemIds.length + " · Apply to all", "jellytag-coverage", () => {
+            if (this.promotedTags.has(key)) {
+              this.promotedTags.delete(key);
+            } else {
+              this.promotedTags.add(key);
+            }
+            this.renderList();
+            this.updateButtons();
+          });
+          promote.setAttribute("aria-pressed", String(promoted));
+          promote.setAttribute("aria-label", (promoted ? "Undo applying " : "Apply ") + tag + " to all selected items");
+          row.appendChild(promote);
+        }
+        const remove = createButton("×", "jellytag-icon-button", () => {
+          this.currentTags = this.currentTags.filter((current) => current.toLowerCase() !== key);
+          this.promotedTags.delete(key);
+          this.renderList();
+          this.updateButtons();
+        });
+        remove.setAttribute("aria-label", "Remove tag " + tag);
+        row.appendChild(remove);
+        this.list.appendChild(row);
+      }
+    }
+
+    addInput() {
+      if (!this.loaded || this.saving) {
         return;
       }
-      if (!this.currentTags.some((t) => t.toLowerCase() === val.toLowerCase())) {
-        this.currentTags.push(val);
-        this._renderList();
-        this._updateButtons();
+      const tag = this.input.value.trim();
+      if (tag && !this.currentTags.some((current) => current.toLowerCase() === tag.toLowerCase())) {
+        this.currentTags.push(tag);
+        this.renderList();
+        this.updateButtons();
       }
       this.input.value = "";
       this.input.focus();
     }
 
-    _promoteTag(tagName) {
-      this.promotedTags.add(tagName.toLowerCase());
-      this._renderList();
-      this._updateButtons();
-    }
-
-    _demoteTag(tagName) {
-      this.promotedTags.delete(tagName.toLowerCase());
-      this._renderList();
-      this._updateButtons();
-    }
-
-    _removeTag(tagName) {
-      this.currentTags = this.currentTags.filter((t) => t.toLowerCase() !== tagName.toLowerCase());
-      this.promotedTags.delete(tagName.toLowerCase());
-      this._renderList();
-      this._updateButtons();
-    }
-
-    async _save() {
-      if (this._saving) {
+    async save() {
+      if (this.saving || !this.loaded) {
         return;
       }
-      this._saving = true;
-      const tagsToAdd = this.currentTags.filter((t) => {
-        const isNew = !this.originalTags.some((o) => o.toLowerCase() === t.toLowerCase());
-        const isPromoted = this.promotedTags.has(t.toLowerCase());
-        return isNew || isPromoted;
-      });
-      const tagsToRemove = this.originalTags.filter((t) => !this.currentTags.some((c) => c.toLowerCase() === t.toLowerCase()));
-
-      if (tagsToAdd.length === 0 && tagsToRemove.length === 0) {
-        this._saving = false;
-        this.close();
+      const changes = this.changes();
+      if (!changes.add.length && !changes.remove.length) {
         return;
       }
-
-      this.saveBtn.disabled = true;
-      this.saveBtn.textContent = "Saving...";
-
+      this.saving = true;
+      this.status.textContent = "Saving tags...";
+      this.updateButtons();
       try {
-        const result = await applyTagChanges(this.itemIds, tagsToAdd, tagsToRemove);
-        if (result.forbidden) {
-          showToast("You don't have permission to edit tags.");
-        } else if (result.failures === 0) {
-          showToast("Tags saved.");
-        } else if (result.successes === 0) {
-          showToast("Failed to save tags.");
-        } else {
-          showToast("Saved tags for " + result.successes + " of " + (result.successes + result.failures) + " items. " + result.failures + " failed.");
-        }
-        this._saving = false;
-        if (result.failures > 0 && result.successes === 0) {
-          if (this.saveBtn) {
-            this.saveBtn.disabled = false;
-            this.saveBtn.textContent = "Save";
-          }
-        } else {
+        const result = await applyTagChanges(this.context, changes.add, changes.remove);
+        this.saving = false;
+        if (!result.failures) {
+          finishEditing(this.context);
           this.close();
-          exitSelectionMode();
+          showToast("Tags saved.");
+        } else {
+          this.status.textContent = resultMessage(result);
+          this.updateButtons();
         }
-      } catch (e) {
-        console.error("[JellyTag] Failed to save tags:", e);
-        showToast("Failed to save tags.");
-        this._saving = false;
-        if (this.saveBtn) {
-          this.saveBtn.disabled = false;
-          this.saveBtn.textContent = "Save";
-        }
+      } catch (error) {
+        this.saving = false;
+        this.status.textContent = error.message || "Failed to save tags. Try again.";
+        this.updateButtons();
       }
     }
 
     close() {
-      if (this._saving) {
+      if (this.saving) {
         return;
       }
-      if (this._escHandler) {
-        document.removeEventListener("keydown", this._escHandler);
+      document.removeEventListener("keydown", this.onKeydown, true);
+      window.removeEventListener("hashchange", this.onNavigation);
+      window.removeEventListener("popstate", this.onNavigation);
+      this.overlay.remove();
+      document.body.classList.remove("jellytag-dialog-open");
+      if (this.previousFocus?.isConnected) {
+        this.previousFocus.focus();
       }
-      if (this.overlay && this.overlay.parentNode) {
-        this.overlay.parentNode.removeChild(this.overlay);
-      }
-      this.overlay = null;
     }
   }
 
-function createMenuButton(iconName, label, onClick) {
-  const btn = document.createElement("button");
-  btn.setAttribute("is", "paper-icon-button-light");
-  btn.className = "btnOption listItem listItem-button actionSheetMenuItem emby-button paper-icon-button-light";
-
-  btn.innerHTML = `
-    <span class="actionsheetMenuItemIcon listItemIcon listItemIcon-transparent material-icons ${iconName}"></span>
-    <span class="actionSheetItemText">${label}</span>
-  `;
-
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onClick();
-  });
-
-  return btn;
-}
-
-  function dismissActionSheet() {
-    const actionSheet = document.querySelector(".actionSheetContent");
-    if (!actionSheet) {
-      return;
-    }
-
-    const cancelBtn = actionSheet.querySelector(".btnCloseActionSheet, .btnCancel");
-    if (cancelBtn) {
-      cancelBtn.click();
-      return;
-    }
-
-    if (window.history.length > 1) {
-      window.history.back();
-    }
+  function dismissActionSheet(sheet) {
+    const dialog = sheet.closest(".actionSheet");
+    return new Promise((resolve, reject) => {
+      if (!dialog) {
+        reject(new Error("Couldn't close the item menu."));
+        return;
+      }
+      const timer = setTimeout(() => reject(new Error("Couldn't close the item menu.")), 2000);
+      dialog.addEventListener("close", () => {
+        clearTimeout(timer);
+        resolve();
+      }, { once: true });
+      const cancel = dialog.querySelector(".btnCloseActionSheet");
+      if (cancel) {
+        cancel.click();
+      } else if (dialog.dialogContainer) {
+        const container = dialog.dialogContainer;
+        container.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        container.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      }
+    });
   }
 
-  let quickTagInFlight = false;
-
-  function injectMenuButtons(actionSheet) {
-    if (actionSheet.hasAttribute(MARKER_ATTR)) {
-      return;
-    }
-
-    isMutatingDOM = true;
-    try {
-      actionSheet.setAttribute(MARKER_ATTR, "true");
-
-      const buttons = actionSheet.querySelectorAll("button");
-      if (![...buttons].some((button) => ["multiSelect", "edit", "addtoplaylist", "playlist", "addtocollection", "editimages", "editsubtitles", "identify"].includes(button.getAttribute("data-id")))) {
+  function createMenuButton(iconName, label, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "listItem listItem-button actionSheetMenuItem emby-button jellytag-menu-button";
+    const icon = document.createElement("span");
+    icon.className = "actionsheetMenuItemIcon listItemIcon listItemIcon-transparent material-icons " + iconName;
+    icon.setAttribute("aria-hidden", "true");
+    const body = document.createElement("div");
+    body.className = "listItemBody";
+    const text = document.createElement("div");
+    text.className = "listItemBodyText actionSheetItemText";
+    text.textContent = label;
+    body.appendChild(text);
+    button.append(icon, body);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (button.disabled) {
         return;
       }
-      const itemIds = pendingMenuItemIds;
-      const session = pendingMenuSession;
-      if (menuContextAmbiguous || !isCurrentMenuSession(session)
-        || !pendingMenuServerId || pendingMenuServerId !== session.serverId) {
-        return;
-      }
-      if (!repeatedMenuRequest) {
-        awaitingMenuEvent = null;
-        pendingMenuItemIds = null;
-        pendingMenuSession = null;
-        pendingMenuServerId = null;
-      }
-      if (!itemIds?.length) {
-        return;
-      }
-      if (![...buttons].some((button) => ["edit", "addtoplaylist", "playlist", "addtocollection"].includes(button.getAttribute("data-id")))) {
-        return;
-      }
-
-      let anchorButton = null;
-
-      for (const btn of buttons) {
-        const textEl = btn.querySelector(".actionSheetItemText");
-        if (textEl) {
-          const text = textEl.textContent.trim().toLowerCase();
-          if (text === "add to playlist" || text === "add to collection") {
-            if (text === "add to playlist") {
-              anchorButton = btn;
-              break;
-            }
-            if (!anchorButton) {
-              anchorButton = btn;
-            }
-          }
-        }
-      }
-
-      const insertAfter = anchorButton || null;
-
-      const tagDialogBtn = createMenuButton("local_offer", "Manage Tags", () => {
-        if (!isCurrentMenuSession(session)) {
-          return;
-        }
-        dismissActionSheet();
-        if (itemIds.length === 0) {
-          showToast("No items found to tag.");
-          return;
-        }
-        const dialog = new TagDialog(itemIds);
-        dialog.open().catch((e) => {
-          console.error("[JellyTag] Failed to open tag dialog:", e);
-          showToast("Failed to load tags.");
-        });
+      button.disabled = true;
+      Promise.resolve(onClick()).finally(() => {
+        button.disabled = false;
       });
+    });
+    return button;
+  }
 
-      const container = insertAfter ? insertAfter.parentNode : actionSheet;
-      if (insertAfter && insertAfter.nextSibling) {
-        container.insertBefore(tagDialogBtn, insertAfter.nextSibling);
-      } else if (insertAfter) {
-        container.appendChild(tagDialogBtn);
-      } else {
-        container.appendChild(tagDialogBtn);
+  async function injectMenuButtons(sheet) {
+    if (sheet.hasAttribute(MARKER_ATTR) || processingSheets.has(sheet)) {
+      return;
+    }
+    sheet.setAttribute(MARKER_ATTR, "true");
+    const scroller = sheet.querySelector(".actionSheetScroller");
+    if (!scroller || !scroller.querySelector('button[data-id="multiSelect"], button[data-id="edit"], button[data-id="addtoplaylist"], button[data-id="playlist"], button[data-id="addtocollection"], button[data-id="editimages"], button[data-id="editsubtitles"], button[data-id="identify"]')) {
+      return;
+    }
+    const context = pendingMenu;
+    const session = pendingMenuSession;
+    if (menuContextAmbiguous || !isCurrentMenuSession(session)) {
+      return;
+    }
+    if (!repeatedMenuRequest) {
+      awaitingMenuEvent = null;
+      pendingMenu = null;
+      pendingMenuSession = null;
+    }
+    if (!context) {
+      return;
+    }
+    context.session = session;
+    if (!scroller.querySelector('button[data-id="edit"], button[data-id="addtoplaylist"], button[data-id="playlist"], button[data-id="addtocollection"]')) {
+      return;
+    }
+    let closing = false;
+    sheet.closest(".actionSheet")?.addEventListener("closing", () => {
+      closing = true;
+    }, { once: true });
+    processingSheets.add(sheet);
+    try {
+      const apiClient = getApiClient(context);
+      const user = await apiClient.getCurrentUser();
+      if (!user.Policy?.IsAdministrator) {
+        sheet.setAttribute(MARKER_ATTR, "true");
+        return;
       }
-
-      let lastInserted = tagDialogBtn;
+      const quickTags = await loadQuickTags(apiClient);
+      if (!sheet.isConnected || closing || !isCurrentMenuSession(session)) {
+        return;
+      }
+      sheet.setAttribute(MARKER_ATTR, "true");
+      const manage = createMenuButton("local_offer", "Manage Tags", async () => {
+        try {
+          await dismissActionSheet(sheet);
+          getApiClient(context);
+          await new TagDialog(context).open();
+        } catch (error) {
+          showToast(error.message || "Failed to load tags.");
+        }
+      });
+      const anchor = scroller.querySelector('button[data-id="addtoplaylist"], button[data-id="playlist"]') || scroller.querySelector('button[data-id="addtocollection"]');
+      if (anchor) {
+        anchor.after(manage);
+      } else {
+        scroller.appendChild(manage);
+      }
+      let last = manage;
       for (const tag of quickTags) {
-        const quickBtn = createMenuButton("loyalty", "+ " + tag, () => {
-          if (!isCurrentMenuSession(session)) {
-            return;
-          }
+        const button = createMenuButton("loyalty", "+ " + tag, async () => {
           if (quickTagInFlight) {
             showToast("Tagging in progress...");
             return;
           }
           quickTagInFlight = true;
-          dismissActionSheet();
-          if (itemIds.length === 0) {
-            quickTagInFlight = false;
-            showToast("No items found to tag.");
-            return;
-          }
-          addTagToItems(itemIds, tag)
-            .then(() => {
+          try {
+            await dismissActionSheet(sheet);
+            const result = await applyTagChanges(context, [tag], []);
+            if (!result.failures) {
+              finishEditing(context);
               showToast("Tagged: " + tag);
-              exitSelectionMode();
-            })
-            .catch((e) => {
-              console.error("[JellyTag] Quick tag failed:", e);
-              if (e && e.forbidden) {
-                showToast("You don't have permission to edit tags.");
-              } else {
-                showToast("Failed to add tag: " + tag);
-              }
-            })
-            .finally(() => {
-              quickTagInFlight = false;
-            });
+            } else {
+              showToast(resultMessage(result));
+            }
+          } catch (error) {
+            showToast(error.message || "Failed to add tag: " + tag);
+          } finally {
+            quickTagInFlight = false;
+          }
         });
-
-        if (lastInserted.nextSibling) {
-          lastInserted.parentNode.insertBefore(quickBtn, lastInserted.nextSibling);
-        } else {
-          lastInserted.parentNode.appendChild(quickBtn);
-        }
-        lastInserted = quickBtn;
+        last.after(button);
+        last = button;
       }
+    } catch (error) {
+      console.warn("[JellyTag] Could not add tag actions:", error);
     } finally {
-      isMutatingDOM = false;
+      processingSheets.delete(sheet);
     }
   }
 
-  function tryInjectIntoActionSheets() {
-    const sheets = document.querySelectorAll(".actionSheetContent");
-    for (const sheet of sheets) {
-      injectMenuButtons(sheet);
-    }
-  }
-
-  let observer = null;
-  let debounceTimer = null;
-  let isMutatingDOM = false;
-
-  function startObserver() {
-    if (observer) {
+  function init() {
+    if (document.documentElement.hasAttribute("data-jellytag-client")) {
       return;
     }
-
-    observer = new MutationObserver(() => {
-      if (isMutatingDOM) {
-        return;
-      }
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        debounceTimer = null;
-        tryInjectIntoActionSheets();
-      }, 50);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  }
-
-  let initRetries = 0;
-  const MAX_INIT_RETRIES = 30;
-
-  async function init() {
-    if (typeof ApiClient === "undefined") {
-      if (++initRetries > MAX_INIT_RETRIES) {
-        console.warn("[JellyTag] ApiClient not available after " + MAX_INIT_RETRIES + " retries, giving up.");
-        return;
-      }
-      setTimeout(init, 1000);
-      return;
-    }
-
+    document.documentElement.setAttribute("data-jellytag-client", "true");
     for (const eventName of ["click", "command", "contextmenu", "keydown"]) {
       document.addEventListener(eventName, captureMenuEvent, true);
     }
     window.addEventListener("hashchange", invalidateMenuContext);
     window.addEventListener("popstate", invalidateMenuContext);
-
-    await loadQuickTags();
-
-    const originalPushState = history.pushState.bind(history);
-    history.pushState = function (...args) {
-      originalPushState(...args);
-      loadQuickTags();
-    };
-    const originalReplaceState = history.replaceState.bind(history);
-    history.replaceState = function (...args) {
-      originalReplaceState(...args);
-      loadQuickTags();
-    };
-    window.addEventListener("popstate", () => loadQuickTags());
-
-    startObserver();
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof Element)) {
+            continue;
+          }
+          if (node.matches(".actionSheetContent")) {
+            injectMenuButtons(node);
+          }
+          for (const sheet of node.querySelectorAll(".actionSheetContent")) {
+            injectMenuButtons(sheet);
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
     init();
   }
