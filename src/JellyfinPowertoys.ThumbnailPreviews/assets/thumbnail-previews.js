@@ -1,746 +1,521 @@
-/**
- * @typedef {Object} TrickplayMetadata
- * @property {number} Resolution
- * @property {number} Width
- * @property {number} Height
- * @property {number} TileWidth
- * @property {number} TileHeight
- * @property {number} ThumbnailCount
- * @property {number} Interval
- * @property {string} VideoId
- *
- * @typedef {Object} TrailerInfo
- * @property {string} Url
- * @property {string} Name
- *
- * @typedef {Object} Item
- * @property {string} Id
- * @property {string} ServerId
- * @property {number} RunTimeTicks
- * @property {{[itemId: string]: {[resolution: string]: TrickplayMetadata}}} Trickplay
- * @property {TrailerInfo[]} RemoteTrailers
- *
- * @typedef {Object} Credentials
- * @property {string} Id
- * @property {string} UserId
- * @property {string} ManualAddress
- * @property {string} LocalAddress
- * @property {string} AccessToken
- *
- * @typedef {Object} Settings
- * @property {number} PreviewDuration
- * @property {boolean} LoopPreview
- * @property {number} FrameMinDuration
- * @property {string | null | undefined} Resolutions
- * @property {boolean} ShowTrailerPreview
- * @property {boolean} EnableTrailerLengthLimit
- * @property {number} TrailerMaxLengthSeconds
- * @property {boolean} OnlyShowSilentTrailers
- * @property {boolean} PlayTrailerAudio
- * @property {boolean} EnableHoverPlay
- * @property {number} MouseLingerDelay
- */
-
 (() => {
-  const PLUGIN_ID = "6a65ce4e-fb35-4e99-8f37-02bc3979fe7e";
+  const CARD_SELECTOR = ".card[data-id]";
+  const DEFAULTS = {
+    PreviewDuration: 10000,
+    FrameMinDuration: 400,
+    LoopPreview: false,
+    Resolutions: null,
+    ShowTrailerPreview: true,
+    EnableTrailerLengthLimit: true,
+    TrailerMaxLengthSeconds: 60,
+    OnlyShowSilentTrailers: false,
+    PlayTrailerAudio: false,
+    EnableHoverPlay: false,
+    MouseLingerDelay: 800,
+  };
+  const cards = new Map();
+  const items = new Map();
+  const configurations = new Map();
+  let activePreview;
+  let contextKey;
+  let scanScheduled = false;
 
-  /**
-   * @type {Map<string, Item>}
-   */
-  const itemCache = new Map();
+  function getContext(serverId) {
+    const client = window.ApiClient;
+    if (!client || !client.accessToken?.() || !client.getCurrentUserId?.()) return null;
+    const currentServer = client.serverId();
+    if (serverId && serverId !== currentServer) return null;
+    return {
+      client,
+      key: `${currentServer}:${client.getCurrentUserId()}:${client.accessToken()}`,
+      userId: client.getCurrentUserId(),
+    };
+  }
 
-  /**
-   * @type {Settings}
-   */
-  let _settings;
-
-  /**
-   * @param {string} serverId
-   */
-  function getCredentials(serverId) {
-    const storageItem = localStorage.getItem("jellyfin_credentials");
-    if (!storageItem) {
-      return;
+  function normalizeSettings(configuration) {
+    const settings = { ...DEFAULTS, ...configuration };
+    for (const name of ["PreviewDuration", "FrameMinDuration", "TrailerMaxLengthSeconds", "MouseLingerDelay"]) {
+      const value = Number(settings[name]);
+      settings[name] = Number.isFinite(value) && value > 0 ? value : DEFAULTS[name];
     }
-    /**
-     * @type {{Servers: Credentials[]}}
-     */
-    const credentials = JSON.parse(storageItem);
+    return settings;
+  }
 
-    for (const server of credentials?.Servers ?? []) {
-      if (![server.ManualAddress, server.LocalAddress, server.RemoteAddress].includes(location.origin)) {
-        continue;
-      }
-      if (server.Id !== serverId) {
-        continue;
-      }
-      return {
-        serverId: server.Id,
-        serverUrl: location.origin,
-        apiKey: server.AccessToken,
-        userId: server.UserId,
+  async function getSettings(context) {
+    let entry = configurations.get(context.key);
+    if (!entry || entry.expires <= Date.now()) {
+      entry = {
+        expires: Date.now() + 10000,
+        promise: context.client.getJSON(context.client.getUrl("PowerToys/ThumbnailPreviews/Configuration"), true)
+          .then(normalizeSettings)
+          .catch(() => ({ ...DEFAULTS })),
       };
+      configurations.set(context.key, entry);
     }
-    return;
+    return entry.promise;
   }
 
-  /**
-   * @param {string} itemId
-   * @param {string} serverId
-   */
-  async function queryTrickplayMetadata(itemId, serverId) {
-    if (itemCache.has(itemId)) {
-      return itemCache.get(itemId);
-    }
-    const credentials = getCredentials(serverId);
-    if (!credentials) {
-      return;
-    }
-    const url = new URL(`${credentials.serverUrl}/Items`);
-    url.searchParams.set("ServerId", serverId);
-    url.searchParams.set("Ids", itemId);
-    url.searchParams.set("Fields", "Trickplay,RemoteTrailers");
-
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `MediaBrowser Token="${credentials.apiKey}"`,
-      },
-    });
-    if (!response.ok) {
-      return;
-    }
-    /**
-     * @type {{Items: Item[]}}
-     */
-    const data = await response.json();
-    const item = data.Items[0];
-    if (!item) {
-      return;
-    }
-    itemCache.set(itemId, item);
-
-    return item;
-  }
-
-  /**
-   * @param {Node} sprite
-   * @param {Node} mask
-   * @param {TrickplayMetadata} trickplay
-   */
-  function initPreview(sprite, mask, trickplay) {
-    const { TileWidth, TileHeight } = trickplay;
-    const frameWidth = trickplay.Width / TileWidth;
-    const frameHeight = trickplay.Height / TileHeight;
-
-    const containerRect = mask.parentElement.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
-
-    const scaleX = containerWidth / frameWidth;
-    const scaleY = containerHeight / frameHeight;
-    const scale = Math.min(scaleX, scaleY);
-
-    const scaledFrameWidth = frameWidth * scale;
-    const scaledFrameHeight = frameHeight * scale;
-
-    const offsetX = (containerWidth - scaledFrameWidth) / 2;
-    const offsetY = (containerHeight - scaledFrameHeight) / 2;
-
-    mask.style.position = "absolute";
-    mask.style.left = `${offsetX}px`;
-    mask.style.top = `${offsetY}px`;
-    mask.style.width = `${scaledFrameWidth}px`;
-    mask.style.height = `${scaledFrameHeight}px`;
-    mask.style.overflow = "hidden";
-
-    sprite.style.width = `${scaledFrameWidth}px`;
-    sprite.style.height = `${scaledFrameHeight}px`;
-  }
-
-  /**
-   * @param {number} frame
-   * @param {Node} sprite
-   * @param {Node} mask
-   * @param {TrickplayMetadata} trickplay
-   * @param {HTMLImageElement[]} sheets
-   */
-  function showFrame(frame, sprite, mask, trickplay, sheets) {
-    const { TileWidth, TileHeight } = trickplay;
-    const frameWidth = trickplay.Width / TileWidth;
-    const frameHeight = trickplay.Height / TileHeight;
-
-    const framesPerSheet = TileWidth * TileHeight;
-    const sheetIndex = Math.floor(frame / framesPerSheet);
-    const frameInSheet = frame % framesPerSheet;
-
-    const frameX = frameInSheet % TileWidth;
-    const frameY = Math.floor(frameInSheet / TileWidth);
-
-    const containerRect = mask.parentElement.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
-
-    const scaleX = containerWidth / frameWidth;
-    const scaleY = containerHeight / frameHeight;
-    const scale = Math.min(scaleX, scaleY);
-
-    const scaledFrameWidth = frameWidth * scale;
-    const scaledFrameHeight = frameHeight * scale;
-    const scaledSheetWidth = trickplay.Width * scale;
-    const scaledSheetHeight = trickplay.Height * scale;
-
-    sprite.style.backgroundImage = `url(${sheets[sheetIndex].src})`;
-    sprite.style.backgroundSize = `${scaledSheetWidth}px ${scaledSheetHeight}px`;
-    sprite.style.backgroundPosition = `${-frameX * scaledFrameWidth}px ${-frameY * scaledFrameHeight}px`;
-  }
-
-  /**
-   * @param {Node} container
-   * @param {Item} item
-   * @param {Settings} settings
-   * @param {string} resolution
-   */
-  async function playPreview(container, item, settings, resolution) {
-    const credentials = getCredentials(item.ServerId);
-    if (!credentials) {
-      return;
-    }
-
-    let cancel = false;
-    const cancelHandler = () => (cancel = true);
-
-    const mask = document.createElement("div");
-    const sprite = document.createElement("div");
-
-    mask.className = "mask";
-    sprite.className = "sprite";
-
-    mask.appendChild(sprite);
-    container.appendChild(mask);
-    container.classList.add("playing");
-    setTimeout(() => container.addEventListener("click", cancelHandler), 0);
-
-    try {
-      const { serverUrl, apiKey } = credentials;
-      const { Trickplay, RunTimeTicks } = item;
-      const { TileWidth, TileHeight, ThumbnailCount, Interval } = Trickplay[item.Id][resolution];
-
-      let frameSkip = 1;
-      let frameDuration = settings.FrameMinDuration ?? 400;
-      let frameCount = ThumbnailCount;
-      let frameCountEstimate = Math.floor(RunTimeTicks / 100 / Interval / (TileWidth * TileHeight));
-      if (frameCount < frameCountEstimate) {
-        frameCount = frameCountEstimate;
-      }
-      const sheetCount = Math.ceil(frameCount / (TileHeight * TileWidth));
-
-      /**
-       * @type {HTMLImageElement[]}
-       */
-      const sheets = await Promise.all(
-        Array.from(Array(sheetCount))
-          .map((_, i) => `${serverUrl}/Videos/${item.Id}/Trickplay/${resolution}/${i}.jpg?api_key=${apiKey}`)
-          .map(
-            (url) =>
-              new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = (err) => reject(err);
-                img.src = url;
-              }),
-          ),
-      );
-      const framesNeeded = Math.floor(settings.PreviewDuration / frameDuration);
-      if (frameCount > framesNeeded) {
-        frameSkip = Math.ceil(frameCount / framesNeeded);
-      } else {
-        frameDuration = Math.floor(settings.PreviewDuration / frameCount);
-      }
-
-      console.debug("Playing preview", {
-        item,
-        resolution,
-        frameSkip,
-        frameDuration,
-        frameCount,
-        sheetCount,
-        previewFrames: Math.floor(frameCount / frameSkip),
-        totalDuration: settings.PreviewDuration,
-        loopPreview: settings.LoopPreview,
+  async function getItem(context, itemId) {
+    const key = `${context.key}:${itemId}`;
+    if (!items.has(key)) {
+      const promise = context.client.getItems(context.userId, {
+        Ids: itemId,
+        Fields: "Trickplay,RemoteTrailers,MediaSources,LocalTrailerCount",
+      }).then((result) => result.Items?.[0] ?? null).catch(() => {
+        items.delete(key);
+        return null;
       });
-
-      initPreview(sprite, mask, Trickplay[item.Id][resolution]);
-      do {
-        for (let i = 0; i < frameCount; i += frameSkip) {
-          if (cancel) {
-            break;
-          }
-          showFrame(i, sprite, mask, Trickplay[item.Id][resolution], sheets);
-          await new Promise((resolve) => setTimeout(resolve, frameDuration));
-        }
-      } while (!cancel && settings.LoopPreview);
-    } finally {
-      mask.removeChild(sprite);
-      container.removeChild(mask);
-      container.removeEventListener("click", cancelHandler);
-      container.classList.remove("playing");
+      items.set(key, promise);
     }
+    return items.get(key);
   }
 
-  /**
-   * @param {string} url
-   * @returns {boolean}
-   */
-  function isValidUrl(url) {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * @param {string} url
-   * @param {Settings} settings
-   * @returns {Promise<{valid: boolean, duration?: number}>}
-   */
-  async function verifyTrailerUrl(url, settings) {
-    try {
-      const headResponse = await fetch(url, { method: "HEAD", mode: "cors" });
-      if (!headResponse.ok) {
-        return { valid: false };
+  function selectTrickplay(item, settings) {
+    const sources = item.Trickplay ?? {};
+    const mediaSourceId = sources[item.Id] ? item.Id : item.MediaSources?.find((source) => sources[source.Id])?.Id;
+    const resolutions = sources[mediaSourceId];
+    if (!resolutions) return null;
+    const preferred = settings.Resolutions
+      ? settings.Resolutions.split(",").map((value) => value.trim())
+      : Object.keys(resolutions);
+    for (const resolution of preferred) {
+      const metadata = resolutions[resolution];
+      if (metadata && [metadata.Width, metadata.Height, metadata.TileWidth, metadata.TileHeight, metadata.ThumbnailCount]
+        .every((value) => Number.isInteger(value) && value > 0)) {
+        return { resolution, metadata, mediaSourceId };
       }
-      const contentType = headResponse.headers.get("content-type") || "";
-      if (!contentType.startsWith("video/")) {
-        return { valid: false };
-      }
-    } catch (e) {
-      console.debug("HEAD check failed, falling back to video probe", e);
     }
-
-    return new Promise((resolve) => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.crossOrigin = "anonymous";
-
-      const cleanup = () => {
-        video.removeAttribute("src");
-        video.load();
-      };
-
-      const timeout = setTimeout(() => {
-        cleanup();
-        resolve({ valid: false });
-      }, 15000);
-
-      video.onloadedmetadata = () => {
-        const duration = video.duration;
-        clearTimeout(timeout);
-        cleanup();
-
-        if (settings.EnableTrailerLengthLimit && duration > settings.TrailerMaxLengthSeconds) {
-          resolve({ valid: false });
-          return;
-        }
-
-        resolve({ valid: true, duration });
-      };
-
-      video.onerror = () => {
-        clearTimeout(timeout);
-        cleanup();
-        resolve({ valid: false });
-      };
-
-      video.src = url;
-    });
-  }
-
-  /**
-   * @param {string} url
-   * @returns {Promise<boolean>}
-   */
-  function hasAudioTrack(url) {
-    return new Promise((resolve) => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.crossOrigin = "anonymous";
-
-      const cleanup = () => {
-        video.removeAttribute("src");
-        video.load();
-      };
-
-      const timeout = setTimeout(() => {
-        cleanup();
-        resolve(true);
-      }, 10000);
-
-      video.onloadedmetadata = () => {
-        clearTimeout(timeout);
-
-        if (typeof video.audioTracks !== "undefined") {
-          const result = video.audioTracks.length > 0;
-          cleanup();
-          resolve(result);
-          return;
-        }
-
-        const captureStream = video.captureStream || video.mozCaptureStream;
-        if (captureStream) {
-          try {
-            const stream = captureStream.call(video);
-            const result = stream.getAudioTracks().length > 0;
-            stream.getTracks().forEach((t) => t.stop());
-            cleanup();
-            resolve(result);
-            return;
-          } catch (e) {
-            console.debug("captureStream audio check failed", e);
-          }
-        }
-
-        cleanup();
-        resolve(true);
-      };
-
-      video.onerror = () => {
-        clearTimeout(timeout);
-        cleanup();
-        resolve(true);
-      };
-
-      video.src = url;
-    });
-  }
-
-  /**
-   * @param {Item} item
-   * @param {Settings} settings
-   * @returns {Promise<string | null>}
-   */
-  async function getValidTrailerUrl(item, settings) {
-    if (!settings.ShowTrailerPreview) {
-      return null;
-    }
-
-    const credentials = getCredentials(item.ServerId);
-    if (!credentials) {
-      return null;
-    }
-
-    // Try local trailers
-    try {
-      const localTrailersUrl = `${credentials.serverUrl}/Users/${credentials.userId}/Items/${item.Id}/LocalTrailers`;
-      const response = await fetch(localTrailersUrl, {
-        headers: { Authorization: `MediaBrowser Token="${credentials.apiKey}"` },
-      });
-      if (response.ok) {
-        const localTrailers = await response.json();
-        for (const trailer of localTrailers) {
-          const durationTicks = trailer.RunTimeTicks ?? trailer.MediaSources?.[0]?.RunTimeTicks ?? 0;
-          const durationSeconds = durationTicks ? durationTicks / 10000000 : 0;
-          if (settings.EnableTrailerLengthLimit && durationSeconds > settings.TrailerMaxLengthSeconds) {
-            console.debug("Local trailer too long, skipping", { id: trailer.Id, duration: durationSeconds });
-            continue;
-          }
-          const mediaSourceId = trailer.MediaSources?.[0]?.Id ?? trailer.Id;
-          const container = trailer.MediaSources?.[0]?.Container ?? trailer.Container ?? "mp4";
-          const streamUrl = `${credentials.serverUrl}/Videos/${trailer.Id}/stream.${container}?Static=true&mediaSourceId=${mediaSourceId}&api_key=${credentials.apiKey}`;
-          console.debug("Found valid local trailer", { id: trailer.Id, name: trailer.Name, duration: durationSeconds, streamUrl });
-          return streamUrl;
-        }
-      }
-    } catch (err) {
-      console.debug("Local trailer check failed", err);
-    }
-
-    const trailers = item.RemoteTrailers || [];
-
-    for (const trailer of trailers) {
-      if (!trailer.Url || !isValidUrl(trailer.Url)) {
-        continue;
-      }
-
-      const verification = await verifyTrailerUrl(trailer.Url, settings);
-      if (!verification.valid) {
-        continue;
-      }
-
-      console.debug("Found valid trailer", { url: trailer.Url, duration: verification.duration });
-      return trailer.Url;
-    }
-
     return null;
   }
 
-  /**
-   * @param {Node} container
-   * @param {string} trailerUrl
-   * @param {Settings} settings
-   * @returns {Promise<boolean>}
-   */
-  async function playTrailerPreview(container, trailerUrl, settings) {
-    if (settings.OnlyShowSilentTrailers) {
-      const audioDetected = await hasAudioTrack(trailerUrl);
-      if (audioDetected) {
-        console.debug("Trailer has audio, skipping (OnlyShowSilentTrailers)", trailerUrl);
-        return false;
+  function abortError() {
+    return new DOMException("Preview cancelled", "AbortError");
+  }
+
+  function ensureActive(signal) {
+    if (signal.aborted) throw abortError();
+  }
+
+  function wait(duration, signal) {
+    return new Promise((resolve, reject) => {
+      ensureActive(signal);
+      const timer = setTimeout(() => {
+        signal.removeEventListener("abort", cancel);
+        resolve();
+      }, duration);
+      function cancel() {
+        clearTimeout(timer);
+        reject(abortError());
       }
+      signal.addEventListener("abort", cancel, { once: true });
+    });
+  }
+
+  function loadSheet(client, url, signal) {
+    return new Promise((resolve, reject) => {
+      ensureActive(signal);
+      const request = new AbortController();
+      const image = new Image();
+      let objectUrl;
+      let finished = false;
+      const timer = setTimeout(() => finish(new Error("Preview image timed out")), 15000);
+      function finish(error) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        signal.removeEventListener("abort", cancel);
+        request.abort();
+        image.onload = null;
+        image.onerror = null;
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        if (error) {
+          image.src = "";
+          reject(error);
+        } else {
+          resolve(image);
+        }
+      }
+      function cancel() { finish(abortError()); }
+      image.onload = () => finish();
+      image.onerror = () => finish(new Error("Preview image unavailable"));
+      signal.addEventListener("abort", cancel, { once: true });
+      try {
+        const headers = {};
+        client.setRequestHeaders(headers);
+        void fetch(url, { method: "GET", headers, credentials: "same-origin", signal: request.signal })
+          .then((response) => {
+            if (!response.ok) throw new Error("Preview image unavailable");
+            return response.blob();
+          })
+          .then((blob) => {
+            if (finished) return;
+            ensureActive(signal);
+            objectUrl = URL.createObjectURL(blob);
+            image.src = objectUrl;
+          })
+          .catch(finish);
+      } catch (error) {
+        finish(error);
+      }
+    });
+  }
+
+  function releaseVideo(video) {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    video.remove();
+  }
+
+  function probeVideo(url, signal) {
+    return new Promise((resolve, reject) => {
+      ensureActive(signal);
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      const timer = setTimeout(() => finish(null), 15000);
+      function finish(result, error) {
+        clearTimeout(timer);
+        signal.removeEventListener("abort", cancel);
+        video.onloadedmetadata = null;
+        video.onerror = null;
+        releaseVideo(video);
+        if (error) reject(error);
+        else resolve(result);
+      }
+      function cancel() { finish(null, abortError()); }
+      video.onloadedmetadata = () => {
+        let hasAudio = null;
+        if (video.audioTracks) hasAudio = video.audioTracks.length > 0;
+        else if (typeof video.mozHasAudio === "boolean") hasAudio = video.mozHasAudio;
+        else {
+          const captureStream = video.captureStream || video.mozCaptureStream;
+          if (captureStream) {
+            try {
+              const stream = captureStream.call(video);
+              hasAudio = stream.getAudioTracks().length > 0;
+              stream.getTracks().forEach(track => track.stop());
+            } catch {
+            }
+          }
+        }
+        finish({ duration: video.duration, hasAudio });
+      };
+      video.onerror = () => finish(null);
+      signal.addEventListener("abort", cancel, { once: true });
+      video.src = url;
+    });
+  }
+
+  function trailerAllowed(duration, hasAudio, settings) {
+    return (!settings.EnableTrailerLengthLimit || (Number.isFinite(duration) && duration <= settings.TrailerMaxLengthSeconds))
+      && (!settings.OnlyShowSilentTrailers || hasAudio === false);
+  }
+
+  async function getTrailer(context, item, settings, signal) {
+    if (!settings.ShowTrailerPreview) return null;
+    let localTrailers = [];
+    try {
+      localTrailers = await context.client.getLocalTrailers(context.userId, item.Id);
+    } catch {
     }
+    ensureActive(signal);
+    for (const trailer of localTrailers) {
+      const source = trailer.MediaSources?.[0];
+      const durationTicks = source?.RunTimeTicks ?? trailer.RunTimeTicks;
+      const duration = durationTicks ? durationTicks / 10000000 : null;
+      const streams = source?.MediaStreams ?? trailer.MediaStreams;
+      const hasAudio = streams ? streams.some((stream) => stream.Type === "Audio") : null;
+      if (duration && settings.EnableTrailerLengthLimit && duration > settings.TrailerMaxLengthSeconds) continue;
+      if (settings.OnlyShowSilentTrailers && hasAudio === true) continue;
+      const container = source?.Container ?? trailer.Container ?? "mp4";
+      const url = context.client.getUrl(`Videos/${trailer.Id}/stream.${container}`, {
+        Static: true,
+        mediaSourceId: source?.Id ?? trailer.Id,
+        api_key: context.client.accessToken(),
+      });
+      const probe = await probeVideo(url, signal);
+      if (probe && trailerAllowed(duration ?? probe.duration, hasAudio ?? probe.hasAudio, settings)) return url;
+    }
+    for (const trailer of item.RemoteTrailers ?? []) {
+      let url;
+      try {
+        url = new URL(trailer.Url);
+      } catch {
+        continue;
+      }
+      if (!["http:", "https:"].includes(url.protocol)) continue;
+      const probe = await probeVideo(url.href, signal);
+      if (probe && trailerAllowed(probe.duration, probe.hasAudio, settings)) return url.href;
+    }
+    return null;
+  }
 
-    let cancel = false;
-    const cancelHandler = () => (cancel = true);
+  function previewFrames(metadata, settings) {
+    const count = metadata.ThumbnailCount;
+    const desired = Math.max(1, Math.floor(settings.PreviewDuration / settings.FrameMinDuration));
+    const step = Math.max(1, Math.ceil(count / desired));
+    return Array.from({ length: Math.ceil(count / step) }, (_, index) => index * step);
+  }
 
-    const videoContainer = document.createElement("div");
-    videoContainer.className = "trailer-container";
+  async function playSlideshow(state, trickplay, settings, signal) {
+    const { metadata, resolution, mediaSourceId } = trickplay;
+    const frames = previewFrames(metadata, settings);
+    const framesPerSheet = metadata.TileWidth * metadata.TileHeight;
+    const sheets = new Map();
+    const canvas = document.createElement("canvas");
+    canvas.width = metadata.Width;
+    canvas.height = metadata.Height;
+    canvas.className = "powertoys-preview-media";
+    canvas.setAttribute("aria-hidden", "true");
+    const drawing = canvas.getContext("2d");
+    if (!drawing) throw new Error("Preview drawing unavailable");
+    state.overlay.appendChild(canvas);
+    const duration = Math.max(settings.FrameMinDuration, settings.PreviewDuration / frames.length);
+    do {
+      for (const frame of frames) {
+        ensureActive(signal);
+        const sheetIndex = Math.floor(frame / framesPerSheet);
+        if (!sheets.has(sheetIndex)) {
+          const url = state.context.client.getUrl(`Videos/${state.item.Id}/Trickplay/${resolution}/${sheetIndex}.jpg`, {
+            mediaSourceId,
+          });
+          sheets.set(sheetIndex, await loadSheet(state.context.client, url, signal));
+        }
+        const index = frame % framesPerSheet;
+        drawing.drawImage(sheets.get(sheetIndex),
+          (index % metadata.TileWidth) * metadata.Width,
+          Math.floor(index / metadata.TileWidth) * metadata.Height,
+          metadata.Width, metadata.Height, 0, 0, metadata.Width, metadata.Height);
+        await wait(duration, signal);
+      }
+    } while (settings.LoopPreview);
+  }
 
+  async function playTrailer(state, url, settings, signal) {
     const video = document.createElement("video");
-    video.className = "trailer-video";
-    video.src = trailerUrl;
+    video.className = "powertoys-preview-media";
     video.muted = !settings.PlayTrailerAudio;
     video.loop = settings.LoopPreview;
     video.playsInline = true;
-    if (!trailerUrl.startsWith(location.origin)) {
-      video.crossOrigin = "anonymous";
-    }
-
-    videoContainer.appendChild(video);
-    container.appendChild(videoContainer);
-    container.classList.add("playing");
-    container.classList.add("playing-trailer");
-    setTimeout(() => container.addEventListener("click", cancelHandler), 0);
-
+    video.preload = "auto";
+    video.setAttribute("aria-hidden", "true");
+    state.overlay.appendChild(video);
     try {
-      await video.play();
-
-      await new Promise((resolve) => {
-        const checkEnd = () => {
-          if (cancel || video.ended) {
-            resolve();
-          } else {
-            requestAnimationFrame(checkEnd);
-          }
-        };
-        video.addEventListener("ended", resolve, { once: true });
-        checkEnd();
+      await new Promise((resolve, reject) => {
+        ensureActive(signal);
+        function finish(error) {
+          signal.removeEventListener("abort", cancel);
+          video.onended = null;
+          video.onerror = null;
+          if (error) reject(error);
+          else resolve();
+        }
+        function cancel() { finish(abortError()); }
+        video.onended = () => finish();
+        video.onerror = () => finish(new Error("Trailer playback unavailable"));
+        signal.addEventListener("abort", cancel, { once: true });
+        video.src = url;
+        video.play().catch((error) => finish(error));
       });
-    } catch (error) {
-      console.error("Error playing trailer preview", error);
     } finally {
-      video.pause();
-      video.src = "";
-      videoContainer.removeChild(video);
-      container.removeChild(videoContainer);
-      container.removeEventListener("click", cancelHandler);
-      container.classList.remove("playing");
-      container.classList.remove("playing-trailer");
+      releaseVideo(video);
     }
-
-    return true;
   }
 
-  /**
-   * @param {Item} item
-   * @param {string | null} resolution
-   * @param {string | null} trailerUrl
-   */
-  async function createPlayer(item, resolution, trailerUrl) {
-    const container = document.createElement("div");
-    container.className = "preview-player";
-
-    const playButton = document.createElement("button");
-    playButton.className = "play-button";
-
-    const settings = await getSettings(item.ServerId);
-    const play = async () => {
-      playButton.removeEventListener("click", play);
-      try {
-        let played = false;
-        if (trailerUrl) {
-          played = await playTrailerPreview(container, trailerUrl, settings);
-        }
-        if (!played && resolution) {
-          await playPreview(container, item, settings, resolution);
-        }
-      } finally {
-        playButton.addEventListener("click", play);
-      }
-    };
-    playButton.addEventListener("click", play);
-    container.appendChild(playButton);
-
-    const icon = document.createElement("img");
-    const iconName = trailerUrl ? "clapperboard" : "image-play";
-    icon.setAttribute("src", `https://unpkg.com/lucide-static@latest/icons/${iconName}.svg`);
-    playButton.appendChild(icon);
-
-    return container;
+  function setControl(state, playing, loading = false) {
+    const label = playing ? "Stop preview" : "Preview";
+    state.control.setAttribute("aria-label", `${label}: ${state.item.Name ?? "video"}`);
+    state.control.setAttribute("aria-pressed", String(playing));
+    state.control.title = loading ? "Loading preview…" : label;
   }
 
-  /**
-   * @param {string} serverId
-   */
-  async function getSettings(serverId) {
-    if (_settings) {
-      return _settings;
-    }
-    const credentials = getCredentials(serverId);
-    if (credentials) {
-      const response = await fetch(`${credentials.serverUrl}/Plugins/${PLUGIN_ID}/Configuration`, {
-        headers: { Authorization: `MediaBrowser Token="${credentials.apiKey}"` },
-      });
-      if (response.ok) {
-        _settings = await response.json();
-      }
-    }
-    setTimeout(() => {
-      _settings = undefined;
-    }, 10000);
-
-    return (
-      _settings ?? {
-        PreviewDuration: 10000,
-        LoopPreview: false,
-      }
-    );
+  function stopPreview(state) {
+    clearTimeout(state.lingerTimer);
+    state.playback?.abort();
   }
 
-  /**
-   * @param {Node} node
-   */
-  async function injectPlayer(node) {
-    let container = node.querySelector(".cardScalable");
-    if (!container) {
+  async function startPreview(state) {
+    if (state.playback) {
+      stopPreview(state);
       return;
     }
-    if (container.querySelector(".preview-player")) {
-      return;
-    }
-
-    /**
-     * @type {string}
-     */
-    const itemId = node.getAttribute("data-id");
-    /**
-     * @type {string}
-     */
-    const serverId = node.getAttribute("data-serverid");
-
-    const item = await queryTrickplayMetadata(itemId, serverId);
-    if (!item) {
-      return;
-    }
-
-    const settings = await getSettings(serverId);
-
-    let trailerUrl = null;
+    if (!state.card.isConnected) return;
+    if (activePreview) stopPreview(activePreview);
+    const playback = new AbortController();
+    state.playback = playback;
+    activePreview = state;
+    const signal = playback.signal;
+    state.overlay = document.createElement("div");
+    state.overlay.className = "powertoys-preview-overlay";
+    state.overlay.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      stopPreview(state);
+    });
+    state.surface.appendChild(state.overlay);
+    state.surface.classList.add("powertoys-preview-playing");
+    setControl(state, true, true);
     try {
-      trailerUrl = await getValidTrailerUrl(item, settings);
-    } catch (err) {
-      console.debug("Trailer check failed", err);
-    }
-
-    let resolution = null;
-    if (item.Trickplay?.[itemId]) {
-      if (settings.Resolutions) {
-        for (const key of settings.Resolutions.split(",").map((key) => key.trim())) {
-          if (item.Trickplay[item.Id][key]) {
-            resolution = key;
-            break;
-          }
+      const settings = await getSettings(state.context);
+      ensureActive(signal);
+      const trickplay = selectTrickplay(state.item, settings);
+      let played = false;
+      const trailer = await getTrailer(state.context, state.item, settings, signal);
+      ensureActive(signal);
+      setControl(state, true);
+      if (trailer) {
+        try {
+          await playTrailer(state, trailer, settings, signal);
+          played = true;
+        } catch (error) {
+          if (error.name === "AbortError") throw error;
         }
-      } else {
-        resolution = Object.keys(item.Trickplay[item.Id])[0];
       }
-    }
-
-    if (!trailerUrl && !resolution) {
-      return;
-    }
-
-    const playerContainer = await createPlayer(item, resolution, trailerUrl);
-    container.appendChild(playerContainer);
-
-    if (settings.EnableHoverPlay) {
-      let lingerTimeout = null;
-      let cooldownActive = false;
-      let cooldownTimer = null;
-      let mouseLeft = false;
-
-      const startCooldown = () => {
-        cooldownActive = true;
-        mouseLeft = false;
-        clearTimeout(cooldownTimer);
-        cooldownTimer = setTimeout(
-          () => {
-            if (mouseLeft) {
-              cooldownActive = false;
-            } else {
-              cooldownTimer = null;
-            }
-          },
-          (settings.MouseLingerDelay || 800) * 2,
-        );
-      };
-
-      const observer = new MutationObserver(() => {
-        if (!playerContainer.classList.contains("playing") && !cooldownActive) return;
-        if (!playerContainer.classList.contains("playing")) {
-          startCooldown();
-        }
-      });
-      observer.observe(playerContainer, { attributes: true, attributeFilter: ["class"] });
-
-      node.addEventListener("mouseenter", () => {
-        if (playerContainer.classList.contains("playing")) return;
-        if (cooldownActive) return;
-        lingerTimeout = setTimeout(() => {
-          playerContainer.querySelector(".play-button")?.click();
-        }, settings.MouseLingerDelay || 800);
-      });
-      node.addEventListener("mouseleave", () => {
-        if (lingerTimeout) {
-          clearTimeout(lingerTimeout);
-          lingerTimeout = null;
-        }
-        if (cooldownActive) {
-          if (!cooldownTimer) {
-            cooldownActive = false;
-          } else {
-            mouseLeft = true;
-          }
-        }
-      });
+      if (!played && trickplay) await playSlideshow(state, trickplay, settings, signal);
+    } catch (error) {
+      if (error.name !== "AbortError") console.debug("Thumbnail preview unavailable");
+    } finally {
+      state.overlay?.remove();
+      state.overlay = null;
+      state.surface.classList.remove("powertoys-preview-playing");
+      state.playback = null;
+      if (activePreview === state) activePreview = null;
+      state.cooldownUntil = Date.now() + (state.settings.MouseLingerDelay * 2);
+      setControl(state, false);
     }
   }
 
-  const querySelector = "[data-mediatype=Video]";
-
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type !== "childList") {
-        continue;
+  function createControl(state, hasTrailer) {
+    const control = document.createElement(state.card.tagName === "BUTTON" ? "span" : "button");
+    if (control.tagName === "BUTTON") control.type = "button";
+    else {
+      control.setAttribute("role", "button");
+      control.tabIndex = 0;
+    }
+    control.className = "powertoys-preview-toggle";
+    const icon = document.createElement("img");
+    const iconName = hasTrailer ? "clapperboard" : "image-play";
+    icon.setAttribute("src", `https://unpkg.com/lucide-static@latest/icons/${iconName}.svg`);
+    icon.alt = "";
+    icon.setAttribute("aria-hidden", "true");
+    control.appendChild(icon);
+    control.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      void startPreview(state);
+    });
+    control.addEventListener("keydown", (event) => {
+      if (["Enter", " "].includes(event.key)) {
+        event.preventDefault();
+        event.stopPropagation();
+        void startPreview(state);
       }
-      for (const node of mutation.addedNodes) {
-        if (node.nodeType !== 1) {
-          continue;
-        }
-        if (node?.matches(querySelector)) {
-          injectPlayer(node);
-        }
-        for (const child of node?.querySelectorAll(querySelector) ?? []) {
-          injectPlayer(child);
-        }
+    });
+    state.control = control;
+    setControl(state, false);
+    return control;
+  }
+
+  function removeCard(state) {
+    stopPreview(state);
+    state.discovery.abort();
+    state.control?.remove();
+    state.surface.classList.remove("powertoys-preview-host");
+    state.card.removeEventListener("mouseenter", state.enter);
+    state.card.removeEventListener("mouseleave", state.leave);
+    cards.delete(state.card);
+  }
+
+  async function attachCard(card, context) {
+    const surface = card.querySelector(".cardScalable");
+    if (!surface) return;
+    const itemId = card.getAttribute("data-id");
+    const state = { card, surface, context, itemId, discovery: new AbortController(), cooldownUntil: 0 };
+    cards.set(card, state);
+    try {
+      const [item, settings] = await Promise.all([getItem(context, itemId), getSettings(context)]);
+      ensureActive(state.discovery.signal);
+      if (!item) {
+        cards.delete(card);
+        return;
+      }
+      if (!card.isConnected || cards.get(card) !== state) return;
+      state.item = item;
+      state.settings = settings;
+      const trickplay = selectTrickplay(item, settings);
+      const hasTrailer = settings.ShowTrailerPreview && (item.LocalTrailerCount > 0 || item.RemoteTrailers?.length > 0);
+      if (!trickplay && !hasTrailer) return;
+      surface.classList.add("powertoys-preview-host");
+      surface.appendChild(createControl(state, hasTrailer));
+      state.enter = () => {
+        if (!state.settings.EnableHoverPlay || state.playback || Date.now() < state.cooldownUntil) return;
+        clearTimeout(state.lingerTimer);
+        state.lingerTimer = setTimeout(() => void startPreview(state), state.settings.MouseLingerDelay);
+      };
+      state.leave = () => clearTimeout(state.lingerTimer);
+      card.addEventListener("mouseenter", state.enter);
+      card.addEventListener("mouseleave", state.leave);
+    } catch (error) {
+      if (error.name !== "AbortError") console.debug("Thumbnail preview unavailable");
+    }
+  }
+
+  function reconcile() {
+    scanScheduled = false;
+    const context = getContext();
+    if (context?.key !== contextKey) {
+      for (const state of cards.values()) removeCard(state);
+      items.clear();
+      configurations.clear();
+      contextKey = context?.key;
+    }
+    for (const state of cards.values()) {
+      if (!state.card.isConnected || state.card.getAttribute("data-id") !== state.itemId
+        || getContext(state.card.getAttribute("data-serverid"))?.key !== state.context.key
+        || state.card.querySelector(".cardScalable") !== state.surface || (state.control && !state.control.isConnected)) {
+        removeCard(state);
       }
     }
-  });
+    if (!context) return;
+    for (const card of document.querySelectorAll(CARD_SELECTOR)) {
+      const mediaType = card.getAttribute("data-mediatype")?.toLowerCase();
+      if (mediaType !== "video" || cards.has(card)) continue;
+      if (getContext(card.getAttribute("data-serverid"))) void attachCard(card, context);
+    }
+  }
 
-  document.querySelectorAll(querySelector).forEach(injectPlayer);
+  function scheduleScan() {
+    if (scanScheduled) return;
+    scanScheduled = true;
+    requestAnimationFrame(reconcile);
+  }
 
+  function stopAll() {
+    for (const state of cards.values()) stopPreview(state);
+  }
+
+  const observer = new MutationObserver(scheduleScan);
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ["data-id", "data-serverid", "data-mediatype"],
   });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && activePreview) {
+      event.preventDefault();
+      stopPreview(activePreview);
+    }
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopAll();
+    else scheduleScan();
+  });
+  window.addEventListener("hashchange", () => { stopAll(); scheduleScan(); });
+  window.addEventListener("popstate", () => { stopAll(); scheduleScan(); });
+  window.addEventListener("storage", scheduleScan);
+  window.addEventListener("focus", scheduleScan);
+  window.addEventListener("pagehide", stopAll);
+  scheduleScan();
+  setTimeout(scheduleScan, 1000);
 })();

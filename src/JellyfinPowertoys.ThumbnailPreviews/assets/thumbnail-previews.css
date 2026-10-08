@@ -1,36 +1,30 @@
-.preview-player {
+.powertoys-preview-host {
+  position: relative;
+}
+
+.powertoys-preview-toggle {
   position: absolute;
   top: 4px;
   left: 4px;
-  width: 36px;
-  height: 36px;
-  pointer-events: none;
-}
-
-.preview-player.playing {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.preview-player .play-button {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0);
-  border: none;
-  cursor: pointer;
+  z-index: 8;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
   padding: 0;
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
   pointer-events: auto;
   transition: all 0.2s ease;
 }
 
-.preview-player .play-button img {
+.powertoys-preview-toggle:focus-visible {
+  box-shadow: 0 0 0 2px #080b10, 0 0 0 4px #fff;
+}
+
+.powertoys-preview-toggle img {
   width: 28px;
   height: 28px;
   filter: invert(1);
@@ -38,40 +32,28 @@
   pointer-events: none;
 }
 
-.preview-player .play-button:hover img {
+.powertoys-preview-toggle:hover img {
   transform: scale(1.15);
   filter: invert(1) blur(1px);
 }
 
-.preview-player .mask {
+.powertoys-preview-overlay {
   position: absolute;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-.preview-player .mask .sprite {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-repeat: no-repeat;
-  z-index: 9999;
-}
-
-.preview-player .trailer-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+  z-index: 7;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: inherit;
+  background: #080b10;
+  cursor: pointer;
 }
 
-.preview-player .trailer-container .trailer-video {
+.powertoys-preview-media {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  pointer-events: none;
 }
