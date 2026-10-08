@@ -12,5 +12,8 @@ export default defineConfig([
         ...globals.browser,
       },
     },
+    rules: {
+      "no-empty": ["error", { allowEmptyCatch: true }],
+    },
   },
 ]);
