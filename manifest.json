@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.CastCurator.zip",
+        "checksum": "178ecc5e62db30d8a032fb2ca072e0f1",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
+      {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
         "targetAbi": "10.11.9.0",
@@ -155,6 +163,14 @@
     "overview": "Automatically organize your library by studio.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.StudioCurator.zip",
+        "checksum": "161a69d8f6bfaaea0d471b044b258cd3",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
       {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
@@ -303,6 +319,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.PrivacyMode.zip",
+        "checksum": "dfdd22cd89e9e6a69fdae7d3dac2db95",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
+      {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
         "targetAbi": "10.11.9.0",
@@ -449,6 +473,14 @@
     "overview": "Enables playback of remote trailers from any source.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.RemoteTrailers.zip",
+        "checksum": "202e0853fe83ff2a420b31acfa669e7c",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
       {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
@@ -597,6 +629,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.ThumbnailPreviews.zip",
+        "checksum": "faed82f27713bcd03b3781e19f993cf4",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
+      {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
         "targetAbi": "10.11.9.0",
@@ -744,6 +784,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
       {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.WatchHistoryJanitor.zip",
+        "checksum": "ba78c9797cfef858a4274b69d0b2be45",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
+      {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
         "targetAbi": "10.11.9.0",
@@ -890,6 +938,14 @@
     "overview": "Simplified tag management. Add, remove, and manage tags right from the context menu.",
     "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
     "versions": [
+      {
+        "version": "1.4.0.0",
+        "changelog": "Fix Cast Curator sync for Jellyfin 12.1\n\nBuild the plugins against Jellyfin 12.1 and .NET 10. Consume the updated people query result and keep the original formatting. Use the 1.4 release line on main while Jellyfin 10.11 remains on its independent maintenance branch.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lennykean/jellyfin-powertoys/releases/download/v1.4.0.0/JellyfinPowertoys.JellyTag.zip",
+        "checksum": "9cc7b2a8b921a14d4dab40f1c3559d03",
+        "timestamp": "2026-10-08T03:04:45Z"
+      },
       {
         "version": "1.3.0.0",
         "changelog": "upgrade to jellyfin 10.11.9",
