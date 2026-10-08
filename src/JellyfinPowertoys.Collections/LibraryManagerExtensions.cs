@@ -20,17 +20,17 @@ public static class LibraryManagerExtensions
     public static async Task<Folder> GetCustomCollectionsFolderAsync(this ILibraryManager libraryManager, string name, string appDataPath, ILibraryMonitor monitor)
     {
         var path = Path.Combine(appDataPath, $"{name.ToLower().Replace(" ", "-")}-collections");
+        var folder = libraryManager.RootFolder.Children
+            .OfType<Folder>()
+            .FirstOrDefault(f => f.Path == path);
+        if (folder is not null)
+        {
+            return folder;
+        }
         try
         {
             monitor.ReportFileSystemChangeBeginning(path);
 
-            var folder = libraryManager.RootFolder.Children
-                .OfType<Folder>()
-                .FirstOrDefault(f => f.Path == path);
-            if (folder is not null)
-            {
-                return folder;
-            }
             var directory = Directory.CreateDirectory(path);
             folder = new()
             {
@@ -83,8 +83,18 @@ public static class LibraryManagerExtensions
         }
         finally
         {
-            monitor.ReportFileSystemChangeComplete(path, true);
+            monitor.ReportFileSystemChangeComplete(path, false);
         }
+    }
+
+    public static async Task SaveCustomCollectionAsync(this BoxSet collection, IFileSystem fileSystem, CancellationToken cancellationToken = default)
+    {
+        collection.UpdateRatingToItems(collection.GetLinkedChildren().ToArray());
+        await collection.UpdateToRepositoryAsync(ItemUpdateType.MetadataEdit, cancellationToken);
+        await collection.RefreshMetadata(new(new DirectoryService(fileSystem))
+        {
+            ForceSave = true,
+        }, cancellationToken);
     }
 
     public static async Task SyncMetadataAsync(

@@ -10,7 +10,6 @@ using Jellyfin.Data.Enums;
 using JellyfinPowertoys.Collections;
 
 using MediaBrowser.Common.Configuration;
-using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Library;
@@ -23,7 +22,6 @@ namespace JellyfinPowertoys.StudioCurator;
 
 public class ScheduledTask(
     ILibraryManager libraryManager,
-    ICollectionManager collectionManager,
     ILibraryMonitor libraryMonitor,
     IFileSystem fileSystem,
     IApplicationPaths appPaths,
@@ -86,6 +84,17 @@ public class ScheduledTask(
                     .GetItemList(new() { Recursive = true, StudioIds = [studio.Id], ExcludeItemTypes = [BaseItemKind.BoxSet] })
                     .ToDictionary(k => k.Id, v => v);
                 var collectionItems = collection?.GetLinkedChildren().ToDictionary(k => k.Id, v => v) ?? [];
+                var collectionChanged = false;
+
+                if (!studioItems.Values.Any(ItemMatchesFilters))
+                {
+                    if (collection is not null)
+                    {
+                        logger.LogDebug("Collection {CollectionId} ({CollectionName}) has no items, deleting it", collection.Id, collection.Name);
+                        libraryManager.DeleteItem(collection, new() { DeleteFileLocation = true });
+                    }
+                    continue;
+                }
 
                 foreach (var itemId in studioItems.Keys.Union(collectionItems.Keys))
                 {
@@ -105,7 +114,12 @@ public class ScheduledTask(
                                 item.Name,
                                 collection.Id,
                                 collection.Name);
-                            await collectionManager.RemoveFromCollectionAsync(collection.Id, [item.Id]);
+                            var child = collection.LinkedChildren.FirstOrDefault(c => c.ItemId == item.Id);
+                            if (child is not null)
+                            {
+                                collection.LinkedChildren = collection.LinkedChildren.Except([child]).ToArray();
+                                collectionChanged = true;
+                            }
                             collectionItems.Remove(itemId);
                         }
                     }
@@ -119,13 +133,18 @@ public class ScheduledTask(
                                 collection = libraryManager.CreateCustomCollection(studio.Name, studioCollectionsFolder, libraryMonitor);
                             }
                             logger.LogDebug("Adding item {ItemId} ({ItemName}) to collection {CollectionId}", itemId, item.Name, collection.Id);
-                            await collectionManager.AddToCollectionAsync(collection.Id, [item.Id]);
+                            collection.LinkedChildren = [.. collection.LinkedChildren, LinkedChild.Create(item)];
+                            collectionChanged = true;
                             collectionItems[itemId] = item;
                         }
                     }
                 }
                 if (collection is not null && collectionItems.Count > 0)
                 {
+                    if (collectionChanged)
+                    {
+                        await collection.SaveCustomCollectionAsync(fileSystem, cancellationToken);
+                    }
                     await libraryManager.SyncMetadataAsync(studio, collection, fileSystem, Plugin.Instance!.Configuration.FetchMissingMetadata, cancellationToken);
                 }
                 else if (collection is not null)

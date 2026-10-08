@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using JellyfinPowertoys.Collections;
 
 using MediaBrowser.Common.Configuration;
-using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Library;
@@ -22,7 +21,6 @@ namespace JellyfinPowertoys.CastCurator;
 
 public class ScheduledTask(
     ILibraryManager libraryManager,
-    ICollectionManager collectionManager,
     ILibraryMonitor libraryMonitor,
     IFileSystem fileSystem,
     IApplicationPaths appPaths,
@@ -84,9 +82,38 @@ public class ScheduledTask(
                 }
 
                 var personItems = libraryManager.GetItemList(new() { Recursive = true, PersonIds = [person.Id] }).ToDictionary(k => k.Id, v => v);
-                var collectionItems = collection?.GetLinkedChildren().ToDictionary(k => k.Id, v => v) ?? [];
+                var matchingPersonItems = new Dictionary<Guid, BaseItem>();
+                foreach (var item in personItems.Values)
+                {
+                    if (!ItemMatchesFilters(item))
+                    {
+                        continue;
+                    }
+                    if (!itemRoleCache.TryGetValue(item.Id, out var itemRoles))
+                    {
+                        itemRoles = libraryManager.GetPeople(item).ToLookup(k => k.Name, v => v);
+                        itemRoleCache[item.Id] = itemRoles;
+                    }
+                    if (itemRoles[name].Any(RoleMatchesFilters))
+                    {
+                        matchingPersonItems.Add(item.Id, item);
+                    }
+                }
 
-                foreach (var itemId in personItems.Keys.Union(collectionItems.Keys))
+                var collectionItems = collection?.GetLinkedChildren().ToDictionary(k => k.Id, v => v) ?? [];
+                var collectionChanged = false;
+
+                if (matchingPersonItems.Count == 0)
+                {
+                    if (collection is not null)
+                    {
+                        logger.LogDebug("Collection {CollectionId} ({CollectionName}) has no items, deleting it", collection.Id, collection.Name);
+                        libraryManager.DeleteItem(collection, new() { DeleteFileLocation = true });
+                    }
+                    continue;
+                }
+
+                foreach (var itemId in matchingPersonItems.Keys.Union(collectionItems.Keys))
                 {
                     var item = personItems.TryGetValue(itemId, out var p)
                         ? p
@@ -94,14 +121,9 @@ public class ScheduledTask(
                             ? c
                             : throw new InvalidOperationException($"Item {itemId} not found in person or collection");
 
-                    if (!itemRoleCache.TryGetValue(itemId, out var itemRoles))
-                    {
-                        itemRoles = libraryManager.GetPeople(item).ToLookup(k => k.Name, v => v);
-                        itemRoleCache[itemId] = itemRoles;
-                    }
                     if (collection is not null && collectionItems.ContainsKey(itemId))
                     {
-                        if (!personItems.ContainsKey(itemId) || !(ItemMatchesFilters(item) && itemRoles.Contains(name) && itemRoles[name].Any(RoleMatchesFilters)))
+                        if (!matchingPersonItems.ContainsKey(itemId))
                         {
                             logger.LogDebug(
                                 "Item {ItemId} ({ItemName}) does not match filters, deleting it from collection {CollectionId} ({CollectionName})",
@@ -109,27 +131,34 @@ public class ScheduledTask(
                                 item.Name,
                                 collection.Id,
                                 collection.Name);
-                            await collectionManager.RemoveFromCollectionAsync(collection.Id, [item.Id]);
+                            var child = collection.LinkedChildren.FirstOrDefault(c => c.ItemId == item.Id);
+                            if (child is not null)
+                            {
+                                collection.LinkedChildren = collection.LinkedChildren.Except([child]).ToArray();
+                                collectionChanged = true;
+                            }
                             collectionItems.Remove(itemId);
                         }
                     }
-                    else if (personItems.ContainsKey(itemId))
+                    else if (matchingPersonItems.ContainsKey(itemId))
                     {
-                        if (ItemMatchesFilters(item) && itemRoles.Contains(name) && itemRoles[name].Any(RoleMatchesFilters))
+                        if (collection is null)
                         {
-                            if (collection is null)
-                            {
-                                logger.LogDebug("Collection for person {PersonId} ({PersonName}) was not found, creating it", person.Id, person.Name);
-                                collection = libraryManager.CreateCustomCollection(person.Name, peopleCollectionsFolder, libraryMonitor);
-                            }
-                            logger.LogDebug("Adding item {ItemId} ({ItemName}) to collection {CollectionId}", itemId, item.Name, collection.Id);
-                            await collectionManager.AddToCollectionAsync(collection.Id, [item.Id]);
-                            collectionItems[itemId] = item;
+                            logger.LogDebug("Collection for person {PersonId} ({PersonName}) was not found, creating it", person.Id, person.Name);
+                            collection = libraryManager.CreateCustomCollection(person.Name, peopleCollectionsFolder, libraryMonitor);
                         }
+                        logger.LogDebug("Adding item {ItemId} ({ItemName}) to collection {CollectionId}", itemId, item.Name, collection.Id);
+                        collection.LinkedChildren = [.. collection.LinkedChildren, LinkedChild.Create(item)];
+                        collectionChanged = true;
+                        collectionItems[itemId] = item;
                     }
                 }
                 if (collection is not null && collectionItems.Count > 0)
                 {
+                    if (collectionChanged)
+                    {
+                        await collection.SaveCustomCollectionAsync(fileSystem, cancellationToken);
+                    }
                     await libraryManager.SyncMetadataAsync(person, collection, fileSystem, Plugin.Instance!.Configuration.FetchMissingMetadata, cancellationToken);
                 }
                 else if (collection is not null)
