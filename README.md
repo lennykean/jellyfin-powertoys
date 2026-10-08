@@ -17,6 +17,18 @@ A collection of plugins to enhance Jellyfin media server with additional feature
 4. Install the desired plugins
 5. Restart the Jellyfin server
 
+## Jellyfin versions and releases
+
+| Jellyfin version | Source branch | Plugin release line |
+| --- | --- | --- |
+| 12.1 | `main` | `1.4.x.x` |
+| 10.11.9 | `jellyfin-10.11` | `1.3.x.x` |
+| 10.9 | `jellyfin-10.9` | `1.1.x.x` |
+
+Each branch releases independently. All releases update the shared catalog at `main/manifest.json`, so the catalog URL stays the same.
+
+Create release tags on the corresponding source branch and keep their version numbers within that branch's release line. Newer Jellyfin lines must have higher plugin version numbers because Jellyfin selects the highest compatible version from the catalog.
+
 ## Plugins
 
 ### Thumbnail Previews

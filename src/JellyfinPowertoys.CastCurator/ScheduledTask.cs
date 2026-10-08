@@ -46,7 +46,7 @@ public class ScheduledTask(
         var itemRoleCache = new Dictionary<Guid, ILookup<string, PersonInfo>>();
 
         var peopleCollectionsFolder = await libraryManager.GetCustomCollectionsFolderAsync("People", appPaths.DataPath, libraryMonitor);
-        var people = libraryManager.GetPeopleItems(new() { }).GroupBy(x => x.Name).ToDictionary(g => g.Key, g => g.First());
+        var people = libraryManager.GetPeopleItems(new() { }).Items.OfType<Person>().GroupBy(x => x.Name).ToDictionary(g => g.Key, g => g.First());
         var collections = libraryManager.GetItemList(new() { ParentId = peopleCollectionsFolder.Id, })
             .OfType<BoxSet>()
             .GroupBy(x => x.Name)
