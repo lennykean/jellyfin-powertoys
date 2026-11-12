@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{box.width}} {{box.height}}">
+  <circle cx="{{box.width | div:2}}" cy="{{box.height | mul:0.39}}" r="{{box.width | mul:0.21}}" fill="#F2C9CF"/>
+  <ellipse cx="{{box.width | div:2}}" cy="{{box.height | mul:0.875}}" rx="{{box.width | mul:0.4}}" ry="{{box.height | mul:0.25}}" fill="#F2C9CF"/>
+</svg>

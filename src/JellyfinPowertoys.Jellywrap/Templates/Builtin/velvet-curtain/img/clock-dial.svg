@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="145 145 830 830" width="830" height="830">
+  <circle id="rim" cx="560" cy="560" r="410" fill="none" stroke="#E3B04B" stroke-width="8"/>
+  <circle id="hub" cx="560" cy="560" r="110" fill="none" stroke="#E3B04B" stroke-width="3"/>
+  <line x1="560" y1="188" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="6"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(15 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(30 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(45 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(60 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(75 560 560)"/>
+  <line x1="560" y1="188" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="6" transform="rotate(90 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(105 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(120 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(135 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(150 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(165 560 560)"/>
+  <line x1="560" y1="188" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="6" transform="rotate(180 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(195 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(210 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(225 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(240 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(255 560 560)"/>
+  <line x1="560" y1="188" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="6" transform="rotate(270 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(285 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(300 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(315 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(330 560 560)"/>
+  <line x1="560" y1="168" x2="560" y2="156" fill="none" stroke="#E3B04B" stroke-width="3" transform="rotate(345 560 560)"/>
+</svg>

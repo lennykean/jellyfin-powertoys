@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="260 830 1400 46">
+  <rect x="260" y="830" width="{{tvp | mul:14}}" height="46" fill="#6B1E3A"/>
+  <rect x="{{tvp | mul:14 | add:260}}" y="830" width="{{mvp | mul:14}}" height="46" fill="#D9546E"/>
+  <rect x="{{tvp | add:mvp | mul:14 | add:260}}" y="830" width="{{mup | mul:14}}" height="46" fill="#2A1020"/>
+</svg>

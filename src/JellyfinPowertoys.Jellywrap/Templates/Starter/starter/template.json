@@ -1,0 +1,27 @@
+{
+  "id": "starter",
+  "name": "Starter",
+  "audience": "general",
+  "extends": { "individual": "adult", "server": "server" },
+  "palette": { "bg": "#14213D", "ink": "#FFFFFF", "accent": "#FCA311" },
+  "slides": {
+    "intro": {
+      "elements": [
+        {
+          "id": "badge",
+          "type": "image",
+          "src": "img/badge.svg",
+          "x": 960,
+          "y": 300,
+          "width": 240,
+          "height": 240,
+          "anchor": "center",
+          "fit": "contain",
+          "in": "pop",
+          "idle": "float"
+        },
+        { "id": "base-headline", "color": "accent", "y": 620, "y2": 660 }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-242 278 484 469" width="484" height="469">
+  <line id="a1" x1="0" y1="395" x2="-70" y2="300" fill="none" stroke="#1E1B4B" stroke-width="10" stroke-linecap="round"/>
+  <line id="a2" x1="0" y1="395" x2="76" y2="306" fill="none" stroke="#1E1B4B" stroke-width="10" stroke-linecap="round"/>
+  <circle id="k1" cx="-70" cy="300" r="17" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8"/>
+  <circle id="k2" cx="76" cy="306" r="17" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8"/>
+  <rect id="set" x="-235" y="390" width="470" height="350" rx="56" fill="{{item.c}}" stroke="#1E1B4B" stroke-width="12" stroke-linejoin="round"/>
+  <rect id="screen" x="-200" y="425" width="400" height="280" rx="38" fill="#FFF8E7" stroke="#1E1B4B" stroke-width="10" stroke-linejoin="round"/>
+</svg>

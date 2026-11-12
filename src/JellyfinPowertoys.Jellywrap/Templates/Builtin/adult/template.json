@@ -1,0 +1,375 @@
+{
+  "id": "adult",
+  "name": "Adult (base)",
+  "audience": "base",
+  "fonts": { "body": "fonts/Manrope-700.ttf" },
+  "palette": { "bg": "#101418", "ink": "#F2F2F2", "accent": "#7DE2D1" },
+  "background": "#000000",
+  "transition": { "type": "crossfade", "duration": 0.8 },
+  "open": { "type": "fade", "duration": 0.5, "ease": "out" },
+  "close": { "type": "fade", "duration": 0.8, "ease": "in-out" },
+  "card": { "slide": "intro", "time": 5 },
+  "vars": {
+    "isEpisode": "me.mostReplayed.kind == \"episode\"",
+    "replayedName": "{{isEpisode | then:\"'\"}}{{me.mostReplayed.title}}{{isEpisode | then:\"'\"}}{{me.mostReplayed.seriesTitle | then:\" (\"}}{{me.mostReplayed.seriesTitle}}{{me.mostReplayed.seriesTitle | then:\")\"}}"
+  },
+  "slides": {
+    "intro": {
+      "duration": 6,
+      "audioGroup": 1,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 120,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "title",
+          "size2": 80,
+          "maxWidth": 1600,
+          "y2": 600,
+          "in": "fade-up",
+          "text": "{{me.name}}, your {{year}} on Jellyfin"
+        }
+      ]
+    },
+    "total-time": {
+      "duration": 8,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "me.totals.hours > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 56,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "You spent {{me.totals.hours | hours:\"number\"}} hours with Jellyfin, that's {{me.totals.days | days}}."
+        }
+      ]
+    },
+    "rhythm": {
+      "duration": 7,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "me.rhythm.streak >= 3",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "You showed up on {{me.rhythm.activeDays}} days. Longest streak: {{me.rhythm.streak}} days ({{me.rhythm.streakFrom | date:\"MMM d\"}} – {{me.rhythm.streakTo | date:\"MMM d\"}})."
+        }
+      ]
+    },
+    "mix": {
+      "duration": 8,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "(me.mix.tv | round:2) < 1 && (me.mix.movies | round:2) < 1 && (me.mix.music | round:2) < 1",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "fade-up",
+          "text": "{{me.mix.tv | percent}} TV · {{me.mix.movies | percent}} movies · {{me.mix.music | percent}} music"
+        }
+      ]
+    },
+    "top-genre": {
+      "duration": 8,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topGenres | count > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "fade-up",
+          "text": "Your genre: {{me.topGenres[0].name}} ({{me.topGenres[0].share | percent}})."
+        }
+      ]
+    },
+    "top-series": {
+      "duration": 12,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topSeries | count >= 3",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Your top shows" }
+      ]
+    },
+    "top-movies": {
+      "duration": 12,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topMovies | count >= 3",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Your top movies" }
+      ]
+    },
+    "top-actor": {
+      "duration": 8,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topActors | count > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 56,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "You spent {{me.topActors[0].hours | hours:\"number\"}} hours with {{me.topActors[0].name}}."
+        }
+      ]
+    },
+    "binge": {
+      "duration": 8,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "me.binge.episodes >= 3",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{me.binge.date | date:\"dddd, MMMM d\"}}: {{me.binge.episodes}} episodes of {{me.binge.series.title}} in one sitting."
+        }
+      ]
+    },
+    "clock": {
+      "duration": 8,
+      "audioGroup": 3,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "in": "fade-up",
+          "text": "Your peak hour: {{me.clock.peakHour | hour}}."
+        }
+      ]
+    },
+    "busiest": {
+      "duration": 7,
+      "audioGroup": 3,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 64,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 48,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "Busiest month: {{me.busiest.month}} ({{me.busiest.monthHours | hours:\"number\"}} h). Busiest day: {{me.busiest.day | date:\"dddd, MMMM d\"}} ({{me.busiest.dayHours | hm}})."
+        }
+      ]
+    },
+    "rewatches": {
+      "duration": 7,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "me.mostReplayed.completions >= 2",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "You came back to {{replayedName}} {{me.mostReplayed.completions}} times."
+        }
+      ]
+    },
+    "new-vs-classic": {
+      "duration": 7,
+      "audioGroup": 3,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{me.newVsClassic.recentShare | percent}} of your watching was from {{year | sub:1}}–{{year}}."
+        }
+      ]
+    },
+    "music": {
+      "duration": 10,
+      "audioGroup": 4,
+      "background": "bg",
+      "when": "me.music != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{me.music.hours | hours:\"number\"}} hours of music. Top artist: {{me.music.topArtist.name}}."
+        }
+      ]
+    },
+    "persona": {
+      "duration": 12,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 120,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "fade-up",
+          "text": "You're {{me.persona.name}}."
+        }
+      ]
+    },
+    "summary": {
+      "duration": 12,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 64,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 48,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{me.totals.hours | hours}} · {{me.topSeries[0].title | default:me.topMovies[0].title}} · {{me.persona.name}}"
+        }
+      ]
+    },
+    "outro": {
+      "duration": 5,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 96,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "in": "fade-up",
+          "text": "That was your {{year}}. See you next year."
+        }
+      ]
+    }
+  }
+}

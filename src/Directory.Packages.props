@@ -1,7 +1,14 @@
 <Project>
+  <PropertyGroup>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="HarfBuzzSharp" Version="8.3.1.5" />
     <PackageVersion Include="HttpResponseTransformer" Version="0.1.2.11-prerelease" />
     <PackageVersion Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44" />
     <PackageVersion Include="Jellyfin.Controller" Version="12.1.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Http" Version="2.1.22" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageVersion Include="SkiaSharp" Version="3.119.4" />
   </ItemGroup>
 </Project>

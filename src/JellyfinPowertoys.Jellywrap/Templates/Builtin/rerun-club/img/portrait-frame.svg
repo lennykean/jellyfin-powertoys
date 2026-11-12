@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="259 209 562 702" width="562" height="702">
+  <ellipse id="frame" cx="540" cy="560" rx="280" ry="350" fill="#3A2A1F"/>
+  <ellipse id="ring" cx="540" cy="560" rx="256" ry="326" fill="none" stroke="#4A3628" stroke-width="6"/>
+</svg>

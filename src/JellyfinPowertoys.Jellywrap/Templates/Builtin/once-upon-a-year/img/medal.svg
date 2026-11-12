@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-232 -232 464 464">
+  <circle cx="0" cy="0" r="230" fill="#FFFDF8"/>
+  <circle cx="0" cy="0" r="224" fill="none" stroke="#4B1D5E" stroke-width="12"/>
+  <circle cx="200" cy="0" r="5" fill="#FF8FB1"/>
+  <circle cx="194.99" cy="44.5" r="5" fill="#FF8FB1"/>
+  <circle cx="180.19" cy="86.78" r="5" fill="#FF8FB1"/>
+  <circle cx="156.37" cy="124.7" r="5" fill="#FF8FB1"/>
+  <circle cx="124.7" cy="156.37" r="5" fill="#FF8FB1"/>
+  <circle cx="86.78" cy="180.19" r="5" fill="#FF8FB1"/>
+  <circle cx="44.5" cy="194.99" r="5" fill="#FF8FB1"/>
+  <circle cx="0" cy="200" r="5" fill="#FF8FB1"/>
+  <circle cx="-44.5" cy="194.99" r="5" fill="#FF8FB1"/>
+  <circle cx="-86.78" cy="180.19" r="5" fill="#FF8FB1"/>
+  <circle cx="-124.7" cy="156.37" r="5" fill="#FF8FB1"/>
+  <circle cx="-156.37" cy="124.7" r="5" fill="#FF8FB1"/>
+  <circle cx="-180.19" cy="86.78" r="5" fill="#FF8FB1"/>
+  <circle cx="-194.99" cy="44.5" r="5" fill="#FF8FB1"/>
+  <circle cx="-200" cy="0" r="5" fill="#FF8FB1"/>
+  <circle cx="-194.99" cy="-44.5" r="5" fill="#FF8FB1"/>
+  <circle cx="-180.19" cy="-86.78" r="5" fill="#FF8FB1"/>
+  <circle cx="-156.37" cy="-124.7" r="5" fill="#FF8FB1"/>
+  <circle cx="-124.7" cy="-156.37" r="5" fill="#FF8FB1"/>
+  <circle cx="-86.78" cy="-180.19" r="5" fill="#FF8FB1"/>
+  <circle cx="-44.5" cy="-194.99" r="5" fill="#FF8FB1"/>
+  <circle cx="0" cy="-200" r="5" fill="#FF8FB1"/>
+  <circle cx="44.5" cy="-194.99" r="5" fill="#FF8FB1"/>
+  <circle cx="86.78" cy="-180.19" r="5" fill="#FF8FB1"/>
+  <circle cx="124.7" cy="-156.37" r="5" fill="#FF8FB1"/>
+  <circle cx="156.37" cy="-124.7" r="5" fill="#FF8FB1"/>
+  <circle cx="180.19" cy="-86.78" r="5" fill="#FF8FB1"/>
+  <circle cx="194.99" cy="-44.5" r="5" fill="#FF8FB1"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-354 -232 708 464">
+  <rect x="-300" y="-230" width="600" height="460" rx="24" fill="#FFC233"/>
+  <circle cx="-300" cy="0" r="52" fill="#F3E3C3"/>
+  <circle cx="300" cy="0" r="52" fill="#F3E3C3"/>
+  <circle cx="-170" cy="-190" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="-152" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="-114" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="-76" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="-38" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="0" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="38" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="76" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="114" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="152" r="7" fill="#F3E3C3"/>
+  <circle cx="-170" cy="190" r="7" fill="#F3E3C3"/>
+  <polygon points="-235,-176 -228.12,-159.47 -210.27,-158.03 -223.87,-146.38 -219.72,-128.97 -235,-138.3 -250.28,-128.97 -246.13,-146.38 -259.73,-158.03 -241.88,-159.47" fill="#D6336C"/>
+</svg>

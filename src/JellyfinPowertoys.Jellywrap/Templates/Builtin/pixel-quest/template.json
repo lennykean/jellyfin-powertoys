@@ -1,0 +1,2772 @@
+{
+  "id": "pixel-quest",
+  "name": "Pixel Quest",
+  "audience": "kids",
+  "extends": { "individual": "kid" },
+  "fonts": {
+    "word": ["fonts/PixelifySans-700.ttf", "pkg:adult/fonts/Manrope-700.ttf"],
+    "game": ["fonts/PressStart2P-400.ttf", "fonts/PixelifySans-700.ttf", "pkg:adult/fonts/Manrope-700.ttf"],
+    "body": ["fonts/PixelifySans-700.ttf", "pkg:adult/fonts/Manrope-700.ttf"]
+  },
+  "palette": {
+    "teal": "#0B6E73",
+    "grape": "#6B3FE0",
+    "coin": "#FFD447",
+    "heart": "#FF4D6D",
+    "gem": "#5BE37D",
+    "cream": "#FFF4D6",
+    "shadow": "#0B2A3A"
+  },
+  "background": "#000000",
+  "open": { "type": "fade", "duration": 0.5, "ease": "steps:4" },
+  "close": { "type": "fade", "duration": 1.0, "ease": "steps:5" },
+  "card": { "slide": "intro", "time": 5 },
+  "transition": {
+    "type": "layer",
+    "duration": 0.8,
+    "cut": 0.4,
+    "elements": [
+      {
+        "id": "flip",
+        "type": "repeat",
+        "count": 144,
+        "vars": { "x0": "{{index | mod:16 | mul:120}}", "y0": "{{index | div:16 | floor | mul:120}}", "a": "{{index | div:16 | floor | mul:0.025}}", "b": "{{a | add:0.4}}" },
+        "template": [
+          {
+            "id": "l",
+            "type": "shape",
+            "shape": "rect",
+            "x": "{{x0}}",
+            "y": "{{y0}}",
+            "width": 0,
+            "height": 120,
+            "fill": "shadow",
+            "animate": [
+              {
+                "prop": "width",
+                "keys": [
+                  ["{{a}}", 0],
+                  ["{{a | add:0.05}}", 12, "step"],
+                  ["{{a | add:0.1}}", 30, "step"],
+                  ["{{a | add:0.15}}", 42, "step"],
+                  ["{{a | add:0.2}}", 61, "step"],
+                  ["{{b}}", 42, "step"],
+                  ["{{b | add:0.05}}", 30, "step"],
+                  ["{{b | add:0.1}}", 12, "step"],
+                  ["{{b | add:0.15}}", 0, "step"]
+                ]
+              }
+            ]
+          },
+          {
+            "id": "r",
+            "type": "shape",
+            "shape": "rect",
+            "anchor": "top-right",
+            "x": "{{x0 | add:120}}",
+            "y": "{{y0}}",
+            "width": 0,
+            "height": 120,
+            "fill": "shadow",
+            "animate": [
+              {
+                "prop": "width",
+                "keys": [
+                  ["{{a}}", 0],
+                  ["{{a | add:0.05}}", 12, "step"],
+                  ["{{a | add:0.1}}", 30, "step"],
+                  ["{{a | add:0.15}}", 42, "step"],
+                  ["{{a | add:0.2}}", 61, "step"],
+                  ["{{b}}", 42, "step"],
+                  ["{{b | add:0.05}}", 30, "step"],
+                  ["{{b | add:0.1}}", 12, "step"],
+                  ["{{b | add:0.15}}", 0, "step"]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "vars": {
+    "spr": {
+      "stars": "M-6 0h1v1h-1zM4 0h1v1h-1zM-1 2h1v1h-1zM-2 3h3v1h-3zM-4 4h7v1h-7zM-2 5h3v1h-3zM4 5h1v1h-1zM-3 6h2v1h-2zM0 6h2v1h-2zM-5 8h1v1h-1zM3 8h1v1h-1z"
+    }
+  },
+  "presets": {
+    "drop": [
+      {
+        "prop": "opacity",
+        "keys": [
+          [-0.01, 0],
+          [0, 1, "step"]
+        ]
+      },
+      {
+        "prop": "y",
+        "keys": [
+          [0, "-{{dist | default:240}}"],
+          ["{{d | default:0.5}}", "-12", "steps:6"],
+          ["{{d | default:0.5 | add:0.17}}", "+0", "step"]
+        ]
+      }
+    ],
+    "blink": [
+      {
+        "prop": "opacity",
+        "keys": [
+          [-0.01, 0],
+          [0, 1, "step"],
+          [0.05, 0, "step"],
+          [0.1, 1, "step"],
+          [0.15, 0, "step"],
+          [0.2, 1, "step"],
+          [0.25, 0, "step"],
+          [0.3, 1, "step"]
+        ]
+      }
+    ],
+    "grow": [
+      {
+        "prop": "scale",
+        "keys": [
+          [-0.01, 0],
+          [0, 0.25, "step"],
+          [0.0833, 0.5, "step"],
+          [0.1667, 0.75, "step"],
+          [0.25, 1, "step"],
+          [0.3333, 1.12, "step"],
+          [0.4167, 1, "step"]
+        ]
+      }
+    ],
+    "fall": [
+      {
+        "prop": "y",
+        "keys": [
+          [0, "+0"],
+          [0.0833, "+12", "step"],
+          [0.1667, "+36", "step"],
+          [0.25, "+72", "step"],
+          [0.3333, "+132", "step"],
+          [0.4167, "+204", "step"],
+          [0.5, "+300", "step"],
+          [0.5833, "+408", "step"],
+          [0.6667, "+528", "step"],
+          [0.75, "+672", "step"],
+          [0.8, "+760", "step"]
+        ]
+      }
+    ],
+    "hopout": [
+      {
+        "prop": "y",
+        "keys": [
+          [0, "+0"],
+          [0.0833, "-84", "step"],
+          [0.1667, "-156", "step"],
+          [0.25, "-180", "step"],
+          [0.3333, "-156", "step"],
+          [0.4167, "-84", "step"],
+          [0.5, "+0", "step"],
+          [0.8, "+0"]
+        ]
+      }
+    ],
+    "bob": [
+      {
+        "prop": "y",
+        "loop": "{{period | default:1}}",
+        "keys": [
+          [0, "+0"],
+          ["{{period | default:1 | mul:0.25}}", "-12", "step"],
+          ["{{period | default:1 | mul:0.5}}", "-24", "step"],
+          ["{{period | default:1 | mul:0.75}}", "-12", "step"],
+          ["{{period | default:1}}", "+0", "step"]
+        ]
+      }
+    ],
+    "spin": [
+      {
+        "prop": "scaleX",
+        "loop": 0.6,
+        "keys": [
+          [0, 1],
+          [0.1, 0.66, "step"],
+          [0.2, 0.33, "step"],
+          [0.3, 0.12, "step"],
+          [0.4, 0.33, "step"],
+          [0.5, 0.66, "step"],
+          [0.6, 1, "step"]
+        ]
+      }
+    ],
+    "flash": [
+      {
+        "prop": "color",
+        "keys": [
+          [-0.01, "{{base}}"],
+          [0, "{{alt}}", "step"],
+          [0.1, "{{base}}", "step"],
+          [0.2, "{{alt}}", "step"],
+          [0.3, "{{base}}", "step"],
+          [0.4, "{{alt}}", "step"],
+          [0.5, "{{base}}", "step"]
+        ]
+      }
+    ],
+    "flash-fill": [
+      {
+        "prop": "fill",
+        "keys": [
+          [-0.01, "{{base}}"],
+          [0, "{{alt}}", "step"],
+          [0.1, "{{base}}", "step"],
+          [0.2, "{{alt}}", "step"],
+          [0.3, "{{base}}", "step"],
+          [0.4, "{{alt}}", "step"],
+          [0.5, "{{base}}", "step"]
+        ]
+      }
+    ]
+  },
+  "fallbacks": {
+    "poster": [
+      {
+        "id": "fb-fill",
+        "type": "shape",
+        "shape": "rect",
+        "x": 0,
+        "y": 0,
+        "width": "{{box.width}}",
+        "height": "{{box.height}}",
+        "fill": "{{title | hash | mod:4 | pick:\"heart\",\"coin\",\"gem\",\"grape\"}}"
+      },
+      {
+        "id": "fb-art",
+        "type": "group",
+        "x": "{{box.width | div:2}}",
+        "y": "{{box.height | mul:0.1 | round}}",
+        "scale": "{{box.width | mul:0.025 | floor | mul:2 | atLeast:4}}",
+        "idle": "bob",
+        "children": [{ "id": "s", "type": "shape", "shape": "path", "d": "{{spr.stars}}", "fill": "{{title | hash | mod:4 | pick:\"cream\",\"shadow\",\"shadow\",\"cream\"}}" }]
+      }
+    ]
+  },
+  "slides": {
+    "intro": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        { "id": "platform", "type": "image", "src": "img/platform-wide.svg", "x": 1488, "y": 660, "width": 312, "height": 72, "fit": "fill" },
+        {
+          "id": "coin",
+          "type": "group",
+          "x": 1644,
+          "y": 588,
+          "scale": 14,
+          "idle": "spin",
+          "children": [{ "id": "coin", "type": "image", "src": "img/coin.svg", "x": -4, "y": -4, "width": 8, "height": 8, "fit": "fill" }]
+        },
+        { "id": "player", "type": "text", "text": "PLAYER 1", "font": "game", "size": 44, "color": "cream", "x": 56, "y": 100, "align": "left" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "name",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.5, "args": { "d": 0.6, "dist": 480 } },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{me.possessive}}",
+                  "font": "word",
+                  "size": 300,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:400}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1700
+                }
+              ]
+            },
+            {
+              "id": "year",
+              "type": "group",
+              "x": 960,
+              "y": 620,
+              "in": { "preset": "grow", "at": 1.1 },
+              "children": [
+                {
+                  "id": "edge",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:154 | div:12 | round | mul:12 | add:24}}",
+                  "height": 240,
+                  "fill": "shadow"
+                },
+                {
+                  "id": "box",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:154 | div:12 | round | mul:12}}",
+                  "height": 216,
+                  "fill": "coin"
+                },
+                { "id": "t", "type": "text", "text": "{{year}}!", "font": "game", "size": 110, "color": "shadow", "x": 0, "y": 48, "align": "center" }
+              ]
+            },
+            {
+              "id": "since",
+              "type": "repeat",
+              "count": 2,
+              "when": "dataStartsLate",
+              "in": { "preset": "blink", "at": 1.6 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "since {{dataStart | date:\"MMM d\"}}",
+                  "font": "word",
+                  "size": 64,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:820}}",
+                  "align": "center"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "jelly",
+          "type": "group",
+          "x": -240,
+          "y": 948,
+          "scale": 18,
+          "start": 0.3,
+          "idle": "bob",
+          "out": "hopout",
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0.3, -240],
+                [1.5, 288, "steps:14"]
+              ]
+            }
+          ],
+          "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+        }
+      ]
+    },
+    "total-time": {
+      "background": "grape",
+      "vars": {
+        "mins": "me.totals.hours < 1",
+        "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
+        "amount": "{{mins | then:m,me.totals.hours | round}}",
+        "mw": "{{(m == 1) | then:\" minute!\",\" minutes!\"}}",
+        "unit": "{{mins | then:mw,\" hours —\"}}",
+        "movies": "{{me.totals.hours | div:1.5 | round}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "coins",
+          "type": "repeat",
+          "items": [
+            { "x": 200, "ph": 0 },
+            { "x": 1720, "ph": 0.3 }
+          ],
+          "template": [
+            {
+              "id": "c",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": 520,
+              "scale": 20,
+              "idle": { "preset": "spin", "at": "{{item.ph}}" },
+              "children": [{ "id": "coin", "type": "image", "src": "img/coin.svg", "x": -4, "y": -4, "width": 8, "height": 8, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "label",
+              "type": "group",
+              "x": 960,
+              "y": 168,
+              "in": { "preset": "grow", "at": 0.3 },
+              "children": [
+                {
+                  "id": "edge",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:73 | div:12 | round | mul:12 | add:24}}",
+                  "height": 132,
+                  "fill": "shadow"
+                },
+                {
+                  "id": "box",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:73 | div:12 | round | mul:12}}",
+                  "height": 108,
+                  "fill": "coin"
+                },
+                { "id": "t", "type": "text", "text": "HIGH SCORE!", "font": "game", "size": 52, "color": "shadow", "x": 0, "y": 23, "align": "center" }
+              ]
+            },
+            {
+              "id": "about",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.4, "args": { "d": 0.5, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                { "id": "t", "type": "text", "text": "About", "font": "word", "size": 96, "color": "{{c}}", "x": "{{o | add:960}}", "y": "{{o | add:356}}", "align": "center" }
+              ]
+            },
+            {
+              "id": "score",
+              "type": "repeat",
+              "count": 2,
+              "start": 0.8,
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "front": "index == 1", "c": "{{front | then:\"cream\",\"shadow\"}}", "f": "{{front | then:\"coin\",\"shadow\"}}" },
+              "template": [
+                {
+                  "id": "n",
+                  "type": "text",
+                  "font": "game",
+                  "size": 260,
+                  "color": "{{c}}",
+                  "align": "right",
+                  "value": "{{amount}}",
+                  "text": "{{value | floor}}",
+                  "x": "{{measure.n.width | sub:measure.u.width | div:2 | add:960 | add:o}}",
+                  "y": "{{o | add:650}}",
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [0.8, 0],
+                        [3.2, 1, "steps:36"]
+                      ]
+                    },
+                    { "preset": "flash", "at": 3.2, "args": { "base": "c", "alt": "f" } }
+                  ]
+                },
+                {
+                  "id": "u",
+                  "type": "text",
+                  "font": "word",
+                  "size": 130,
+                  "color": "{{c}}",
+                  "align": "left",
+                  "text": "{{unit}}",
+                  "x": "{{measure.n.width | sub:measure.u.width | div:2 | add:960 | add:o}}",
+                  "y": "{{o | add:650}}"
+                }
+              ]
+            },
+            {
+              "id": "bar",
+              "type": "group",
+              "start": 0.8,
+              "children": [
+                { "id": "frame", "type": "shape", "shape": "rect", "x": 654, "y": 876, "width": 612, "height": 72, "fill": "shadow" },
+                {
+                  "id": "cells",
+                  "type": "repeat",
+                  "count": 10,
+                  "template": [
+                    {
+                      "id": "c",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{index | mul:60 | add:666}}",
+                      "y": 888,
+                      "width": 48,
+                      "height": 48,
+                      "fill": "cream@0.25",
+                      "animate": [
+                        {
+                          "prop": "fill",
+                          "keys": [
+                            [0, "cream@0.25"],
+                            ["{{index | add:1 | mul:0.24 | add:0.8}}", "gem", "step"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "burst",
+              "type": "repeat",
+              "count": 12,
+              "vars": { "an": "{{index | div:12 | mul:6.283185307179586}}", "ca": "an | cos", "sa": "an | sin" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "{{index | mod:4 | pick:\"coin\",\"cream\",\"heart\",\"gem\"}}",
+                  "start": 3.2,
+                  "end": 3.8,
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        [3.2, "{{ca | mul:192 | add:960}}"],
+                        [3.8, "{{ca | mul:640 | add:960}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [3.2, "{{sa | mul:144 | add:540}}"],
+                        [3.8, "{{sa | mul:480 | add:540}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [3.2, 24],
+                        [3.56, 12, "step"]
+                      ]
+                    },
+                    {
+                      "prop": "height",
+                      "keys": [
+                        [3.2, 24],
+                        [3.56, 12, "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "like",
+              "type": "repeat",
+              "count": 2,
+              "when": "!mins",
+              "in": { "preset": "blink", "at": 3.6 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "front": "index == 1", "c": "{{front | then:\"cream\",\"shadow\"}}", "c2": "{{front | then:\"coin\",\"shadow\"}}" },
+              "template": [
+                {
+                  "id": "row",
+                  "type": "group",
+                  "layout": "row",
+                  "align": "center",
+                  "maxWidth": 1760,
+                  "x": "{{o | add:960}}",
+                  "children": [
+                    { "id": "a", "type": "text", "font": "word", "size": 88, "color": "{{c}}", "y": "{{o | add:812}}", "text": "that's like " },
+                    { "id": "b", "type": "text", "font": "game", "size": 80, "color": "{{c2}}", "y": "{{o | add:812}}", "text": "{{movies}}" },
+                    { "id": "d", "type": "text", "font": "word", "size": 88, "color": "{{c}}", "y": "{{o | add:812}}", "text": " movies!" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "counts": {
+      "background": "teal",
+      "vars": {
+        "both": "me.totals.episodes > 0 && me.totals.movies > 0",
+        "eps": "me.totals.episodes > 0",
+        "bx": "{{both | then:216,660}}",
+        "one": "{{eps | then:me.totals.episodes,me.totals.movies}}",
+        "c1": "{{eps | then:\"gem\",\"coin\"}}",
+        "f1": "{{eps | then:\"coin\",\"heart\"}}",
+        "lone": "{{eps | then:\"episodes!\",\"movies!\"}}",
+        "label": "{{both | then:\"episodes\",lone}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "block1",
+              "type": "group",
+              "in": { "preset": "drop", "at": 0.3, "args": { "d": 0.5, "dist": 360 } },
+              "children": [
+                { "id": "edge", "type": "shape", "shape": "rect", "x": "{{bx | sub:12}}", "y": 216, "width": 624, "height": 384, "fill": "shadow" },
+                { "id": "box", "type": "shape", "shape": "rect", "x": "{{bx}}", "y": 228, "width": 600, "height": 360, "fill": "{{c1}}" },
+                {
+                  "id": "n",
+                  "type": "text",
+                  "font": "game",
+                  "size": 170,
+                  "color": "shadow",
+                  "x": "{{bx | add:300}}",
+                  "y": 504,
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 552,
+                  "fitOn": "final",
+                  "value": "{{one}}",
+                  "text": "{{value | floor}}",
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [0.9, 0],
+                        [3.0, 1, "steps:31"]
+                      ]
+                    },
+                    { "preset": "flash", "at": 3.0, "args": { "base": "\"shadow\"", "alt": "f1" } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "block2",
+              "type": "group",
+              "when": "both",
+              "in": { "preset": "drop", "at": 0.6, "args": { "d": 0.5, "dist": 360 } },
+              "children": [
+                { "id": "edge", "type": "shape", "shape": "rect", "x": 1092, "y": 216, "width": 624, "height": 384, "fill": "shadow" },
+                { "id": "box", "type": "shape", "shape": "rect", "x": 1104, "y": 228, "width": 600, "height": 360, "fill": "coin" },
+                {
+                  "id": "n",
+                  "type": "text",
+                  "font": "game",
+                  "size": 170,
+                  "color": "shadow",
+                  "x": 1404,
+                  "y": 504,
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 552,
+                  "fitOn": "final",
+                  "value": "{{me.totals.movies}}",
+                  "text": "{{value | floor}}",
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [1.2, 0],
+                        [3.2, 1, "steps:30"]
+                      ]
+                    },
+                    { "preset": "flash", "at": 3.2, "args": { "base": "\"shadow\"", "alt": "\"heart\"" } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "label1",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "blink", "at": 1.0 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{label}}",
+                  "font": "word",
+                  "size": 110,
+                  "color": "{{c}}",
+                  "x": "{{bx | add:300 | add:o}}",
+                  "y": "{{o | add:744}}",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "label2",
+              "type": "repeat",
+              "count": 2,
+              "when": "both",
+              "in": { "preset": "blink", "at": 1.3 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                { "id": "t", "type": "text", "text": "movies!", "font": "word", "size": 110, "color": "{{c}}", "x": "{{o | add:1404}}", "y": "{{o | add:744}}", "align": "center" }
+              ]
+            },
+            {
+              "id": "and",
+              "type": "repeat",
+              "count": 2,
+              "when": "both",
+              "in": { "preset": "blink", "at": 1.5 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+              "template": [
+                { "id": "t", "type": "text", "text": "and", "font": "word", "size": 96, "color": "{{c}}", "x": "{{o | add:960}}", "y": "{{o | add:440}}", "align": "center" }
+              ]
+            },
+            {
+              "id": "jelly",
+              "type": "group",
+              "x": 960,
+              "y": 948,
+              "scale": 14,
+              "in": { "preset": "blink", "at": 0.2 },
+              "idle": "bob",
+              "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+            }
+          ]
+        }
+      ]
+    },
+    "fav-shows": {
+      "background": "teal",
+      "vars": { "x0": "{{(me.topSeries | count == 2) | then:1200,960}}", "x1": "{{(me.topSeries | count == 2) | then:720,480}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "heading",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.2, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "Your favorite shows",
+                  "font": "word",
+                  "size": 120,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:168}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1400
+                }
+              ]
+            },
+            {
+              "id": "carts",
+              "type": "repeat",
+              "items": "{{me.topSeries | take:3}}",
+              "vars": {
+                "first": "index == 0",
+                "W": "{{first | then:432,348}}",
+                "H": "{{first | then:600,492}}",
+                "cx": "{{index | pick:x0,x1,1440}}",
+                "T": "{{index | pick:2.0,1.2,0.5}}",
+                "X": "{{W | div:-2 | add:cx}}",
+                "Y": "{{H | mul:-1 | add:936}}",
+                "fs": "{{W | mul:0.12 | round}}"
+              },
+              "template": [
+                {
+                  "id": "cart",
+                  "type": "group",
+                  "in": { "preset": "drop", "at": "{{T}}", "args": { "d": 0.5, "dist": 480 } },
+                  "children": [
+                    {
+                      "id": "edge",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{X | sub:12}}",
+                      "y": "{{Y | sub:12}}",
+                      "width": "{{W | add:24}}",
+                      "height": "{{H | add:24}}",
+                      "fill": "shadow"
+                    },
+                    {
+                      "id": "poster",
+                      "type": "image",
+                      "src": "{{item.poster}}",
+                      "title": "{{item.title}}",
+                      "x": "{{X}}",
+                      "y": "{{Y}}",
+                      "width": "{{W}}",
+                      "height": "{{H}}",
+                      "fallback": "poster"
+                    },
+                    {
+                      "id": "band",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{X}}",
+                      "width": "{{W}}",
+                      "fill": "shadow",
+                      "y": "{{measure.ttl.lines | mul:1.05 | add:0.75 | mul:measure.ttl.size | mul:-1 | add:Y | add:H}}",
+                      "height": "{{measure.ttl.lines | mul:1.05 | add:0.75 | mul:measure.ttl.size}}"
+                    },
+                    {
+                      "id": "ttl",
+                      "type": "text",
+                      "text": "{{item.title}}",
+                      "font": "word",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "lines",
+                      "lines": 3,
+                      "minSize": "{{fs | mul:0.7 | round}}",
+                      "size": "{{fs}}",
+                      "maxWidth": "{{W | mul:0.86}}",
+                      "lineHeight": 1.05,
+                      "roundLineHeight": false,
+                      "x": "{{cx}}",
+                      "y": 0,
+                      "y2": "{{fs | mul:-0.5 | add:Y | add:H}}"
+                    },
+                    { "id": "tag", "type": "shape", "shape": "rect", "x": "{{X | sub:12}}", "y": "{{Y | sub:12}}", "width": 96, "height": 96, "fill": "shadow" },
+                    {
+                      "id": "rank",
+                      "type": "text",
+                      "text": "{{index | add:1}}",
+                      "font": "game",
+                      "size": 40,
+                      "color": "{{first | then:\"coin\",\"cream\"}}",
+                      "x": "{{X | add:36}}",
+                      "y": "{{Y | add:56}}",
+                      "align": "center"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "crown",
+              "type": "group",
+              "x": "{{x0}}",
+              "y": 222,
+              "scale": 18,
+              "in": { "preset": "drop", "at": 2.6, "args": { "d": 0.4, "dist": 360 } },
+              "idle": "bob",
+              "children": [{ "id": "crown", "type": "image", "src": "img/crown.svg", "x": -4, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            },
+            {
+              "id": "burst",
+              "type": "repeat",
+              "count": 12,
+              "vars": { "an": "{{index | div:12 | mul:6.283185307179586}}", "ca": "an | cos", "sa": "an | sin" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "{{index | mod:4 | pick:\"coin\",\"cream\",\"heart\",\"gem\"}}",
+                  "start": 3.0,
+                  "end": 3.6,
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        [3.0, "{{ca | mul:168 | add:x0}}"],
+                        [3.6, "{{ca | mul:560 | add:x0}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [3.0, "{{sa | mul:126 | add:560}}"],
+                        [3.6, "{{sa | mul:420 | add:560}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [3.0, 24],
+                        [3.36, 12, "step"]
+                      ]
+                    },
+                    {
+                      "prop": "height",
+                      "keys": [
+                        [3.0, 24],
+                        [3.36, 12, "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "fav-movies": {
+      "background": "grape",
+      "vars": { "x0": "{{(me.topMovies | count == 2) | then:1200,960}}", "x1": "{{(me.topMovies | count == 2) | then:720,480}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "heading",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.2, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "Your favorite movies",
+                  "font": "word",
+                  "size": 120,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:168}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1400
+                }
+              ]
+            },
+            {
+              "id": "carts",
+              "type": "repeat",
+              "items": "{{me.topMovies | take:3}}",
+              "vars": {
+                "first": "index == 0",
+                "W": "{{first | then:432,348}}",
+                "H": "{{first | then:600,492}}",
+                "cx": "{{index | pick:x0,x1,1440}}",
+                "T": "{{index | pick:2.0,1.2,0.5}}",
+                "X": "{{W | div:-2 | add:cx}}",
+                "Y": "{{H | mul:-1 | add:936}}",
+                "fs": "{{W | mul:0.12 | round}}"
+              },
+              "template": [
+                {
+                  "id": "cart",
+                  "type": "group",
+                  "in": { "preset": "drop", "at": "{{T}}", "args": { "d": 0.5, "dist": 480 } },
+                  "children": [
+                    {
+                      "id": "edge",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{X | sub:12}}",
+                      "y": "{{Y | sub:12}}",
+                      "width": "{{W | add:24}}",
+                      "height": "{{H | add:24}}",
+                      "fill": "shadow"
+                    },
+                    {
+                      "id": "poster",
+                      "type": "image",
+                      "src": "{{item.poster}}",
+                      "title": "{{item.title}}",
+                      "x": "{{X}}",
+                      "y": "{{Y}}",
+                      "width": "{{W}}",
+                      "height": "{{H}}",
+                      "fallback": "poster"
+                    },
+                    {
+                      "id": "band",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{X}}",
+                      "width": "{{W}}",
+                      "fill": "shadow",
+                      "y": "{{measure.ttl.lines | mul:1.05 | add:0.75 | mul:measure.ttl.size | mul:-1 | add:Y | add:H}}",
+                      "height": "{{measure.ttl.lines | mul:1.05 | add:0.75 | mul:measure.ttl.size}}"
+                    },
+                    {
+                      "id": "ttl",
+                      "type": "text",
+                      "text": "{{item.title}}",
+                      "font": "word",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "lines",
+                      "lines": 3,
+                      "minSize": "{{fs | mul:0.7 | round}}",
+                      "size": "{{fs}}",
+                      "maxWidth": "{{W | mul:0.86}}",
+                      "lineHeight": 1.05,
+                      "roundLineHeight": false,
+                      "x": "{{cx}}",
+                      "y": 0,
+                      "y2": "{{fs | mul:-0.5 | add:Y | add:H}}"
+                    },
+                    { "id": "tag", "type": "shape", "shape": "rect", "x": "{{X | sub:12}}", "y": "{{Y | sub:12}}", "width": 96, "height": 96, "fill": "shadow" },
+                    {
+                      "id": "rank",
+                      "type": "text",
+                      "text": "{{index | add:1}}",
+                      "font": "game",
+                      "size": 40,
+                      "color": "{{first | then:\"coin\",\"cream\"}}",
+                      "x": "{{X | add:36}}",
+                      "y": "{{Y | add:56}}",
+                      "align": "center"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "crown",
+              "type": "group",
+              "x": "{{x0}}",
+              "y": 222,
+              "scale": 18,
+              "in": { "preset": "drop", "at": 2.6, "args": { "d": 0.4, "dist": 360 } },
+              "idle": "bob",
+              "children": [{ "id": "crown", "type": "image", "src": "img/crown.svg", "x": -4, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            },
+            {
+              "id": "burst",
+              "type": "repeat",
+              "count": 12,
+              "vars": { "an": "{{index | div:12 | mul:6.283185307179586}}", "ca": "an | cos", "sa": "an | sin" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "{{index | mod:4 | pick:\"coin\",\"cream\",\"heart\",\"gem\"}}",
+                  "start": 3.0,
+                  "end": 3.6,
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        [3.0, "{{ca | mul:168 | add:x0}}"],
+                        [3.6, "{{ca | mul:560 | add:x0}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [3.0, "{{sa | mul:126 | add:560}}"],
+                        [3.6, "{{sa | mul:420 | add:560}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [3.0, 24],
+                        [3.36, 12, "step"]
+                      ]
+                    },
+                    {
+                      "prop": "height",
+                      "keys": [
+                        [3.0, 24],
+                        [3.36, 12, "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "story": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "platforms",
+          "type": "repeat",
+          "items": [
+            { "x": 240, "y": 828 },
+            { "x": 720, "y": 732 },
+            { "x": 1152, "y": 636 }
+          ],
+          "template": [{ "id": "platform", "type": "image", "src": "img/platform.svg", "x": "{{item.x}}", "y": "{{item.y}}", "width": 288, "height": 72, "fit": "fill" }]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "head",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.2, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "Your favorite kind of story:",
+                  "font": "word",
+                  "size": 72,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:168}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1400
+                }
+              ]
+            },
+            {
+              "id": "genre",
+              "type": "repeat",
+              "count": 2,
+              "pivot": [960, 320],
+              "in": { "preset": "grow", "at": 1.0 },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{me.storyGenre.name}}!",
+                  "font": "word",
+                  "size": 210,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:380}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1500
+                }
+              ]
+            },
+            {
+              "id": "flag",
+              "type": "group",
+              "in": { "preset": "blink", "at": 2.1 },
+              "children": [{ "id": "flag", "type": "image", "src": "img/flag.svg", "x": 1380, "y": 468, "width": 96, "height": 168, "fit": "fill" }]
+            },
+            {
+              "id": "jelly",
+              "type": "group",
+              "x": 156,
+              "y": 948,
+              "scale": 12,
+              "in": { "preset": "blink", "at": 0.2 },
+              "idle": "bob",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [0.8, 156],
+                    [1.25, 384, "steps:5"],
+                    [1.7, 864, "steps:5"],
+                    [2.15, 1260, "steps:5"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [0.8, 948],
+                    [1.25, 828, "steps:5"],
+                    [1.7, 732, "steps:5"],
+                    [2.15, 636, "steps:5"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [0.8, "+0"],
+                    [0.89, "-96", "step"],
+                    [0.98, "-168", "step"],
+                    [1.07, "-180", "step"],
+                    [1.16, "-132", "step"],
+                    [1.25, "+0", "step"],
+                    [1.34, "-96", "step"],
+                    [1.43, "-168", "step"],
+                    [1.52, "-180", "step"],
+                    [1.61, "-132", "step"],
+                    [1.7, "+0", "step"],
+                    [1.79, "-96", "step"],
+                    [1.88, "-168", "step"],
+                    [1.97, "-180", "step"],
+                    [2.06, "-132", "step"],
+                    [2.15, "+0", "step"]
+                  ]
+                }
+              ],
+              "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+            }
+          ]
+        }
+      ]
+    },
+    "again": {
+      "background": "grape",
+      "vars": {
+        "N": "me.mostReplayed.completions",
+        "nm1": "N | sub:1",
+        "gap": "{{1400 | div:nm1 | atMost:156}}",
+        "step": "{{2.08 | div:nm1 | atMost:0.26}}",
+        "px": "{{gap | mul:0.077 | floor | atMost:12 | atLeast:3}}",
+        "tEnd": "{{nm1 | mul:step | add:1.2}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        { "id": "platform", "type": "image", "src": "img/platform-dark.svg", "x": 1596, "y": 924, "width": 288, "height": 72, "fit": "fill" },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "watched",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.2, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "You watched",
+                  "font": "word",
+                  "size": 76,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:180}}",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "title",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.4, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{replayedMain}}",
+                  "font": "word",
+                  "size": 150,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:350}}",
+                  "y2": "{{o | add:380}}",
+                  "align": "center",
+                  "fit": "title",
+                  "size2": 84,
+                  "lineHeight": 1.05,
+                  "maxWidth": 1700
+                }
+              ]
+            },
+            {
+              "id": "series",
+              "type": "repeat",
+              "count": 2,
+              "when": "replayedSeries",
+              "in": { "preset": "drop", "at": 0.6, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"gem\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{replayedSeries}}",
+                  "font": "word",
+                  "size": 64,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:450}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1700
+                }
+              ]
+            },
+            {
+              "id": "coins",
+              "type": "repeat",
+              "count": "{{N}}",
+              "vars": { "cx": "{{count | sub:1 | div:2 | mul:-1 | add:index | mul:gap | add:960}}" },
+              "template": [
+                {
+                  "id": "c",
+                  "type": "group",
+                  "x": "{{cx}}",
+                  "y": 576,
+                  "scale": "{{px}}",
+                  "in": { "preset": "grow", "at": "{{index | mul:step | add:1.2}}" },
+                  "idle": { "preset": "spin", "at": "{{index | mod:6 | mul:0.1}}" },
+                  "children": [{ "id": "coin", "type": "image", "src": "img/coin.svg", "x": -4, "y": -4, "width": 8, "height": 8, "fit": "fill" }]
+                }
+              ]
+            },
+            { "id": "m1", "type": "text", "text": "{{N}}", "font": "game", "size": 200, "opacity": 0 },
+            { "id": "m2", "type": "text", "text": " times!", "font": "word", "size": 130, "opacity": 0 },
+            {
+              "id": "counter",
+              "type": "repeat",
+              "count": "{{N}}",
+              "vars": {
+                "s": "{{index | mul:step | add:1.2}}",
+                "next": "{{index | add:1 | mul:step | add:1.2}}",
+                "e": "{{(index == count | sub:1) | then:1000,next}}",
+                "xr": "{{measure.m1.width | sub:measure.m2.width | div:2 | add:960}}"
+              },
+              "template": [
+                {
+                  "id": "sh",
+                  "type": "text",
+                  "text": "{{index | add:1}}",
+                  "font": "game",
+                  "size": 200,
+                  "color": "shadow",
+                  "x": "{{xr | add:12}}",
+                  "y": 872,
+                  "align": "right",
+                  "start": "{{s}}",
+                  "end": "{{e}}"
+                },
+                {
+                  "id": "n",
+                  "type": "text",
+                  "text": "{{index | add:1}}",
+                  "font": "game",
+                  "size": 200,
+                  "color": "coin",
+                  "x": "{{xr}}",
+                  "y": 860,
+                  "align": "right",
+                  "start": "{{s}}",
+                  "end": "{{e}}",
+                  "animate": [{ "preset": "flash", "at": "{{tEnd}}", "args": { "base": "\"coin\"", "alt": "\"cream\"" } }]
+                }
+              ]
+            },
+            {
+              "id": "times",
+              "type": "repeat",
+              "count": 2,
+              "start": 1.2,
+              "vars": {
+                "o": "{{(index == 0) | then:12,0}}",
+                "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}",
+                "xr": "{{measure.m1.width | sub:measure.m2.width | div:2 | add:960}}"
+              },
+              "template": [
+                { "id": "t", "type": "text", "text": " times!", "font": "word", "size": 130, "color": "{{c}}", "x": "{{xr | add:o}}", "y": "{{o | add:860}}", "align": "left" }
+              ]
+            },
+            {
+              "id": "jelly",
+              "type": "group",
+              "x": 1740,
+              "y": 924,
+              "scale": 12,
+              "in": { "preset": "blink", "at": 0.2 },
+              "idle": "bob",
+              "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+            }
+          ]
+        }
+      ]
+    },
+    "fav-time": {
+      "background": "teal",
+      "vars": {
+        "part": "me.clock.favoritePart",
+        "ev": "{{(part == \"evening\") | then:-27,-59.4}}",
+        "endDeg": "{{(part == \"morning\") | then:-111.6,ev}}",
+        "span": "{{endDeg | mul:0.017453292519943295 | add:2.9845130209103035}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "cloud1",
+          "type": "group",
+          "x": 60,
+          "y": 156,
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0, 60],
+                [9, 384, "steps:27"]
+              ]
+            }
+          ],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": 0, "y": 0, "width": 216, "height": 72, "fit": "fill" }]
+        },
+        {
+          "id": "cloud2",
+          "type": "group",
+          "x": 1260,
+          "y": 300,
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0, 1260],
+                [9, 1476, "steps:18"]
+              ]
+            }
+          ],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": 0, "y": 0, "width": 216, "height": 72, "fit": "fill" }]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "path",
+              "type": "repeat",
+              "count": 23,
+              "start": 0.2,
+              "vars": {
+                "ak": "{{index | add:1 | div:24 | mul:-3.141592653589793 | add:3.141592653589793}}",
+                "p": "{{ak | mul:-1 | add:2.9845130209103035 | div:span}}",
+                "tk": "{{p | atLeast:0 | mul:1.8 | add:0.3}}",
+                "lit": "{{(p <= 1) | then:\"coin\",\"cream@0.35\"}}"
+              },
+              "template": [
+                {
+                  "id": "d",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 12,
+                  "height": 12,
+                  "fill": "cream@0.35",
+                  "x": "{{ak | cos | mul:730 | add:960 | div:12 | round | mul:12}}",
+                  "y": "{{ak | sin | mul:-730 | add:948 | div:12 | round | mul:12}}",
+                  "animate": [
+                    {
+                      "prop": "fill",
+                      "keys": [
+                        [0, "cream@0.35"],
+                        ["{{tk}}", "{{lit}}", "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "arc",
+              "type": "group",
+              "x": 960,
+              "y": 948,
+              "start": 0.3,
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    [0.3, -171],
+                    [2.1, "{{endDeg}}", "steps:22"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "sun",
+                  "type": "group",
+                  "x": 730,
+                  "y": 0,
+                  "animate": [
+                    {
+                      "prop": "rotation",
+                      "keys": [
+                        [0.3, 171],
+                        [2.1, "{{endDeg | mul:-1}}", "steps:22"]
+                      ]
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "rays",
+                      "type": "repeat",
+                      "items": [
+                        { "x": 0, "y": -120 },
+                        { "x": 120, "y": 0 },
+                        { "x": 0, "y": 120 },
+                        { "x": -120, "y": 0 }
+                      ],
+                      "template": [
+                        {
+                          "id": "r",
+                          "type": "shape",
+                          "shape": "rect",
+                          "anchor": "center",
+                          "x": "{{item.x}}",
+                          "y": "{{item.y}}",
+                          "width": 24,
+                          "height": 24,
+                          "fill": "coin",
+                          "animate": [
+                            {
+                              "prop": "fill",
+                              "loop": 0.5,
+                              "keys": [
+                                [0, "coin"],
+                                [0.25, "cream", "step"],
+                                [0.5, "coin", "step"]
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "disc",
+                      "type": "group",
+                      "scale": 16,
+                      "children": [{ "id": "sun", "type": "image", "src": "img/sun.svg", "x": -6, "y": -6, "width": 12, "height": 12, "fit": "fill" }]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "part",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.6, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{part | title}}s",
+                  "font": "word",
+                  "size": 210,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:680}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1400
+                }
+              ]
+            },
+            {
+              "id": "time",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "blink", "at": 1.2 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "are your time!",
+                  "font": "word",
+                  "size": 96,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:820}}",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "jelly",
+              "type": "group",
+              "x": 1830,
+              "y": 948,
+              "scale": 12,
+              "in": { "preset": "blink", "at": 0.2 },
+              "idle": "bob",
+              "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+            }
+          ]
+        }
+      ]
+    },
+    "music": {
+      "background": "grape",
+      "vars": {
+        "song": "me.music.topSongs[0].title",
+        "artist": "me.music.topSongs[0].seriesTitle | default:me.music.topArtist.name",
+        "bang": "{{artist}}!",
+        "head": "{{song | then:song,bang}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        { "id": "platform", "type": "image", "src": "img/platform-dark.svg", "x": 96, "y": 700, "width": 288, "height": 72, "fit": "fill" },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "eq",
+              "type": "repeat",
+              "count": 16,
+              "in": { "preset": "blink", "at": 0.3 },
+              "vars": {
+                "k": "{{index | mul:8}}",
+                "cx": "{{index | mul:108 | add:108}}",
+                "h0": "{{k | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h1": "{{k | add:1 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h2": "{{k | add:2 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h3": "{{k | add:3 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h4": "{{k | add:4 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h5": "{{k | add:5 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h6": "{{k | add:6 | rand | mul:6 | floor | add:2 | mul:30}}",
+                "h7": "{{k | add:7 | rand | mul:6 | floor | add:2 | mul:30}}"
+              },
+              "template": [
+                {
+                  "id": "col",
+                  "type": "group",
+                  "clip": {
+                    "shape": "rect",
+                    "anchor": "bottom-left",
+                    "x": "{{cx}}",
+                    "y": 1032,
+                    "width": 84,
+                    "height": "{{h0}}",
+                    "animate": [
+                      {
+                        "prop": "height",
+                        "loop": 1,
+                        "keys": [
+                          [0, "{{h0}}"],
+                          [0.125, "{{h1}}", "step"],
+                          [0.25, "{{h2}}", "step"],
+                          [0.375, "{{h3}}", "step"],
+                          [0.5, "{{h4}}", "step"],
+                          [0.625, "{{h5}}", "step"],
+                          [0.75, "{{h6}}", "step"],
+                          [0.875, "{{h7}}", "step"],
+                          [1, "{{h0}}", "step"]
+                        ]
+                      }
+                    ]
+                  },
+                  "children": [
+                    {
+                      "id": "blocks",
+                      "type": "repeat",
+                      "count": 7,
+                      "template": [
+                        {
+                          "id": "b",
+                          "type": "shape",
+                          "shape": "rect",
+                          "x": "{{cx}}",
+                          "y": "{{index | add:1 | mul:-30 | add:1032}}",
+                          "width": 84,
+                          "height": 24,
+                          "fill": "{{index | pick:\"gem\",\"gem\",\"gem\",\"coin\",\"coin\",\"heart\",\"heart\"}}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "dancer",
+              "type": "group",
+              "in": { "preset": "blink", "at": 0.2 },
+              "children": [
+                {
+                  "id": "jelly",
+                  "type": "group",
+                  "x": 240,
+                  "y": 700,
+                  "scale": 12,
+                  "idle": { "preset": "bob", "period": 0.5 },
+                  "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+                },
+                {
+                  "id": "notes",
+                  "type": "repeat",
+                  "items": [
+                    { "x": 1620, "y": 168, "ph": 0 },
+                    { "x": 1752, "y": 300, "ph": 0.25 },
+                    { "x": 1608, "y": 432, "ph": 0.5 }
+                  ],
+                  "template": [
+                    {
+                      "id": "n",
+                      "type": "group",
+                      "x": "{{item.x}}",
+                      "y": "{{item.y}}",
+                      "scale": 12,
+                      "idle": { "preset": "bob", "at": "{{item.ph}}" },
+                      "children": [{ "id": "note", "type": "image", "src": "img/note.svg", "x": 0, "y": 0, "width": 8, "height": 10, "fit": "fill" }]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "your-song",
+              "type": "repeat",
+              "count": 2,
+              "in": { "preset": "drop", "at": 0.4, "args": { "d": 0.4, "dist": 240 } },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+              "template": [
+                { "id": "t", "type": "text", "text": "Your song:", "font": "word", "size": 80, "color": "{{c}}", "x": "{{o | add:960}}", "y": "{{o | add:240}}", "align": "center" }
+              ]
+            },
+            {
+              "id": "song",
+              "type": "repeat",
+              "count": 2,
+              "pivot": [960, 400],
+              "in": { "preset": "grow", "at": 1.2 },
+              "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{head}}",
+                  "font": "word",
+                  "size": 200,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:450}}",
+                  "y2": "{{o | add:480}}",
+                  "align": "center",
+                  "fit": "title",
+                  "size2": 110,
+                  "lineHeight": 1.05,
+                  "maxWidth": 1200
+                }
+              ]
+            },
+            {
+              "id": "burst",
+              "type": "repeat",
+              "count": 12,
+              "vars": { "an": "{{index | div:12 | mul:6.283185307179586}}", "ca": "an | cos", "sa": "an | sin" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "{{index | mod:4 | pick:\"coin\",\"cream\",\"heart\",\"gem\"}}",
+                  "start": 1.6,
+                  "end": 2.2,
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        [1.6, "{{ca | mul:192 | add:960}}"],
+                        [2.2, "{{ca | mul:640 | add:960}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [1.6, "{{sa | mul:144 | add:400}}"],
+                        [2.2, "{{sa | mul:480 | add:400}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [1.6, 24],
+                        [1.96, 12, "step"]
+                      ]
+                    },
+                    {
+                      "prop": "height",
+                      "keys": [
+                        [1.6, 24],
+                        [1.96, 12, "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "by",
+              "type": "repeat",
+              "count": 2,
+              "when": "song",
+              "in": { "preset": "blink", "at": 1.8 },
+              "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+              "template": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "by {{artist}}!",
+                  "font": "word",
+                  "size": 80,
+                  "color": "{{c}}",
+                  "x": "{{o | add:960}}",
+                  "y": "{{o | add:600}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1100
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "persona": {
+      "background": "gem",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "player",
+              "type": "group",
+              "in": { "preset": "drop", "at": 0.3, "args": { "d": 0.5, "dist": 360 } },
+              "children": [
+                { "id": "disc", "type": "image", "src": "img/disc.svg", "x": 96, "y": 168, "width": 680, "height": 680, "fit": "fill" },
+                {
+                  "id": "jelly",
+                  "type": "group",
+                  "x": 436,
+                  "y": 780,
+                  "scale": 34,
+                  "idle": "bob",
+                  "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+                },
+                { "id": "xp", "type": "shape", "shape": "rect", "x": 102, "y": 876, "width": 672, "height": 72, "fill": "shadow" },
+                {
+                  "id": "cells",
+                  "type": "repeat",
+                  "count": 10,
+                  "template": [
+                    {
+                      "id": "c",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": "{{index | mul:66 | add:114}}",
+                      "y": 888,
+                      "width": 54,
+                      "height": 48,
+                      "fill": "cream@0.25",
+                      "animate": [
+                        {
+                          "prop": "fill",
+                          "keys": [
+                            [0, "cream@0.25"],
+                            ["{{index | add:1 | mul:0.2 | add:0.8}}", "coin", "step"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "crown",
+              "type": "group",
+              "x": 436,
+              "y": 264,
+              "scale": 24,
+              "in": { "preset": "drop", "at": 3.0, "args": { "d": 0.3, "dist": 360 } },
+              "idle": "bob",
+              "children": [{ "id": "crown", "type": "image", "src": "img/crown.svg", "x": -4, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            },
+            {
+              "id": "label",
+              "type": "group",
+              "x": 1176,
+              "y": 200,
+              "in": { "preset": "grow", "at": 3.0 },
+              "children": [
+                {
+                  "id": "edge",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:73 | div:12 | round | mul:12 | add:24}}",
+                  "height": 132,
+                  "fill": "shadow"
+                },
+                {
+                  "id": "box",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "x": 0,
+                  "y": 0,
+                  "width": "{{measure.t.width | add:73 | div:12 | round | mul:12}}",
+                  "height": 108,
+                  "fill": "grape",
+                  "animate": [{ "preset": "flash-fill", "at": 3.0, "args": { "base": "\"grape\"", "alt": "\"heart\"" } }]
+                },
+                { "id": "t", "type": "text", "text": "LEVEL UP!", "font": "game", "size": 52, "color": "cream", "x": 0, "y": 23, "align": "center" }
+              ]
+            },
+            {
+              "id": "youre",
+              "type": "text",
+              "text": "You're",
+              "font": "word",
+              "size": 110,
+              "color": "shadow",
+              "x": 900,
+              "y": 400,
+              "align": "left",
+              "in": { "preset": "blink", "at": 3.1 }
+            },
+            {
+              "id": "name",
+              "type": "group",
+              "pivot": [1300, 560],
+              "in": { "preset": "grow", "at": 3.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{me.persona.name}}!",
+                  "font": "word",
+                  "size": 170,
+                  "color": "shadow",
+                  "x": 900,
+                  "y": 560,
+                  "align": "left",
+                  "fit": "wrap",
+                  "lines": 2,
+                  "linePitch": 160,
+                  "maxWidth": 940
+                }
+              ]
+            },
+            {
+              "id": "burst",
+              "type": "repeat",
+              "count": 12,
+              "vars": { "an": "{{index | div:12 | mul:6.283185307179586}}", "ca": "an | cos", "sa": "an | sin" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "anchor": "center",
+                  "width": 24,
+                  "height": 24,
+                  "fill": "{{index | mod:4 | pick:\"coin\",\"cream\",\"heart\",\"grape\"}}",
+                  "start": 3.2,
+                  "end": 3.8,
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        [3.2, "{{ca | mul:168 | add:1300}}"],
+                        [3.8, "{{ca | mul:560 | add:1300}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [3.2, "{{sa | mul:126 | add:560}}"],
+                        [3.8, "{{sa | mul:420 | add:560}}", "steps:7"]
+                      ]
+                    },
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [3.2, 24],
+                        [3.56, 12, "step"]
+                      ]
+                    },
+                    {
+                      "prop": "height",
+                      "keys": [
+                        [3.2, 24],
+                        [3.56, 12, "step"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "liner",
+              "type": "group",
+              "in": { "preset": "drop", "at": 4.0, "args": { "d": 0.4, "dist": 240 } },
+              "children": [
+                { "id": "edge", "type": "shape", "shape": "rect", "x": 888, "y": 780, "width": 964, "height": "{{measure.t.lines | mul:56 | add:72}}", "fill": "shadow" },
+                { "id": "box", "type": "shape", "shape": "rect", "x": 900, "y": 792, "width": 940, "height": "{{measure.t.lines | mul:56 | add:48}}", "fill": "cream" },
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{me.persona.oneLiner}}",
+                  "font": "word",
+                  "size": 44,
+                  "color": "shadow",
+                  "x": 924,
+                  "y": 856,
+                  "align": "left",
+                  "fit": "wrap",
+                  "lines": 3,
+                  "linePitch": 56,
+                  "maxWidth": 892
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "summary": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "content",
+          "type": "group",
+          "out": "fall",
+          "children": [
+            {
+              "id": "slots",
+              "type": "repeat",
+              "items": [
+                { "kind": "hours", "text": "{{me.totals.hours | hours:\"number\"}} hours" },
+                { "kind": "poster", "text": "{{me.topSeries[0].title}}", "src": "{{me.topSeries[0].poster}}" },
+                { "kind": "poster", "text": "{{me.topMovies[0].title}}", "src": "{{me.topMovies[0].poster}}" },
+                { "kind": "crown", "text": "{{me.persona.name}}" }
+              ],
+              "where": "item.text",
+              "vars": {
+                "odd": "index | mod:2 == 1",
+                "center": "index == (count | sub:1) && !odd",
+                "tx0": "{{odd | then:996,144}}",
+                "tx": "{{center | then:570,tx0}}",
+                "ty0": "{{(index < 2) | then:144,564}}",
+                "ty": "{{(count <= 2) | then:354,ty0}}",
+                "cx": "{{tx | add:390}}",
+                "cy": "{{ty | add:186}}",
+                "t0": "{{index | mul:0.3 | add:0.3}}"
+              },
+              "template": [
+                {
+                  "id": "slot",
+                  "type": "group",
+                  "pivot": ["{{cx}}", "{{cy}}"],
+                  "in": { "preset": "grow", "at": "{{t0}}" },
+                  "children": [
+                    { "id": "edge", "type": "shape", "shape": "rect", "x": "{{tx | sub:12}}", "y": "{{ty | sub:12}}", "width": 804, "height": 396, "fill": "shadow" },
+                    { "id": "box", "type": "shape", "shape": "rect", "x": "{{tx}}", "y": "{{ty}}", "width": 780, "height": 372, "fill": "cream" },
+                    {
+                      "id": "hours",
+                      "type": "group",
+                      "when": "item.kind == \"hours\"",
+                      "layout": "row",
+                      "align": "center",
+                      "maxWidth": 700,
+                      "x": "{{cx}}",
+                      "children": [
+                        { "id": "n", "type": "text", "text": "{{me.totals.hours | hours:\"number\"}}", "font": "game", "size": 120, "color": "shadow", "y": "{{cy | add:60}}" },
+                        { "id": "u", "type": "text", "text": " hours", "font": "word", "size": 96, "color": "shadow", "y": "{{cy | add:60}}" }
+                      ]
+                    },
+                    {
+                      "id": "cart",
+                      "type": "group",
+                      "when": "item.kind == \"poster\"",
+                      "children": [
+                        { "id": "edge", "type": "shape", "shape": "rect", "x": "{{tx | add:36}}", "y": "{{ty | add:36}}", "width": 216, "height": 300, "fill": "shadow" },
+                        {
+                          "id": "poster",
+                          "type": "image",
+                          "src": "{{item.src}}",
+                          "title": "{{item.text}}",
+                          "x": "{{tx | add:48}}",
+                          "y": "{{ty | add:48}}",
+                          "width": 192,
+                          "height": 276,
+                          "fallback": "poster"
+                        },
+                        {
+                          "id": "label",
+                          "type": "text",
+                          "text": "{{item.text}}",
+                          "font": "word",
+                          "size": 84,
+                          "color": "shadow",
+                          "x": "{{tx | add:288}}",
+                          "y": "{{cy}}",
+                          "align": "left",
+                          "fit": "wrap",
+                          "lines": 3,
+                          "maxWidth": 450,
+                          "lineHeight": 1.05,
+                          "valign": "middle"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "hero",
+                      "type": "group",
+                      "when": "item.kind == \"crown\"",
+                      "children": [
+                        {
+                          "id": "jelly",
+                          "type": "group",
+                          "x": "{{tx | add:168}}",
+                          "y": "{{ty | add:306}}",
+                          "scale": 14,
+                          "idle": "bob",
+                          "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+                        },
+                        {
+                          "id": "crown",
+                          "type": "group",
+                          "x": "{{tx | add:168}}",
+                          "y": "{{ty | add:90}}",
+                          "scale": 12,
+                          "idle": "bob",
+                          "children": [{ "id": "crown", "type": "image", "src": "img/crown.svg", "x": -4, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+                        },
+                        {
+                          "id": "label",
+                          "type": "text",
+                          "text": "{{item.text}}",
+                          "font": "word",
+                          "size": 88,
+                          "color": "shadow",
+                          "x": "{{tx | add:336}}",
+                          "y": "{{cy}}",
+                          "align": "left",
+                          "fit": "wrap",
+                          "lines": 3,
+                          "maxWidth": 420,
+                          "lineHeight": 1.05,
+                          "valign": "middle"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "outro": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "dots",
+          "type": "repeat",
+          "count": 36,
+          "vars": { "s": "{{(index | add:5 | rand < 0.25) | then:24,12}}", "ph": "{{index | add:9 | rand | mul:8 | floor | mul:0.25}}" },
+          "template": [
+            {
+              "id": "d",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | rand | mul:160 | floor | mul:12}}",
+              "y": "{{index | add:3 | rand | mul:69 | floor | mul:12 | add:36}}",
+              "width": "{{s}}",
+              "height": "{{s}}",
+              "fill": "{{(index | add:7 | rand < 0.2) | then:\"coin\",\"cream\"}}",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "loop": 2,
+                  "keys": [
+                    [0, 1],
+                    ["{{ph}}", 0, "step"],
+                    ["{{ph | add:0.25}}", 1, "step"],
+                    [2, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "ground", "type": "image", "src": "img/ground.svg", "x": 0, "y": 948, "width": 1920, "height": 132, "fit": "fill" },
+        {
+          "id": "hearts",
+          "type": "repeat",
+          "count": 3,
+          "template": [
+            {
+              "id": "h",
+              "type": "group",
+              "x": "{{index | mul:84 | add:1620}}",
+              "y": 48,
+              "scale": 10,
+              "children": [{ "id": "heart", "type": "image", "src": "img/heart.svg", "x": 0, "y": 0, "width": 8, "height": 6, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "coins",
+          "type": "repeat",
+          "count": 6,
+          "vars": { "cx": "{{index | mul:240 | add:600}}" },
+          "template": [
+            {
+              "id": "c",
+              "type": "group",
+              "x": "{{cx}}",
+              "y": 870,
+              "scale": 10,
+              "end": "{{cx | sub:280 | div:1860 | mul:3.6 | add:0.6}}",
+              "idle": { "preset": "spin", "at": "{{index | mul:0.1}}" },
+              "children": [{ "id": "coin", "type": "image", "src": "img/coin.svg", "x": -4, "y": -4, "width": 8, "height": 8, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "jelly",
+          "type": "group",
+          "x": 240,
+          "y": 948,
+          "scale": 14,
+          "idle": { "preset": "bob", "period": 0.5 },
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0.6, 240],
+                [4.2, 2100, "steps:43"]
+              ]
+            }
+          ],
+          "children": [{ "id": "jelly", "type": "image", "src": "img/jelly.svg", "x": -6, "y": -12, "width": 12, "height": 12, "fit": "fill" }]
+        },
+        {
+          "id": "what",
+          "type": "repeat",
+          "count": 2,
+          "in": { "preset": "drop", "at": 0.2, "args": { "d": 0.4, "dist": 240 } },
+          "vars": { "o": "{{(index == 0) | then:12,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
+          "template": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "What a year, {{me.name}}!",
+              "font": "word",
+              "size": 170,
+              "color": "{{c}}",
+              "x": "{{o | add:960}}",
+              "y": "{{o | add:400}}",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1600
+            }
+          ]
+        },
+        {
+          "id": "bye",
+          "type": "repeat",
+          "count": 2,
+          "in": { "preset": "blink", "at": 0.8 },
+          "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"coin\"}}" },
+          "template": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "See you next year!",
+              "font": "word",
+              "size": 104,
+              "color": "{{c}}",
+              "x": "{{o | add:960}}",
+              "y": "{{o | add:570}}",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1500
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

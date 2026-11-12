@@ -71,11 +71,11 @@ public static class LibraryManagerExtensions
             {
                 Name = name,
                 Path = path,
-                LibraryFolderIds = (
+                LibraryFolderIds = [.. (
                     from f in libraryManager.GetVirtualFolders()
                     where f.CollectionType == CollectionTypeOptions.boxsets
                     where f.LibraryOptions.PathInfos.Any(p => p.Path == collectionsFolder.Path)
-                    select Guid.Parse(f.ItemId)).ToArray(),
+                    select Guid.Parse(f.ItemId))],
             };
             collectionsFolder.AddChild(collection);
 
@@ -89,7 +89,7 @@ public static class LibraryManagerExtensions
 
     public static async Task SaveCustomCollectionAsync(this BoxSet collection, IFileSystem fileSystem, CancellationToken cancellationToken = default)
     {
-        collection.UpdateRatingToItems(collection.GetLinkedChildren().ToArray());
+        collection.UpdateRatingToItems([.. collection.GetLinkedChildren()]);
         await collection.UpdateToRepositoryAsync(ItemUpdateType.MetadataEdit, cancellationToken);
         await collection.RefreshMetadata(new(new DirectoryService(fileSystem))
         {

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="409 89 1102 902" width="1102" height="902">
+  <rect id="paper" x="410" y="90" width="1100" height="900" fill="#F5EBD7"/>
+  <rect id="band" x="410" y="90" width="1100" height="80" fill="#5A0F1B"/>
+  <rect id="trim" x="410" y="170" width="1100" height="6" fill="#E3B04B"/>
+  <rect id="rule" x="426" y="190" width="1068" height="784" fill="none" stroke="#E3B04B" stroke-width="3"/>
+</svg>

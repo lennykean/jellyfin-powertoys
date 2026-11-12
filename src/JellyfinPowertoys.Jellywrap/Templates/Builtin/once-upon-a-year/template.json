@@ -1,0 +1,3697 @@
+{
+  "id": "once-upon-a-year",
+  "name": "Once Upon a Year",
+  "audience": "kids",
+  "extends": { "individual": "kid" },
+  "fonts": {
+    "display": "fonts/CherrySwash-700.ttf",
+    "body": "fonts/Mali-700.ttf"
+  },
+  "palette": {
+    "peach": "#FFE3D3",
+    "rose": "#FF8FB1",
+    "mint": "#8EE6C4",
+    "lilac": "#B79CFF",
+    "gold": "#FFC94A",
+    "plum": "#4B1D5E",
+    "cream": "#FFFDF8"
+  },
+  "background": "#000000",
+  "transition": { "type": "page-turn", "duration": 0.8, "ease": "in-out", "color": "#4B1D5E", "edgeColor": "#FFFDF8" },
+  "open": { "type": "fade", "duration": 0.5, "ease": "out" },
+  "close": { "type": "fade", "duration": 0.8, "ease": "in-out" },
+  "card": { "slide": "intro", "time": 5 },
+  "vars": {
+    "edge": [
+      { "x": 150, "y": 140, "r": 34 },
+      { "x": 1760, "y": 130, "r": 30 },
+      { "x": 1640, "y": 330, "r": 18 },
+      { "x": 260, "y": 400, "r": 20 },
+      { "x": 120, "y": 660, "r": 24 },
+      { "x": 1820, "y": 600, "r": 22 },
+      { "x": 1700, "y": 880, "r": 28 },
+      { "x": 230, "y": 900, "r": 18 },
+      { "x": 560, "y": 70, "r": 14 },
+      { "x": 1360, "y": 64, "r": 16 }
+    ]
+  },
+  "presets": {
+    "say": [
+      {
+        "prop": "scale",
+        "keys": [
+          [0, 0.55],
+          [0.4, 1, "back"]
+        ]
+      },
+      {
+        "prop": "opacity",
+        "keys": [
+          [0, 0],
+          [0.2, 1]
+        ]
+      }
+    ],
+    "grow": [
+      {
+        "prop": "scale",
+        "keys": [
+          [0, 0],
+          ["{{d | default:0.6}}", 1, "back"]
+        ]
+      }
+    ]
+  },
+  "fallbacks": {
+    "poster": [
+      {
+        "id": "fb-fill",
+        "type": "shape",
+        "shape": "rect",
+        "x": 0,
+        "y": 0,
+        "width": "{{box.width}}",
+        "height": "{{box.height}}",
+        "fill": "{{title | hash:7 | mod:3 | pick:\"mint\",\"gold\",\"peach\"}}"
+      },
+      {
+        "id": "fit1",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "body",
+        "fit": "lines",
+        "lines": 1,
+        "size": "{{box.width | mul:0.1 | round}}",
+        "maxWidth": "{{box.width | mul:0.8}}",
+        "opacity": 0
+      },
+      {
+        "id": "fit2",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "body",
+        "fit": "lines",
+        "lines": 2,
+        "size": "{{box.width | mul:0.1 | round}}",
+        "maxWidth": "{{box.width | mul:0.8}}",
+        "opacity": 0
+      },
+      {
+        "id": "fb-band",
+        "type": "repeat",
+        "count": 1,
+        "vars": {
+          "fs": "{{box.width | mul:0.1 | round}}",
+          "g1": "{{(measure.fit1.size == fs) | then:1,0}}",
+          "g2": "{{(measure.fit2.size == fs) | then:1,0}}",
+          "bh": "{{g1 | add:g2 | mul:-1 | add:3 | mul:1.08 | add:0.7 | mul:fs}}"
+        },
+        "template": [
+          {
+            "id": "band",
+            "type": "shape",
+            "shape": "rect",
+            "x": 0,
+            "y": "{{bh | add:bottom | mul:-1 | add:box.height}}",
+            "width": "{{box.width}}",
+            "height": "{{bh | add:bottom}}",
+            "fill": "plum@0.82"
+          }
+        ]
+      },
+      {
+        "id": "fbt",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "body",
+        "color": "cream",
+        "align": "center",
+        "fit": "wraplines",
+        "lines": 3,
+        "size": "{{box.width | mul:0.1 | round}}",
+        "maxWidth": "{{box.width | mul:0.8}}",
+        "lineHeight": 1.08,
+        "roundLineHeight": false,
+        "x": "{{box.width | div:2}}",
+        "y": 0,
+        "y2": "{{box.width | mul:0.1 | round | mul:-0.68 | sub:bottom | add:box.height}}"
+      }
+    ]
+  },
+  "slides": {
+    "intro": {
+      "background": "peach",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"gold\",\"lilac\",\"rose\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hill",
+          "type": "shape",
+          "shape": "ellipse",
+          "x": 960,
+          "y": 1180,
+          "rx": 1300,
+          "ry": 210,
+          "fill": "mint",
+          "animate": [
+            {
+              "prop": "y",
+              "keys": [
+                [0, "+220"],
+                [0.9, "+0", "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "castle",
+          "type": "group",
+          "x": 40,
+          "y": 1000,
+          "scale": 1.2,
+          "animate": [
+            {
+              "prop": "scaleY",
+              "keys": [
+                [0.3, 0],
+                [1.2, 1, "back"]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "c",
+              "type": "group",
+              "y": -260,
+              "children": [
+                { "id": "castle", "type": "image", "src": "img/castle.svg", "x": 10, "y": -26, "width": 340, "height": 293, "fit": "fill" },
+                {
+                  "id": "flag1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [55, -22, 82, -13, 55, -4],
+                  "fill": "gold",
+                  "pivot": [55, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 55 } }]
+                },
+                {
+                  "id": "flag2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [305, -22, 332, -13, 305, -4],
+                  "fill": "gold",
+                  "pivot": [305, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 305 } }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dragon",
+          "type": "group",
+          "x": 0,
+          "y": 0,
+          "scale": 1.5,
+          "start": 0.9,
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0.9, 2200],
+                [1.9, 1620, "out"]
+              ]
+            },
+            {
+              "prop": "y",
+              "keys": [
+                [0.9, 1010],
+                [1.4, 870, "sine-out"],
+                [1.9, 1010, "sine-in"]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "d",
+              "type": "group",
+              "x": -120,
+              "y": -240,
+              "children": [
+                {
+                  "id": "wing1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [70, 110, 10, 64, 30, 140],
+                  "fill": "lilac",
+                  "pivot": [70, 110],
+                  "animate": [
+                    { "prop": "rotation", "wave": { "amplitude": 12.605071, "frequency": 4.5 }, "end": 1.9 },
+                    { "prop": "rotation", "wave": { "amplitude": 12.605071, "frequency": 2.2 }, "start": 1.9 }
+                  ]
+                },
+                {
+                  "id": "wing2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [170, 110, 230, 64, 210, 140],
+                  "fill": "lilac",
+                  "pivot": [170, 110],
+                  "animate": [
+                    { "prop": "rotation", "wave": { "amplitude": -12.605071, "frequency": 4.5 }, "end": 1.9 },
+                    { "prop": "rotation", "wave": { "amplitude": -12.605071, "frequency": 2.2 }, "start": 1.9 }
+                  ]
+                },
+                { "id": "dragon", "type": "image", "src": "img/dragon.svg", "x": 48, "y": 12, "width": 144, "height": 228, "fit": "fill" },
+                {
+                  "id": "eye1",
+                  "type": "group",
+                  "x": 100,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [0, 1],
+                        [0.1, 0.1, "sine-out"],
+                        [0.2, 1, "sine-in"],
+                        [3.4, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [0, 1],
+                            [0.04, 0, "step"],
+                            [0.16, 1, "step"],
+                            [3.4, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "eye2",
+                  "type": "group",
+                  "x": 140,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [0, 1],
+                        [0.1, 0.1, "sine-out"],
+                        [0.2, 1, "sine-in"],
+                        [3.4, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [0, 1],
+                            [0.04, 0, "step"],
+                            [0.16, 1, "step"],
+                            [3.4, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "name",
+          "type": "text",
+          "text": "{{me.name}}'s",
+          "font": "display",
+          "size": 250,
+          "color": "plum",
+          "x": 960,
+          "y": 390,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.6,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "banner",
+          "type": "group",
+          "start": 1.21,
+          "children": [
+            {
+              "id": "tail1",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [-85, 554.5, 42.5, 554.5, 42.5, 699, -85, 699, -38.25, 626.75],
+              "fill": "rose",
+              "x": 0,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, 960],
+                    [1.7, 580, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tail2",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [85, 554.5, -42.5, 554.5, -42.5, 699, 85, 699, 38.25, 626.75],
+              "fill": "rose",
+              "x": 0,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, 960],
+                    [1.7, 1340, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "fold1",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [0, 665, 42.5, 665, 42.5, 699],
+              "fill": "plum",
+              "opacity": 0.35,
+              "x": 0,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, 960],
+                    [1.7, 580, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "fold2",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [0, 665, -42.5, 665, -42.5, 699],
+              "fill": "plum",
+              "opacity": 0.35,
+              "x": 0,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, 960],
+                    [1.7, 1340, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "band",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 960,
+              "y": 495,
+              "width": 0,
+              "height": 170,
+              "radius": 12.75,
+              "fill": "rose",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, 960],
+                    [1.7, 580, "out"]
+                  ]
+                },
+                {
+                  "prop": "width",
+                  "keys": [
+                    [1.2, 0],
+                    [1.7, 760, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "year",
+          "type": "text",
+          "text": "{{year}}!",
+          "font": "display",
+          "size": 150,
+          "color": "plum",
+          "x": 960,
+          "y": 632,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.5,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"lilac\"}}",
+              "start": 1.700000000000001,
+              "end": 2.8,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.7, "{{ca | mul:k | mul:156 | add:960}}"],
+                    [2.8, "{{ca | mul:k | mul:520 | add:960}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [1.7, "{{sa | mul:k | mul:156 | add:580}}"],
+                    [2.8, "{{sa | mul:k | mul:520 | add:580}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [1.7, "{{sz}}"],
+                    [2.8, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [1.7, 1],
+                    [2.8, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "since",
+          "type": "text",
+          "when": "dataStartsLate",
+          "text": "since {{dataStart | date:\"MMM d\"}}",
+          "font": "body",
+          "size": 70,
+          "color": "plum",
+          "x": 960,
+          "y": 790,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 900,
+          "delay": 2.0,
+          "words": { "stagger": 0.2, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "total-time": {
+      "background": "mint",
+      "vars": {
+        "mins": "me.totals.hours < 1",
+        "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
+        "amount": "{{mins | then:m,me.totals.hours}}",
+        "mw": "{{(m == 1) | then:\"minute!\",\"minutes!\"}}",
+        "hw": "hours — that's like {{me.totals.hours | div:1.5 | round}} movies!",
+        "words": "{{mins | then:mw,hw}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"cream\",\"gold\",\"rose\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "about",
+          "type": "text",
+          "text": "About",
+          "font": "body",
+          "size": 100,
+          "color": "plum",
+          "x": 960,
+          "y": 195,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "badge",
+          "type": "group",
+          "x": 960,
+          "y": 500,
+          "animate": [
+            {
+              "prop": "scale",
+              "keys": [
+                [0.4, 0],
+                [1.1, 1, "back"]
+              ]
+            },
+            {
+              "prop": "scale",
+              "keys": [
+                [3.6, 1],
+                [3.85, 1.18, "sine-out"],
+                [4.1, 1, "sine-in"]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "pulse",
+              "type": "group",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    [0.8, "+0"],
+                    [1.0, "+0.0072414", "sine-out"],
+                    [1.2, "+0", "sine-in"],
+                    [1.4, "+0.0168966", "sine-out"],
+                    [1.6, "+0", "sine-in"],
+                    [1.8, "+0.0265517", "sine-out"],
+                    [2.0, "+0", "sine-in"],
+                    [2.2, "+0.0362069", "sine-out"],
+                    [2.4, "+0", "sine-in"],
+                    [2.6, "+0.0458621", "sine-out"],
+                    [2.8, "+0", "sine-in"],
+                    [3.0, "+0.0555172", "sine-out"],
+                    [3.2, "+0", "sine-in"],
+                    [3.4, "+0.0651724", "sine-out"],
+                    [3.6, "+0", "sine-in"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "star",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 8,
+                  "inner": 0.54,
+                  "x": 0,
+                  "y": 0,
+                  "radius": 270,
+                  "fill": "gold",
+                  "animate": [{ "prop": "angle", "rate": 8.594367 }]
+                },
+                {
+                  "id": "num",
+                  "type": "text",
+                  "value": "{{amount}}",
+                  "text": "{{value | round}}",
+                  "font": "display",
+                  "size": 210,
+                  "color": "plum",
+                  "x": 0,
+                  "y": 12,
+                  "align": "center",
+                  "baseline": "middle",
+                  "fit": "line",
+                  "maxWidth": 380,
+                  "fitOn": "final",
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [0.7, 0],
+                        [3.6, 1, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 3.600000000000001,
+              "end": 4.7,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [3.6, "{{ca | mul:k | mul:168 | add:960}}"],
+                    [4.7, "{{ca | mul:k | mul:560 | add:960}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.6, "{{sa | mul:k | mul:168 | add:500}}"],
+                    [4.7, "{{sa | mul:k | mul:560 | add:500}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [3.6, "{{sz}}"],
+                    [4.7, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [3.6, 1],
+                    [4.7, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "unit",
+          "type": "text",
+          "text": "{{words}}",
+          "font": "display",
+          "size": 104,
+          "color": "plum",
+          "x": 960,
+          "y": 925,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 4.0,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "counts": {
+      "background": "gold",
+      "vars": {
+        "both": "me.totals.episodes > 0 && me.totals.movies > 0",
+        "eps": "me.totals.episodes > 0",
+        "mx": "{{both | then:560,960}}",
+        "one": "{{eps | then:me.totals.episodes,me.totals.movies}}",
+        "lone": "{{eps | then:\"episodes!\",\"movies!\"}}",
+        "label": "{{both | then:\"episodes\",lone}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"cream\",\"rose\",\"plum\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medal1",
+          "type": "group",
+          "x": "{{mx}}",
+          "y": 450,
+          "in": { "preset": "grow", "at": 0.3, "args": { "d": 0.6 } },
+          "children": [
+            { "id": "medal", "type": "image", "src": "img/medal.svg", "x": -232, "y": -232, "width": 464, "height": 464, "fit": "fill" },
+            {
+              "id": "num",
+              "type": "text",
+              "value": "{{one}}",
+              "text": "{{value | round}}",
+              "font": "display",
+              "size": 170,
+              "color": "plum",
+              "x": 0,
+              "y": 14,
+              "align": "center",
+              "baseline": "middle",
+              "fit": "line",
+              "maxWidth": 320,
+              "fitOn": "final",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.5, 0],
+                    [2.6, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst1",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"cream\",\"rose\"}}",
+              "start": 2.600000000000001,
+              "end": 3.7,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [2.6, "{{ca | mul:k | mul:129 | add:mx}}"],
+                    [3.7, "{{ca | mul:k | mul:430 | add:mx}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [2.6, "{{sa | mul:k | mul:129 | add:450}}"],
+                    [3.7, "{{sa | mul:k | mul:430 | add:450}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [2.6, "{{sz}}"],
+                    [3.7, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [2.6, 1],
+                    [3.7, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "label1",
+          "type": "text",
+          "text": "{{label}}",
+          "font": "display",
+          "size": 110,
+          "color": "plum",
+          "x": "{{mx}}",
+          "y": 820,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.0,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "and",
+          "type": "text",
+          "when": "both",
+          "text": "and",
+          "font": "body",
+          "size": 84,
+          "color": "plum",
+          "x": 960,
+          "y": 480,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.8,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "medal2",
+          "type": "group",
+          "when": "both",
+          "x": 1360,
+          "y": 450,
+          "in": { "preset": "grow", "at": 1.9, "args": { "d": 0.6 } },
+          "children": [
+            { "id": "medal", "type": "image", "src": "img/medal.svg", "x": -232, "y": -232, "width": 464, "height": 464, "fit": "fill" },
+            {
+              "id": "num",
+              "type": "text",
+              "value": "{{me.totals.movies}}",
+              "text": "{{value | round}}",
+              "font": "display",
+              "size": 170,
+              "color": "plum",
+              "x": 0,
+              "y": 14,
+              "align": "center",
+              "baseline": "middle",
+              "fit": "line",
+              "maxWidth": 320,
+              "fitOn": "final",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [2.2, 0],
+                    [3.4, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst2",
+          "type": "repeat",
+          "when": "both",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"cream\",\"rose\"}}",
+              "start": 3.400000000000001,
+              "end": 4.5,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [3.4, "{{ca | mul:k | mul:129 | add:1360}}"],
+                    [4.5, "{{ca | mul:k | mul:430 | add:1360}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.4, "{{sa | mul:k | mul:129 | add:450}}"],
+                    [4.5, "{{sa | mul:k | mul:430 | add:450}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [3.4, "{{sz}}"],
+                    [4.5, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [3.4, 1],
+                    [4.5, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "label2",
+          "type": "text",
+          "when": "both",
+          "text": "movies!",
+          "font": "display",
+          "size": 110,
+          "color": "plum",
+          "x": 1360,
+          "y": 820,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 3.0,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "fav-shows": {
+      "background": "lilac",
+      "vars": { "x0": "{{(me.topSeries | count == 2) | then:1200,960}}", "x1": "{{(me.topSeries | count == 2) | then:690,450}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"gold\",\"cream\",\"plum\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "heading",
+          "type": "text",
+          "text": "Your favorite shows",
+          "font": "display",
+          "size": 120,
+          "color": "plum",
+          "x": 960,
+          "y": 168,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "rows",
+          "type": "repeat",
+          "items": "{{me.topSeries | take:3}}",
+          "vars": {
+            "W": "{{(index == 0) | then:420,360}}",
+            "Y": "{{(index == 0) | then:210,290}}",
+            "T": "{{index | pick:3.8,2.6,1.8}}",
+            "xs": "{{index | pick:x0,x1,1470}}",
+            "base": "{{W | mul:1.5 | add:Y}}",
+            "bottom": "{{W | mul:0.12}}",
+            "amp": "{{(index == 0) | then:8,0}}"
+          },
+          "template": [
+            {
+              "id": "bob",
+              "type": "group",
+              "animate": [{ "prop": "y", "wave": { "amplitude": "{{amp}}", "frequency": 1.6, "phase": "{{T | mul:-1.6}}", "grow": ["{{T | add:0.7}}", "{{T | add:1.6}}"] } }],
+              "children": [
+                {
+                  "id": "pop",
+                  "type": "group",
+                  "pivot": [0, "{{base}}"],
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        ["{{T}}", 0],
+                        ["{{T | add:0.7}}", 1, "back"]
+                      ]
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "poster",
+                      "type": "image",
+                      "src": "{{item.poster}}",
+                      "title": "{{item.title}}",
+                      "x": "{{W | div:-2 | add:xs}}",
+                      "y": "{{Y}}",
+                      "width": "{{W}}",
+                      "height": "{{W | mul:1.5}}",
+                      "clip": { "shape": "arch", "radius": "{{W | mul:0.05}}" },
+                      "border": { "width": "{{W | mul:0.02}}", "color": "plum" },
+                      "fallback": "poster"
+                    },
+                    { "id": "rank-dot", "type": "shape", "shape": "circle", "x": "{{xs}}", "y": "{{base}}", "radius": "{{W | mul:0.11}}", "fill": "plum" },
+                    {
+                      "id": "rank",
+                      "type": "text",
+                      "text": "{{index | add:1}}",
+                      "font": "display",
+                      "size": "{{W | mul:0.143 | round}}",
+                      "color": "cream",
+                      "x": "{{xs}}",
+                      "y": "{{W | mul:0.0066 | add:base}}",
+                      "align": "center",
+                      "baseline": "middle"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "title",
+              "type": "text",
+              "text": "{{item.title}}",
+              "font": "body",
+              "size": 50,
+              "color": "plum",
+              "x": "{{xs}}",
+              "y": "{{base | add:96}}",
+              "align": "center",
+              "fit": "wrap",
+              "maxWidth": "{{W | add:70}}",
+              "lines": 2,
+              "linePitch": 54,
+              "delay": "{{T | add:0.35}}",
+              "words": { "stagger": 0.12, "in": "say", "pivotY": -0.32 }
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 4.250000000000001,
+              "end": 5.35,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [4.25, "{{ca | mul:k | mul:156 | add:x0}}"],
+                    [5.35, "{{ca | mul:k | mul:520 | add:x0}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [4.25, "{{sa | mul:k | mul:156 | add:525}}"],
+                    [5.35, "{{sa | mul:k | mul:520 | add:525}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [4.25, "{{sz}}"],
+                    [5.35, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [4.25, 1],
+                    [5.35, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "fav-movies": {
+      "background": "rose",
+      "vars": { "x0": "{{(me.topMovies | count == 2) | then:1200,960}}", "x1": "{{(me.topMovies | count == 2) | then:690,450}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"gold\",\"cream\",\"plum\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "heading",
+          "type": "text",
+          "text": "Your favorite movies",
+          "font": "display",
+          "size": 120,
+          "color": "plum",
+          "x": 960,
+          "y": 168,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "rows",
+          "type": "repeat",
+          "items": "{{me.topMovies | take:3}}",
+          "vars": {
+            "W": "{{(index == 0) | then:420,360}}",
+            "Y": "{{(index == 0) | then:210,290}}",
+            "T": "{{index | pick:3.8,2.6,1.8}}",
+            "xs": "{{index | pick:x0,x1,1470}}",
+            "base": "{{W | mul:1.5 | add:Y}}",
+            "bottom": "{{W | mul:0.12}}",
+            "amp": "{{(index == 0) | then:8,0}}"
+          },
+          "template": [
+            {
+              "id": "bob",
+              "type": "group",
+              "animate": [{ "prop": "y", "wave": { "amplitude": "{{amp}}", "frequency": 1.6, "phase": "{{T | mul:-1.6}}", "grow": ["{{T | add:0.7}}", "{{T | add:1.6}}"] } }],
+              "children": [
+                {
+                  "id": "pop",
+                  "type": "group",
+                  "pivot": [0, "{{base}}"],
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        ["{{T}}", 0],
+                        ["{{T | add:0.7}}", 1, "back"]
+                      ]
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "poster",
+                      "type": "image",
+                      "src": "{{item.poster}}",
+                      "title": "{{item.title}}",
+                      "x": "{{W | div:-2 | add:xs}}",
+                      "y": "{{Y}}",
+                      "width": "{{W}}",
+                      "height": "{{W | mul:1.5}}",
+                      "clip": { "shape": "arch", "radius": "{{W | mul:0.05}}" },
+                      "border": { "width": "{{W | mul:0.02}}", "color": "plum" },
+                      "fallback": "poster"
+                    },
+                    { "id": "rank-dot", "type": "shape", "shape": "circle", "x": "{{xs}}", "y": "{{base}}", "radius": "{{W | mul:0.11}}", "fill": "plum" },
+                    {
+                      "id": "rank",
+                      "type": "text",
+                      "text": "{{index | add:1}}",
+                      "font": "display",
+                      "size": "{{W | mul:0.143 | round}}",
+                      "color": "cream",
+                      "x": "{{xs}}",
+                      "y": "{{W | mul:0.0066 | add:base}}",
+                      "align": "center",
+                      "baseline": "middle"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "title",
+              "type": "text",
+              "text": "{{item.title}}",
+              "font": "body",
+              "size": 50,
+              "color": "plum",
+              "x": "{{xs}}",
+              "y": "{{base | add:96}}",
+              "align": "center",
+              "fit": "wrap",
+              "maxWidth": "{{W | add:70}}",
+              "lines": 2,
+              "linePitch": 54,
+              "delay": "{{T | add:0.35}}",
+              "words": { "stagger": 0.12, "in": "say", "pivotY": -0.32 }
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 4.250000000000001,
+              "end": 5.35,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [4.25, "{{ca | mul:k | mul:156 | add:x0}}"],
+                    [5.35, "{{ca | mul:k | mul:520 | add:x0}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [4.25, "{{sa | mul:k | mul:156 | add:525}}"],
+                    [5.35, "{{sa | mul:k | mul:520 | add:525}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [4.25, "{{sz}}"],
+                    [5.35, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [4.25, 1],
+                    [5.35, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "story": {
+      "background": "peach",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"gold\",\"rose\",\"lilac\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "head",
+          "type": "text",
+          "text": "Your favorite kind of story:",
+          "font": "body",
+          "size": 86,
+          "color": "plum",
+          "x": 960,
+          "y": 165,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.25, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "cover",
+          "type": "shape",
+          "shape": "roundRect",
+          "x": 290,
+          "y": 282,
+          "width": 1340,
+          "height": 540,
+          "radius": 28,
+          "fill": "rose",
+          "animate": [
+            {
+              "prop": "opacity",
+              "keys": [
+                [0.9, 0],
+                [1.7, 1, "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "page1",
+          "type": "group",
+          "x": 960,
+          "scaleX": -1,
+          "animate": [
+            {
+              "prop": "scaleX",
+              "keys": [
+                [0.9, 0],
+                [1.7, 1, "out"]
+              ]
+            }
+          ],
+          "children": [
+            { "id": "paper", "type": "shape", "shape": "path", "d": "M0 320 Q320 280 640 306 L640 790 Q320 770 0 800 Z", "fill": "cream" },
+            {
+              "id": "gutter",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [
+                0, 320, 20, 317.56, 40, 315.26, 60, 313.08, 80, 311.03, 100, 309.11, 120, 307.32, 120, 790.51, 100, 791.85, 80, 793.28, 60, 794.81, 40, 796.45, 20, 798.17, 0, 800
+              ],
+              "fill": {
+                "type": "linear",
+                "from": [0, 0],
+                "to": [110, 0],
+                "stops": [
+                  [0, "plum@0.22"],
+                  [1, "plum@0"]
+                ]
+              }
+            },
+            { "id": "edge", "type": "shape", "shape": "path", "d": "M0 320 Q320 280 640 306 L640 790 Q320 770 0 800 Z", "stroke": "plum", "strokeWidth": 6 }
+          ]
+        },
+        {
+          "id": "page2",
+          "type": "group",
+          "x": 960,
+          "animate": [
+            {
+              "prop": "scaleX",
+              "keys": [
+                [0.9, 0],
+                [1.7, 1, "out"]
+              ]
+            }
+          ],
+          "children": [
+            { "id": "paper", "type": "shape", "shape": "path", "d": "M0 320 Q320 280 640 306 L640 790 Q320 770 0 800 Z", "fill": "cream" },
+            {
+              "id": "gutter",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [
+                0, 320, 20, 317.56, 40, 315.26, 60, 313.08, 80, 311.03, 100, 309.11, 120, 307.32, 120, 790.51, 100, 791.85, 80, 793.28, 60, 794.81, 40, 796.45, 20, 798.17, 0, 800
+              ],
+              "fill": {
+                "type": "linear",
+                "from": [0, 0],
+                "to": [110, 0],
+                "stops": [
+                  [0, "plum@0.22"],
+                  [1, "plum@0"]
+                ]
+              }
+            },
+            { "id": "edge", "type": "shape", "shape": "path", "d": "M0 320 Q320 280 640 306 L640 790 Q320 770 0 800 Z", "stroke": "plum", "strokeWidth": 6 }
+          ]
+        },
+        {
+          "id": "scene",
+          "type": "group",
+          "animate": [
+            {
+              "prop": "opacity",
+              "keys": [
+                [1.4, 0],
+                [1.8, 1]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "castle",
+              "type": "group",
+              "x": 390,
+              "y": 740,
+              "scale": 0.55,
+              "children": [
+                {
+                  "id": "c",
+                  "type": "group",
+                  "y": -260,
+                  "children": [
+                    { "id": "castle", "type": "image", "src": "img/castle.svg", "x": 10, "y": -26, "width": 340, "height": 293, "fit": "fill" },
+                    {
+                      "id": "flag1",
+                      "type": "shape",
+                      "shape": "polygon",
+                      "points": [55, -22, 82, -13, 55, -4],
+                      "fill": "gold",
+                      "pivot": [55, -13],
+                      "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 55 } }]
+                    },
+                    {
+                      "id": "flag2",
+                      "type": "shape",
+                      "shape": "polygon",
+                      "points": [305, -22, 332, -13, 305, -4],
+                      "fill": "gold",
+                      "pivot": [305, -13],
+                      "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 305 } }]
+                    }
+                  ]
+                }
+              ]
+            },
+            { "id": "tree1", "type": "image", "src": "img/tree.svg", "x": 1097, "y": 597, "width": 106, "height": 145, "fit": "fill" },
+            { "id": "tree2", "type": "image", "src": "img/tree.svg", "x": 1475.83, "y": 615.83, "width": 88.33, "height": 120.83, "fit": "fill" },
+            {
+              "id": "path",
+              "type": "repeat",
+              "count": 24,
+              "vars": {
+                "q": "{{index | div:23}}",
+                "m": "{{1 | sub:q}}",
+                "b0": "{{m | mul:m | mul:m}}",
+                "b1": "{{m | mul:m | mul:q | mul:3}}",
+                "b2": "{{m | mul:q | mul:q | mul:3}}",
+                "b3": "{{q | mul:q | mul:q}}",
+                "x1": "{{b1 | mul:820}}",
+                "x2": "{{b2 | mul:1100}}",
+                "x3": "{{b3 | mul:1350}}",
+                "y1": "{{b1 | mul:790}}",
+                "y2": "{{b2 | mul:380}}",
+                "y3": "{{b3 | mul:500}}"
+              },
+              "template": [
+                {
+                  "id": "dot",
+                  "type": "shape",
+                  "shape": "circle",
+                  "x": "{{b0 | mul:620 | add:x1 | add:x2 | add:x3}}",
+                  "y": "{{b0 | mul:700 | add:y1 | add:y2 | add:y3}}",
+                  "radius": 8,
+                  "fill": "plum",
+                  "start": "{{index | mul:0.05416666666666667 | add:1.7}}"
+                }
+              ]
+            },
+            {
+              "id": "goal",
+              "type": "shape",
+              "shape": "star",
+              "points": 5,
+              "inner": 0.45,
+              "x": 1420,
+              "y": 470,
+              "radius": 72,
+              "fill": "gold",
+              "in": { "preset": "grow", "at": 2.9, "args": { "d": 0.5 } },
+              "animate": [{ "prop": "angle", "wave": { "amplitude": 5.729578, "frequency": 1.5 } }]
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"rose\"}}",
+              "start": 3.000000000000001,
+              "end": 4.1,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [3.0, "{{ca | mul:k | mul:90 | add:1420}}"],
+                    [4.1, "{{ca | mul:k | mul:300 | add:1420}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.0, "{{sa | mul:k | mul:90 | add:470}}"],
+                    [4.1, "{{sa | mul:k | mul:300 | add:470}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [3.0, "{{sz}}"],
+                    [4.1, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [3.0, 1],
+                    [4.1, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "genre",
+          "type": "text",
+          "text": "{{me.storyGenre.name}}!",
+          "font": "display",
+          "size": 190,
+          "color": "plum",
+          "x": 960,
+          "y": 1000,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 3.0,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "again": {
+      "background": {
+        "type": "linear",
+        "from": [0, 0],
+        "to": [0, 1080],
+        "stops": [
+          [0, "#2F1040"],
+          [1, "plum"]
+        ]
+      },
+      "vars": {
+        "N": "me.mostReplayed.completions",
+        "nm1": "N | sub:1",
+        "step": "{{2.16 | div:nm1 | atMost:0.27}}",
+        "gap": "{{1200 | div:nm1 | atMost:150}}",
+        "tEnd": "{{nm1 | mul:step | add:1.4}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sky",
+          "type": "repeat",
+          "count": 46,
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "circle",
+              "x": "{{index | rand | mul:1920}}",
+              "y": "{{index | add:50 | rand | mul:1080}}",
+              "radius": "{{index | add:99 | rand | mul:3 | add:2}}",
+              "fill": "cream",
+              "opacity": 0.55,
+              "animate": [{ "prop": "opacity", "wave": { "amplitude": 0.25, "frequency": 2, "phase": "{{index}}" } }]
+            }
+          ]
+        },
+        {
+          "id": "comet",
+          "type": "group",
+          "x": 0,
+          "y": 0,
+          "start": 0.0001,
+          "end": 7,
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0, -200],
+                [7, 2200]
+              ]
+            },
+            {
+              "prop": "y",
+              "keys": [
+                [0, 90],
+                [7, 300]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "tail",
+              "type": "shape",
+              "shape": "polygon",
+              "points": [-1.6, 18, 1.6, -18, -418, -37],
+              "fill": {
+                "type": "linear",
+                "from": [-418, -37],
+                "to": [0, 0],
+                "stops": [
+                  [0, "gold@0"],
+                  [1, "gold@0.85"]
+                ]
+              }
+            },
+            { "id": "comet", "type": "image", "src": "img/comet.svg", "x": -22, "y": -22, "width": 44, "height": 44, "fit": "fill" }
+          ]
+        },
+        {
+          "id": "watched",
+          "type": "text",
+          "text": "You watched",
+          "font": "body",
+          "size": 84,
+          "color": "cream",
+          "x": 960,
+          "y": 165,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.25, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "text": "{{replayedMain}}",
+          "font": "display",
+          "size": 130,
+          "size2": 78,
+          "color": "gold",
+          "x": 960,
+          "y": 305,
+          "y2": 332,
+          "align": "center",
+          "fit": "title",
+          "maxWidth": 1760,
+          "lineHeight": 1.05,
+          "single": { "fit": "wrap", "lines": 1 },
+          "delay": 0.75,
+          "words": { "stagger": 0.25, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "series",
+          "type": "text",
+          "when": "replayedSeries",
+          "text": "{{replayedSeries}}",
+          "font": "body",
+          "size": 66,
+          "color": "cream",
+          "x": 960,
+          "y": 400,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.3,
+          "words": { "stagger": 0.2, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "stars",
+          "type": "repeat",
+          "count": "{{N}}",
+          "vars": {
+            "c": "{{count | sub:1 | div:2}}",
+            "r": "{{gap | mul:0.35 | atMost:52}}",
+            "tk": "{{index | mul:step | add:1.4}}",
+            "rel": "{{index | sub:c | div:c | mul:1.5707963267948966}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 5,
+              "inner": 0.45,
+              "x": "{{index | sub:c | mul:gap | add:960}}",
+              "y": "{{rel | cos | mul:-60 | add:590}}",
+              "radius": "{{r}}",
+              "fill": "gold",
+              "in": { "preset": "grow", "at": "{{tk}}", "args": { "d": 0.4 } },
+              "animate": [{ "prop": "angle", "wave": { "amplitude": 6.875494, "frequency": 1.2, "phase": "{{index}}" } }]
+            }
+          ]
+        },
+        { "id": "m1", "type": "text", "text": "{{N}}", "font": "display", "size": 250, "x": 0, "y": 0, "opacity": 0 },
+        { "id": "m2", "type": "text", "text": "times!", "font": "display", "size": 130, "x": 0, "y": 0, "opacity": 0 },
+        {
+          "id": "counter",
+          "type": "repeat",
+          "count": "{{N}}",
+          "vars": { "s": "{{index | mul:step | add:1.6}}", "next": "{{index | add:1 | mul:step | add:1.6}}", "e": "{{(index == count | sub:1) | then:1000,next}}" },
+          "template": [
+            {
+              "id": "n",
+              "type": "text",
+              "text": "{{index | add:1}}",
+              "font": "display",
+              "size": 250,
+              "color": "gold",
+              "x": "{{measure.m2.width | div:-2 | add:942}}",
+              "y": 820,
+              "align": "center",
+              "baseline": "middle",
+              "start": "{{s}}",
+              "end": "{{e}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{s}}", 1.22],
+                    ["{{s | add:0.25}}", 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "times",
+          "type": "text",
+          "text": "times!",
+          "font": "display",
+          "size": 130,
+          "color": "cream",
+          "x": "{{measure.m2.width | mul:-1 | add:measure.m1.width | div:2 | add:978}}",
+          "y": 880,
+          "align": "left",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": "{{tEnd | add:0.1}}",
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}",
+            "t0": "{{tEnd | add:0.3}}",
+            "t1": "{{tEnd | add:1.4}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": "{{t0 | add:0.000000000000001}}",
+              "end": "{{t1}}",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    ["{{t0}}", "{{ca | mul:k | mul:126 | add:960}}"],
+                    ["{{t1}}", "{{ca | mul:k | mul:420 | add:960}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    ["{{t0}}", "{{sa | mul:k | mul:126 | add:820}}"],
+                    ["{{t1}}", "{{sa | mul:k | mul:420 | add:820}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    ["{{t0}}", "{{sz}}"],
+                    ["{{t1}}", "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 1],
+                    ["{{t1}}", 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "fav-time": {
+      "background": {
+        "type": "linear",
+        "from": [0, 0],
+        "to": [0, 1080],
+        "stops": [
+          [0, "peach"],
+          [1, "#FFD27A"]
+        ]
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"rose\",\"lilac\",\"cream\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "arc",
+          "type": "group",
+          "x": 960,
+          "y": 1200,
+          "animate": [
+            {
+              "prop": "rotation",
+              "keys": [
+                [0.3, -170],
+                [2.4, -55, "in-out"]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "sun",
+              "type": "group",
+              "x": 1000,
+              "y": 0,
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    [0.3, 170],
+                    [2.4, 55, "in-out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "rays",
+                  "type": "group",
+                  "animate": [{ "prop": "rotation", "rate": 14.323945 }],
+                  "children": [{ "id": "sun-rays", "type": "image", "src": "img/sun-rays.svg", "x": -212, "y": -212, "width": 424, "height": 424, "fit": "fill" }]
+                },
+                { "id": "sun", "type": "image", "src": "img/sun.svg", "x": -127, "y": -127, "width": 254, "height": 254, "fit": "fill" }
+              ]
+            }
+          ]
+        },
+        { "id": "hill2", "type": "shape", "shape": "ellipse", "x": 1450, "y": 1130, "rx": 900, "ry": 250, "fill": "#B5F0DA" },
+        {
+          "id": "castle",
+          "type": "group",
+          "x": 1380,
+          "y": 905,
+          "scale": 0.62,
+          "children": [
+            {
+              "id": "c",
+              "type": "group",
+              "y": -260,
+              "children": [
+                { "id": "castle", "type": "image", "src": "img/castle.svg", "x": 10, "y": -26, "width": 340, "height": 293, "fit": "fill" },
+                {
+                  "id": "flag1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [55, -22, 82, -13, 55, -4],
+                  "fill": "gold",
+                  "pivot": [55, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 55 } }]
+                },
+                {
+                  "id": "flag2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [305, -22, 332, -13, 305, -4],
+                  "fill": "gold",
+                  "pivot": [305, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 305 } }]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "hill1", "type": "shape", "shape": "ellipse", "x": 380, "y": 1170, "rx": 1100, "ry": 250, "fill": "mint" },
+        {
+          "id": "part",
+          "type": "text",
+          "text": "{{me.clock.favoritePart | title}}s",
+          "font": "display",
+          "size": 210,
+          "color": "plum",
+          "x": 800,
+          "y": 560,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.0,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"rose\",\"lilac\"}}",
+              "start": 1.200000000000001,
+              "end": 2.3,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.2, "{{ca | mul:k | mul:192 | add:800}}"],
+                    [2.3, "{{ca | mul:k | mul:640 | add:800}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [1.2, "{{sa | mul:k | mul:192 | add:490}}"],
+                    [2.3, "{{sa | mul:k | mul:640 | add:490}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [1.2, "{{sz}}"],
+                    [2.3, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [1.2, 1],
+                    [2.3, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "time",
+          "type": "text",
+          "text": "are your time!",
+          "font": "display",
+          "size": 120,
+          "color": "plum",
+          "x": 800,
+          "y": 720,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.6,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "music": {
+      "background": "mint",
+      "vars": {
+        "song": "me.music.topSongs[0].title",
+        "artist": "me.music.topSongs[0].seriesTitle | default:me.music.topArtist.name",
+        "bang": "{{artist}}!",
+        "head": "{{song | then:song,bang}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": "{{edge}}",
+          "vars": { "c": "{{index | mod:3 | pick:\"cream\",\"gold\",\"lilac\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "stage", "type": "image", "src": "img/stage.svg", "x": 518, "y": 866, "width": 1124, "height": 188, "fit": "fill" },
+        {
+          "id": "ripples",
+          "type": "repeat",
+          "count": 3,
+          "vars": { "o": "{{index | mul:-0.55}}", "o2": "{{index | mul:-0.55 | add:1.65}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "ellipse",
+              "x": 1080,
+              "y": 960,
+              "rx": 80,
+              "ry": 14,
+              "stroke": "cream",
+              "strokeWidth": 6,
+              "animate": [
+                {
+                  "prop": "rx",
+                  "keys": [
+                    ["{{o}}", 80],
+                    ["{{o2}}", 480]
+                  ],
+                  "loop": 1.65
+                },
+                {
+                  "prop": "ry",
+                  "keys": [
+                    ["{{o}}", 14],
+                    ["{{o2}}", 74]
+                  ],
+                  "loop": 1.65
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{o}}", 0.9],
+                    ["{{o2}}", 0]
+                  ],
+                  "loop": 1.65
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "notes",
+          "type": "repeat",
+          "count": 7,
+          "vars": {
+            "o": "{{index | mul:-0.45714285714285713}}",
+            "nx": "{{index | rand | mul:700 | add:760}}",
+            "ns": "{{index | add:4 | rand | mul:0.3 | add:1}}",
+            "nc": "{{index | mod:2 | pick:\"#7B3FA0\",\"plum\"}}"
+          },
+          "template": [
+            {
+              "id": "note",
+              "type": "group",
+              "x": "{{nx}}",
+              "y": 0,
+              "scale": "{{ns}}",
+              "animate": [
+                { "prop": "x", "wave": { "amplitude": 30, "frequency": 2, "phase": "{{index}}" } },
+                {
+                  "prop": "y",
+                  "keys": [
+                    ["{{o}}", 930],
+                    ["{{o | add:3.2}}", 670]
+                  ],
+                  "loop": 3.2
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{o}}", 0],
+                    ["{{o | add:1.6}}", 1, "sine-out"],
+                    ["{{o | add:3.2}}", 0, "sine-in"]
+                  ],
+                  "loop": 3.2
+                }
+              ],
+              "children": [
+                { "id": "head", "type": "shape", "shape": "ellipse", "x": 0, "y": 0, "rx": 22, "ry": 16, "angle": -20.053523, "fill": "{{nc}}" },
+                { "id": "stem", "type": "shape", "shape": "rect", "x": 16, "y": -86, "width": 7, "height": 84, "fill": "{{nc}}" },
+                { "id": "flag", "type": "shape", "shape": "path", "d": "M23 -86 Q60 -60 44 -22 Q48 -54 23 -60 Z", "fill": "{{nc}}" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dragon",
+          "type": "group",
+          "x": 300,
+          "y": 0,
+          "scale": 1.35,
+          "animate": [
+            {
+              "prop": "y",
+              "keys": [
+                [0, 1000],
+                [0.490874, 974, "sine-out"],
+                [0.981748, 1000, "sine-in"]
+              ],
+              "loop": 0.981748
+            }
+          ],
+          "children": [
+            {
+              "id": "d",
+              "type": "group",
+              "x": -120,
+              "y": -240,
+              "children": [
+                {
+                  "id": "wing1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [70, 110, 10, 64, 30, 140],
+                  "fill": "lilac",
+                  "pivot": [70, 110],
+                  "animate": [{ "prop": "rotation", "wave": { "amplitude": 12.605071, "frequency": 4.5 } }]
+                },
+                {
+                  "id": "wing2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [170, 110, 230, 64, 210, 140],
+                  "fill": "lilac",
+                  "pivot": [170, 110],
+                  "animate": [{ "prop": "rotation", "wave": { "amplitude": -12.605071, "frequency": 4.5 } }]
+                },
+                { "id": "dragon", "type": "image", "src": "img/dragon.svg", "x": 48, "y": 12, "width": 144, "height": 228, "fit": "fill" },
+                {
+                  "id": "eye1",
+                  "type": "group",
+                  "x": 100,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [-0.7, 1],
+                        [-0.6, 0.1, "sine-out"],
+                        [-0.5, 1, "sine-in"],
+                        [2.7, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [-0.7, 1],
+                            [-0.66, 0, "step"],
+                            [-0.54, 1, "step"],
+                            [2.7, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "eye2",
+                  "type": "group",
+                  "x": 140,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [-0.7, 1],
+                        [-0.6, 0.1, "sine-out"],
+                        [-0.5, 1, "sine-in"],
+                        [2.7, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [-0.7, 1],
+                            [-0.66, 0, "step"],
+                            [-0.54, 1, "step"],
+                            [2.7, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "your-song",
+          "type": "text",
+          "text": "Your song:",
+          "font": "body",
+          "size": 90,
+          "color": "plum",
+          "x": 960,
+          "y": 190,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "song",
+          "type": "text",
+          "text": "{{head}}",
+          "font": "display",
+          "size": 210,
+          "size2": 120,
+          "color": "plum",
+          "x": 960,
+          "y": 440,
+          "y2": 506,
+          "align": "center",
+          "fit": "title",
+          "maxWidth": 1760,
+          "lineHeight": 1.05,
+          "single": { "fit": "wrap", "lines": 1 },
+          "delay": 1.6,
+          "words": { "stagger": 0.12, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "splash",
+          "type": "repeat",
+          "count": 12,
+          "vars": {
+            "a": "{{index | div:11 | sub:0.5 | mul:2.4 | add:-1.5707963267948966}}",
+            "v": "{{index | add:21 | rand | mul:220 | add:420}}",
+            "r": "{{index | rand | mul:10 | add:14}}"
+          },
+          "template": [
+            {
+              "id": "drop",
+              "type": "shape",
+              "shape": "circle",
+              "x": 0,
+              "y": 0,
+              "radius": "{{r}}",
+              "fill": "{{index | mod:2 | pick:\"cream\",\"lilac\"}}",
+              "start": 1.700000000000001,
+              "end": 2.7,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.7, 960],
+                    [2.7, "{{a | cos | mul:v | add:960}}"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [1.7, 380],
+                    [2.7, "{{a | sin | mul:v | add:380}}"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [1.7, "+0"],
+                    [2.7, "+600", "quad-in"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [1.7, 1],
+                    [2.7, 0]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 1.700000000000001,
+              "end": 2.8,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [1.7, "{{ca | mul:k | mul:210 | add:960}}"],
+                    [2.8, "{{ca | mul:k | mul:700 | add:960}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [1.7, "{{sa | mul:k | mul:210 | add:380}}"],
+                    [2.8, "{{sa | mul:k | mul:700 | add:380}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [1.7, "{{sz}}"],
+                    [2.8, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [1.7, 1],
+                    [2.8, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "by",
+          "type": "text",
+          "when": "song",
+          "text": "by {{artist}}!",
+          "font": "body",
+          "size": 90,
+          "color": "plum",
+          "x": 960,
+          "y": 600,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 2.4,
+          "words": { "stagger": 0.28, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "persona": {
+      "background": "rose",
+      "vars": { "linerGaps": "me.persona.oneLiner | words | sub:1 | atLeast:1" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "window",
+          "type": "group",
+          "pivot": [0, 950],
+          "animate": [
+            {
+              "prop": "scaleY",
+              "keys": [
+                [0.3, 0],
+                [1.2, 1, "back"]
+              ]
+            }
+          ],
+          "children": [
+            { "id": "pane", "type": "shape", "shape": "arch", "x": 110, "y": 150, "width": 700, "height": 800, "radius": 30, "fill": "peach" },
+            {
+              "id": "inside",
+              "type": "group",
+              "clip": { "shape": "arch", "x": 110, "y": 150, "width": 700, "height": 800, "radius": 30 },
+              "children": [
+                {
+                  "id": "dragon",
+                  "type": "group",
+                  "x": 460,
+                  "y": 910,
+                  "scale": 2.3,
+                  "animate": [
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [1, "+600"],
+                        [2, "+0", "out"]
+                      ]
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "d",
+                      "type": "group",
+                      "x": -120,
+                      "y": -240,
+                      "children": [
+                        {
+                          "id": "wing1",
+                          "type": "shape",
+                          "shape": "polygon",
+                          "points": [70, 110, 10, 64, 30, 140],
+                          "fill": "lilac",
+                          "pivot": [70, 110],
+                          "animate": [{ "prop": "rotation", "wave": { "amplitude": 12.605071, "frequency": 2.2 } }]
+                        },
+                        {
+                          "id": "wing2",
+                          "type": "shape",
+                          "shape": "polygon",
+                          "points": [170, 110, 230, 64, 210, 140],
+                          "fill": "lilac",
+                          "pivot": [170, 110],
+                          "animate": [{ "prop": "rotation", "wave": { "amplitude": -12.605071, "frequency": 2.2 } }]
+                        },
+                        { "id": "dragon", "type": "image", "src": "img/dragon.svg", "x": 48, "y": 12, "width": 144, "height": 228, "fit": "fill" },
+                        {
+                          "id": "crown",
+                          "type": "group",
+                          "start": 3.5,
+                          "animate": [
+                            {
+                              "prop": "y",
+                              "keys": [
+                                [3.5, -260],
+                                [4.0, 0, "in"],
+                                [4.033333, -2.7582],
+                                [4.066667, -4.8936],
+                                [4.1, -6.2666],
+                                [4.133333, -6.835],
+                                [4.166667, -6.65],
+                                [4.2, -5.8431],
+                                [4.233333, -4.6038],
+                                [4.266667, -3.1522],
+                                [4.3, -1.7095],
+                                [4.333333, -0.4704],
+                                [4.366667, -0.4207],
+                                [4.4, -0.885],
+                                [4.433333, -0.917],
+                                [4.466667, -0.5811],
+                                [4.5, 0]
+                              ]
+                            }
+                          ],
+                          "children": [
+                            { "id": "band", "type": "shape", "shape": "polygon", "points": [88, 44, 88, 8, 104, 26, 120, 2, 136, 26, 152, 8, 152, 44], "fill": "gold" },
+                            { "id": "jewel", "type": "shape", "shape": "circle", "x": 120, "y": 30, "radius": 6, "fill": "rose" }
+                          ]
+                        },
+                        {
+                          "id": "eye1",
+                          "type": "group",
+                          "x": 100,
+                          "y": 88,
+                          "animate": [
+                            {
+                              "prop": "scaleY",
+                              "keys": [
+                                [-1.3, 1],
+                                [-1.2, 0.1, "sine-out"],
+                                [-1.1, 1, "sine-in"],
+                                [2.1, 1]
+                              ],
+                              "loop": 3.4
+                            }
+                          ],
+                          "children": [
+                            { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                            {
+                              "id": "shine",
+                              "type": "shape",
+                              "shape": "circle",
+                              "x": 3,
+                              "y": -3,
+                              "radius": 3,
+                              "fill": "cream",
+                              "animate": [
+                                {
+                                  "prop": "opacity",
+                                  "keys": [
+                                    [-1.3, 1],
+                                    [-1.26, 0, "step"],
+                                    [-1.14, 1, "step"],
+                                    [2.1, 1, "step"]
+                                  ],
+                                  "loop": 3.4
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "eye2",
+                          "type": "group",
+                          "x": 140,
+                          "y": 88,
+                          "animate": [
+                            {
+                              "prop": "scaleY",
+                              "keys": [
+                                [-1.3, 1],
+                                [-1.2, 0.1, "sine-out"],
+                                [-1.1, 1, "sine-in"],
+                                [2.1, 1]
+                              ],
+                              "loop": 3.4
+                            }
+                          ],
+                          "children": [
+                            { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                            {
+                              "id": "shine",
+                              "type": "shape",
+                              "shape": "circle",
+                              "x": 3,
+                              "y": -3,
+                              "radius": 3,
+                              "fill": "cream",
+                              "animate": [
+                                {
+                                  "prop": "opacity",
+                                  "keys": [
+                                    [-1.3, 1],
+                                    [-1.26, 0, "step"],
+                                    [-1.14, 1, "step"],
+                                    [2.1, 1, "step"]
+                                  ],
+                                  "loop": 3.4
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            { "id": "frame", "type": "shape", "shape": "arch", "x": 110, "y": 150, "width": 700, "height": 800, "radius": 30, "stroke": "plum", "strokeWidth": 10 }
+          ]
+        },
+        {
+          "id": "stars",
+          "type": "repeat",
+          "count": 12,
+          "vars": { "an": "{{index | div:11 | mul:1.3 | add:0.85 | mul:3.141592653589793}}", "t0": "{{index | mul:0.2 | add:1.2}}", "ph": "{{index | mul:1.7}}" },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": "{{an | cos | mul:420 | add:460}}",
+              "y": "{{an | sin | mul:470 | add:560}}",
+              "radius": 20.8,
+              "fill": "{{index | mod:2 | pick:\"cream\",\"gold\"}}",
+              "in": { "preset": "grow", "at": "{{t0}}", "args": { "d": 0.4 } },
+              "animate": [
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 3.65, "phase": "{{ph | add:-1.265625}}" }, "start": 1.0, "end": 1.25 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 4.15, "phase": "{{ph | add:-1.890625}}" }, "start": 1.25, "end": 1.5 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 4.65, "phase": "{{ph | add:-2.640625}}" }, "start": 1.5, "end": 1.75 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 5.15, "phase": "{{ph | add:-3.515625}}" }, "start": 1.75, "end": 2.0 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 5.65, "phase": "{{ph | add:-4.515625}}" }, "start": 2.0, "end": 2.25 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 6.15, "phase": "{{ph | add:-5.640625}}" }, "start": 2.25, "end": 2.5 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 6.65, "phase": "{{ph | add:-6.890625}}" }, "start": 2.5, "end": 2.75 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 7.15, "phase": "{{ph | add:-8.265625}}" }, "start": 2.75, "end": 3.0 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 7.65, "phase": "{{ph | add:-9.765625}}" }, "start": 3.0, "end": 3.25 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 8.15, "phase": "{{ph | add:-11.390625}}" }, "start": 3.25, "end": 3.5 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 8.65, "phase": "{{ph | add:-13.140625}}" }, "start": 3.5, "end": 3.75 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 9.15, "phase": "{{ph | add:-15.015625}}" }, "start": 3.75, "end": 4.0 },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 5.4, "phase": "{{ph}}" }, "start": 4.0 }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst1",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 4.000000000000001,
+              "end": 5.1,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [4.0, "{{ca | mul:k | mul:126 | add:460}}"],
+                    [5.1, "{{ca | mul:k | mul:420 | add:460}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [4.0, "{{sa | mul:k | mul:126 | add:470}}"],
+                    [5.1, "{{sa | mul:k | mul:420 | add:470}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [4.0, "{{sz}}"],
+                    [5.1, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [4.0, 1],
+                    [5.1, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "youre",
+          "type": "text",
+          "text": "You're",
+          "font": "body",
+          "size": 100,
+          "color": "plum",
+          "x": 1370,
+          "y": 250,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.2,
+          "words": { "stagger": 0.3, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "name",
+          "type": "text",
+          "text": "{{me.persona.name}}!",
+          "font": "display",
+          "size": 165,
+          "color": "plum",
+          "x": 1370,
+          "y": 430,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 920,
+          "lines": 2,
+          "linePitch": 165,
+          "delay": 4.0,
+          "words": { "stagger": 0.1, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "burst2",
+          "type": "repeat",
+          "count": 16,
+          "vars": {
+            "j": "{{index | rand | mul:0.3}}",
+            "a": "{{index | mul:0.39269908169872414 | add:j}}",
+            "ca": "a | cos",
+            "sa": "a | sin",
+            "k": "{{index | add:7 | rand | mul:0.5 | add:0.75}}",
+            "sz": "{{index | add:3 | rand | mul:20 | add:16}}"
+          },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": 0,
+              "y": 0,
+              "radius": "{{sz}}",
+              "fill": "{{index | mod:2 | pick:\"gold\",\"cream\"}}",
+              "start": 4.100000000000001,
+              "end": 5.2,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [4.1, "{{ca | mul:k | mul:180 | add:1370}}"],
+                    [5.2, "{{ca | mul:k | mul:600 | add:1370}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [4.1, "{{sa | mul:k | mul:180 | add:470}}"],
+                    [5.2, "{{sa | mul:k | mul:600 | add:470}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "radius",
+                  "keys": [
+                    [4.1, "{{sz}}"],
+                    [5.2, "{{sz | mul:0.5}}"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [4.1, 1],
+                    [5.2, 0, "in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "fit1", "type": "text", "text": "{{me.persona.oneLiner}}", "font": "body", "size": 54, "fit": "wrap", "maxWidth": 860, "lines": 1, "opacity": 0 },
+        { "id": "fit2", "type": "text", "text": "{{me.persona.oneLiner}}", "font": "body", "size": 54, "fit": "wrap", "maxWidth": 860, "lines": 2, "opacity": 0 },
+        { "id": "fit3", "type": "text", "text": "{{me.persona.oneLiner}}", "font": "body", "size": 54, "fit": "wrap", "maxWidth": 860, "lines": 3, "opacity": 0 },
+        {
+          "id": "bubble",
+          "type": "repeat",
+          "count": 1,
+          "vars": { "g1": "{{(measure.fit1.size == 54) | then:66,0}}", "g2": "{{(measure.fit2.size == 54) | then:66,0}}", "g3": "{{(measure.fit3.size == 54) | then:66,0}}" },
+          "template": [
+            {
+              "id": "b",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 900,
+              "y": 660,
+              "width": 940,
+              "height": "{{g1 | add:g2 | add:g3 | mul:-1 | add:334}}",
+              "radius": 40,
+              "fill": "cream",
+              "animate": [
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [4.9, 0],
+                    [5.3, 1]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "liner",
+          "type": "text",
+          "text": "{{me.persona.oneLiner}}",
+          "font": "body",
+          "size": 54,
+          "color": "plum",
+          "x": 1370,
+          "y": 740,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 860,
+          "lines": 4,
+          "linePitch": 66,
+          "delay": 5.2,
+          "words": { "stagger": "{{5.6 | div:linerGaps | atMost:0.28}}", "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    },
+    "summary": {
+      "background": "peach",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "card", "type": "shape", "shape": "roundRect", "x": 60, "y": 50, "width": 1800, "height": 980, "radius": 46, "fill": "cream", "stroke": "plum", "strokeWidth": 10 },
+        { "id": "rule", "type": "shape", "shape": "roundRect", "x": 84, "y": 74, "width": 1752, "height": 932, "radius": 34, "stroke": "rose", "strokeWidth": 3 },
+        {
+          "id": "tiles",
+          "type": "repeat",
+          "items": [
+            { "kind": "hours", "text": "{{me.totals.hours | hours:\"number\"}} hours", "col": "mint" },
+            { "kind": "poster", "text": "{{me.topSeries[0].title}}", "src": "{{me.topSeries[0].poster}}", "col": "lilac" },
+            { "kind": "poster", "text": "{{me.topMovies[0].title}}", "src": "{{me.topMovies[0].poster}}", "col": "gold" },
+            { "kind": "crown", "text": "{{me.persona.name}}", "col": "rose" }
+          ],
+          "where": "item.text",
+          "vars": {
+            "odd": "index | mod:2 == 1",
+            "center": "index == (count | sub:1) && !odd",
+            "tx0": "{{odd | then:990,150}}",
+            "tx": "{{center | then:570,tx0}}",
+            "ty0": "{{(index < 2) | then:130,560}}",
+            "ty": "{{(count <= 2) | then:345,ty0}}",
+            "cx": "{{tx | add:390}}",
+            "cy": "{{ty | add:195}}",
+            "t0": "{{index | mul:0.6 | add:0.4}}",
+            "bottom": "0"
+          },
+          "template": [
+            {
+              "id": "tile",
+              "type": "group",
+              "pivot": ["{{cx}}", "{{cy}}"],
+              "in": { "preset": "grow", "at": "{{t0}}", "args": { "d": 0.5 } },
+              "children": [
+                { "id": "box", "type": "shape", "shape": "roundRect", "x": "{{tx}}", "y": "{{ty}}", "width": 780, "height": 390, "radius": 36, "fill": "{{item.col}}" },
+                {
+                  "id": "hourglass",
+                  "type": "group",
+                  "when": "item.kind == \"hours\"",
+                  "x": "{{tx | add:165}}",
+                  "y": "{{cy}}",
+                  "children": [{ "id": "hourglass", "type": "image", "src": "img/hourglass.svg", "x": -92, "y": -152, "width": 184, "height": 304, "fit": "fill" }]
+                },
+                {
+                  "id": "crown",
+                  "type": "group",
+                  "when": "item.kind == \"crown\"",
+                  "x": "{{tx | add:165}}",
+                  "y": "{{cy}}",
+                  "scale": 3.4,
+                  "children": [
+                    {
+                      "id": "c",
+                      "type": "group",
+                      "x": -120,
+                      "y": -23,
+                      "children": [{ "id": "crown", "type": "image", "src": "img/crown.svg", "x": 84, "y": -2, "width": 72, "height": 50, "fit": "fill" }]
+                    }
+                  ]
+                },
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "when": "item.kind == \"poster\"",
+                  "src": "{{item.src}}",
+                  "title": "{{item.text}}",
+                  "x": "{{tx | add:55}}",
+                  "y": "{{ty | add:30}}",
+                  "width": 220,
+                  "height": 330,
+                  "clip": { "shape": "arch", "radius": 11 },
+                  "border": { "width": 4.4, "color": "plum" },
+                  "fallback": "poster"
+                },
+                {
+                  "id": "label",
+                  "type": "text",
+                  "text": "{{item.text}}",
+                  "font": "display",
+                  "size": 96,
+                  "color": "plum",
+                  "x": "{{tx | add:320}}",
+                  "y": "{{cy}}",
+                  "align": "left",
+                  "fit": "wrap",
+                  "maxWidth": 420,
+                  "lines": 3,
+                  "valign": "middle",
+                  "delay": "{{t0 | add:0.2}}",
+                  "words": { "stagger": 0.1, "in": "say", "pivotY": -0.32 }
+                }
+              ]
+            },
+            {
+              "id": "spark",
+              "type": "shape",
+              "shape": "star",
+              "points": 4,
+              "inner": 0.3,
+              "x": "{{tx | add:740}}",
+              "y": "{{ty | add:44}}",
+              "radius": 20.8,
+              "fill": "cream",
+              "opacity": 0.7,
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "back"]
+                  ],
+                  "max": 1
+                },
+                { "prop": "radius", "wave": { "amplitude": 5.2, "frequency": 2.4, "phase": "{{index | mul:2}}" } },
+                { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:2}}" } }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sparkles",
+          "type": "repeat",
+          "items": [
+            { "x": 96, "y": 90, "r": 30 },
+            { "x": 1824, "y": 90, "r": 30 },
+            { "x": 96, "y": 990, "r": 30 },
+            { "x": 1824, "y": 990, "r": 30 }
+          ],
+          "vars": { "c": "{{index | mod:3 | pick:\"gold\",\"rose\",\"lilac\"}}", "t0": "{{index | mul:0.07 | add:0.1}}" },
+          "template": [
+            {
+              "id": "sp",
+              "type": "group",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "animate": [
+                {
+                  "prop": "scale",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    ["{{t0}}", 0],
+                    ["{{t0 | add:0.5}}", 1, "out"]
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 4,
+                  "inner": 0.3,
+                  "x": 0,
+                  "y": 0,
+                  "radius": "{{item.r | mul:0.75}}",
+                  "fill": "{{c}}",
+                  "opacity": 0.7,
+                  "animate": [
+                    { "prop": "radius", "wave": { "amplitude": "{{item.r | mul:0.25}}", "frequency": 2.4, "phase": "{{index | mul:1.9}}" } },
+                    { "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.4, "phase": "{{index | mul:1.9}}" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "outro": {
+      "background": {
+        "type": "linear",
+        "from": [0, 0],
+        "to": [0, 1080],
+        "stops": [
+          [0, "lilac"],
+          [1, "rose"]
+        ]
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "sky",
+          "type": "repeat",
+          "count": 24,
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "circle",
+              "x": "{{index | add:7 | rand | mul:1920}}",
+              "y": "{{index | add:31 | rand | mul:520}}",
+              "radius": "{{index | add:3 | rand | mul:3 | add:3}}",
+              "fill": "cream",
+              "opacity": 0.7,
+              "animate": [{ "prop": "opacity", "wave": { "amplitude": 0.3, "frequency": 2.2, "phase": "{{index}}" } }]
+            }
+          ]
+        },
+        {
+          "id": "moon",
+          "type": "shape",
+          "shape": "circle",
+          "x": 1700,
+          "y": 0,
+          "radius": 90,
+          "fill": "cream",
+          "animate": [
+            {
+              "prop": "y",
+              "keys": [
+                [0, 560],
+                [1.6, 170, "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bite",
+          "type": "shape",
+          "shape": "circle",
+          "x": 1736,
+          "y": 0,
+          "radius": 82,
+          "fill": {
+            "type": "linear",
+            "from": [0, 0],
+            "to": [0, 1080],
+            "stops": [
+              [0, "lilac"],
+              [1, "rose"]
+            ]
+          },
+          "animate": [
+            {
+              "prop": "y",
+              "keys": [
+                [0, 534],
+                [1.6, 144, "out"]
+              ]
+            }
+          ]
+        },
+        { "id": "hill", "type": "shape", "shape": "ellipse", "x": 960, "y": 1170, "rx": 1250, "ry": 230, "fill": "mint" },
+        {
+          "id": "castle",
+          "type": "group",
+          "x": 60,
+          "y": 990,
+          "scale": 1.05,
+          "children": [
+            {
+              "id": "c",
+              "type": "group",
+              "y": -260,
+              "children": [
+                { "id": "castle", "type": "image", "src": "img/castle.svg", "x": 10, "y": -26, "width": 340, "height": 293, "fit": "fill" },
+                {
+                  "id": "flag1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [55, -22, 82, -13, 55, -4],
+                  "fill": "gold",
+                  "pivot": [55, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 55 } }]
+                },
+                {
+                  "id": "flag2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [305, -22, 332, -13, 305, -4],
+                  "fill": "gold",
+                  "pivot": [305, -13],
+                  "animate": [{ "prop": "scaleX", "wave": { "amplitude": 0.111111, "frequency": 3, "phase": 305 } }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dragon",
+          "type": "group",
+          "x": 1560,
+          "y": 1000,
+          "scale": 1.35,
+          "children": [
+            {
+              "id": "d",
+              "type": "group",
+              "x": -120,
+              "y": -240,
+              "children": [
+                {
+                  "id": "wing1",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [70, 110, 10, 64, 30, 140],
+                  "fill": "lilac",
+                  "pivot": [70, 110],
+                  "animate": [{ "prop": "rotation", "wave": { "amplitude": 12.605071, "frequency": 2.2 } }]
+                },
+                {
+                  "id": "wing2",
+                  "type": "shape",
+                  "shape": "polygon",
+                  "points": [170, 110, 230, 64, 210, 140],
+                  "fill": "lilac",
+                  "pivot": [170, 110],
+                  "rotation": -31.512679,
+                  "animate": [{ "prop": "rotation", "wave": { "amplitude": 20.053523, "frequency": 7 } }]
+                },
+                { "id": "dragon", "type": "image", "src": "img/dragon.svg", "x": 48, "y": 12, "width": 144, "height": 228, "fit": "fill" },
+                {
+                  "id": "eye1",
+                  "type": "group",
+                  "x": 100,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [-2.1, 1],
+                        [-2.0, 0.1, "sine-out"],
+                        [-1.9, 1, "sine-in"],
+                        [1.3, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [-2.1, 1],
+                            [-2.06, 0, "step"],
+                            [-1.94, 1, "step"],
+                            [1.3, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "eye2",
+                  "type": "group",
+                  "x": 140,
+                  "y": 88,
+                  "animate": [
+                    {
+                      "prop": "scaleY",
+                      "keys": [
+                        [-2.1, 1],
+                        [-2.0, 0.1, "sine-out"],
+                        [-1.9, 1, "sine-in"],
+                        [1.3, 1]
+                      ],
+                      "loop": 3.4
+                    }
+                  ],
+                  "children": [
+                    { "id": "pupil", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 9, "fill": "plum" },
+                    {
+                      "id": "shine",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 3,
+                      "y": -3,
+                      "radius": 3,
+                      "fill": "cream",
+                      "animate": [
+                        {
+                          "prop": "opacity",
+                          "keys": [
+                            [-2.1, 1],
+                            [-2.06, 0, "step"],
+                            [-1.94, 1, "step"],
+                            [1.3, 1, "step"]
+                          ],
+                          "loop": 3.4
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "what",
+          "type": "text",
+          "text": "What a year, {{me.name}}!",
+          "font": "display",
+          "size": 150,
+          "color": "plum",
+          "x": 960,
+          "y": 400,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 0.3,
+          "words": { "stagger": 0.25, "in": "say", "pivotY": -0.32 }
+        },
+        {
+          "id": "bye",
+          "type": "text",
+          "text": "See you next year!",
+          "font": "body",
+          "size": 96,
+          "color": "plum",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "wrap",
+          "maxWidth": 1760,
+          "delay": 1.0,
+          "words": { "stagger": 0.2, "in": "say", "pivotY": -0.32 }
+        }
+      ]
+    }
+  }
+}

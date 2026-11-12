@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-126 -135 393 261" width="393" height="261">
+  <path id="sheen" d="M223.78 -122.25 A255 255 0 0 1 252.14 38.11" fill="none" stroke="#5A55A8" stroke-width="22" stroke-linecap="round"/>
+  <circle id="label" cx="0" cy="0" r="120" fill="#FFD23F" stroke="#1E1B4B" stroke-width="10"/>
+  <polygon id="star" points="0,-84 9.59,-63.2 32.34,-60.51 15.52,-44.96 19.98,-22.49 0,-33.68 -19.98,-22.49 -15.52,-44.96 -32.34,-60.51 -9.59,-63.2" fill="#FF5A36" stroke="#1E1B4B" stroke-width="6" stroke-linejoin="round"/>
+  <circle id="hole" cx="0" cy="0" r="14" fill="#1E1B4B"/>
+</svg>

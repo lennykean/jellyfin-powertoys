@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jellywrap</title>
+  </head>
+  <body>
+    <div id="JellywrapConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+      <style>
+        #VideoRows .selectLabel {
+          display: none;
+        }
+        #VideoRows .selectArrowContainer {
+          top: 50%;
+          bottom: auto;
+          transform: translateY(-50%);
+          line-height: 0;
+        }
+
+        #VideoRows .selectArrow {
+          margin-top: 0;
+        }
+
+        #VideoRows [inert] {
+          opacity: 0.4;
+        }
+      </style>
+      <div data-role="content">
+        <div class="content-primary">
+          <h1>Jellywrap</h1>
+          <p>A yearly "wrapped" video for each user, plus one for the whole server</p>
+          <p id="LoadError" hidden>The settings could not be loaded</p>
+
+          <div id="CleanActivityLogWarning" hidden>
+            <h3 id="CleanActivityLogTaskName"></h3>
+            <p id="CleanActivityLogText"></p>
+          </div>
+
+          <form id="JellywrapConfigForm">
+            <div style="display: flex; gap: 10px">
+              <div class="selectContainer" style="flex-grow: 1">
+                <select id="GenerationMonth" is="emby-select" label="Generation Date">
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </div>
+              <div class="inputContainer" style="flex-grow: 1">
+                <input id="GenerationDay" type="number" min="1" max="31" is="emby-input" label="Day" />
+              </div>
+            </div>
+
+            <div class="checkboxContainer">
+              <label class="emby-checkbox-label">
+                <input id="IndividualVisibleToAll" type="checkbox" is="emby-checkbox" />
+                <span>Individual wrapped visible to all users</span>
+              </label>
+            </div>
+
+            <div id="VideoRows" style="margin-bottom: 1.8em"></div>
+
+            <div class="inputContainer">
+              <input id="CustomTemplateFolder" type="text" is="emby-input" label="Custom Template Folder" />
+            </div>
+            <button id="AddStarterTemplate" is="emby-button" type="button" class="raised block emby-button" style="margin-bottom: 1.8em; display: none">
+              <span>Add Starter Template</span>
+            </button>
+
+            <button id="Save" is="emby-button" type="submit" class="raised button-submit block emby-button" disabled>
+              <span>Save</span>
+            </button>
+
+            <div class="selectContainer" style="margin-top: 1.8em">
+              <select id="Year" is="emby-select" label="Year"></select>
+            </div>
+            <button id="RegenerateNow" is="emby-button" type="button" class="raised block emby-button">
+              <span>Regenerate now</span>
+            </button>
+          </form>
+        </div>
+      </div>
+      <script type="text/javascript">
+        const JellywrapConfig = {
+          pluginUniqueId: "79f37cbb-74db-44cb-a2ac-e95a5e7fbd9f",
+          taskKey: "JellyfinPowertoys.Jellywrap.GenerateTask",
+        };
+
+        const demographicIsKid = { auto: null, kid: true, adult: false };
+        const randomTemplate = "";
+        const everyoneRow = "everyone";
+        let templates = [];
+
+        const isKidByRating = (user) => {
+          const maxParentalRating = user.Policy.MaxParentalRating;
+          return maxParentalRating !== null && maxParentalRating !== undefined && maxParentalRating < 18;
+        };
+
+        const setOptions = (select, options, value) => {
+          select.innerHTML = "";
+          for (const [optionValue, text] of options) {
+            const option = document.createElement("option");
+            option.value = optionValue;
+            option.textContent = text;
+            select.appendChild(option);
+          }
+          if (options.length > 0) {
+            select.value = options.some(([optionValue]) => optionValue === value) ? value : options[0][0];
+          }
+        };
+
+        const templateOptions = (offered) => [[randomTemplate, "Random"]].concat(offered.map((t) => [t.Id, t.Name]));
+
+        const addRow = (container, rowId) => {
+          const row = document.createElement("div");
+          row.dataset.row = rowId;
+          row.style.display = "flex";
+          row.style.gap = "10px";
+          row.style.alignItems = "center";
+          row.style.marginBottom = "0.5em";
+          container.appendChild(row);
+          return row;
+        };
+
+        const addCell = (row, flex, text) => {
+          const cell = document.createElement("div");
+          cell.style.flex = flex;
+          cell.textContent = text;
+          row.appendChild(cell);
+          return cell;
+        };
+        const addCheckbox = (row, name) => {
+          const label = document.createElement("label");
+          label.appendChild(document.createElement("span"));
+          addCell(row, "0 0 6em", "").appendChild(label);
+          const checkbox = document.createElement("input", "emby-checkbox");
+          checkbox.type = "checkbox";
+          checkbox.dataset.field = "generate";
+          checkbox.setAttribute("aria-label", "Generate for " + name);
+          label.insertBefore(checkbox, label.firstChild);
+          return checkbox;
+        };
+        const addSelect = (row, field, name) => {
+          const cell = addCell(row, "2", "");
+          cell.className = "selectContainer selectContainer-inline";
+          const select = document.createElement("select", "emby-select");
+          select.dataset.field = field;
+          select.setAttribute("aria-label", field + " for " + name);
+          cell.appendChild(select);
+          return select;
+        };
+
+        const fieldOf = (row, field) => row.querySelector('[data-field="' + field + '"]');
+        const setRowEnabled = (row) => {
+          for (const select of row.querySelectorAll("select")) {
+            select.parentNode.inert = !fieldOf(row, "generate").checked;
+          }
+        };
+        const setUserTemplateOptions = (row, value) => {
+          const demographic = fieldOf(row, "demographic");
+          const isKid = demographic.value === "auto" ? demographic.dataset.kidByRating === "true" : demographic.value === "kid";
+          setOptions(fieldOf(row, "template"), templateOptions(templates.filter((t) => t.HasIndividualVideo && t.IsForKids === isKid)), value);
+        };
+
+        const renderVideoRows = (users, config) => {
+          const container = document.querySelector("#VideoRows");
+          container.innerHTML = "";
+          const header = addRow(container, "header");
+          for (const [flex, title] of [
+            ["2", "User"],
+            ["0 0 6em", "Generate"],
+            ["2", "Demographic"],
+            ["2", "Template"],
+          ]) {
+            addCell(header, flex, title).style.fontWeight = "bold";
+          }
+
+          for (const user of users) {
+            const settings = (config.UserSettings || []).find((s) => s.UserId === user.Id) || { Generate: true, IsKid: null, TemplateId: null };
+            const row = addRow(container, user.Id);
+            addCell(row, "2", user.Name);
+            addCheckbox(row, user.Name).checked = settings.Generate;
+            const demographic = addSelect(row, "demographic", user.Name);
+            demographic.dataset.kidByRating = isKidByRating(user);
+            setOptions(
+              demographic,
+              [
+                ["auto", "Auto (" + (isKidByRating(user) ? "Kid" : "Adult") + ")"],
+                ["kid", "Kid"],
+                ["adult", "Adult"],
+              ],
+              settings.IsKid === true ? "kid" : settings.IsKid === false ? "adult" : "auto",
+            );
+            addSelect(row, "template", user.Name);
+            setUserTemplateOptions(row, settings.TemplateId || randomTemplate);
+            setRowEnabled(row);
+          }
+
+          const row = addRow(container, everyoneRow);
+          addCell(row, "2", "Everyone Together");
+          addCheckbox(row, "Everyone Together").checked = config.GenerateServerVideo;
+          addCell(row, "2", "");
+          setOptions(
+            addSelect(row, "template", "Everyone Together"),
+            templateOptions(templates.filter((t) => t.HasServerVideo && !t.IsForKids)),
+            config.ServerTemplateId || randomTemplate,
+          );
+          setRowEnabled(row);
+        };
+
+        document.querySelector("#VideoRows").addEventListener("change", (e) => {
+          const row = e.target.closest("[data-row]");
+          if (e.target.dataset.field === "generate") {
+            setRowEnabled(row);
+          } else if (e.target.dataset.field === "demographic") {
+            setUserTemplateOptions(row, fieldOf(row, "template").value);
+          }
+        });
+
+        document.querySelector("#JellywrapConfigPage").addEventListener("pageshow", () => {
+          document.querySelector("#Save").disabled = true;
+          document.querySelector("#LoadError").hidden = true;
+          Dashboard.showLoadingMsg();
+          Promise.all([
+            ApiClient.getPluginConfiguration(JellywrapConfig.pluginUniqueId),
+            ApiClient.getUsers(),
+            ApiClient.getScheduledTasks(),
+            ApiClient.getServerConfiguration(),
+            ApiClient.getJSON(ApiClient.getUrl("PowerToys/Jellywrap/Templates")),
+            ApiClient.getJSON(ApiClient.getUrl("PowerToys/Jellywrap/Years")),
+            ApiClient.getJSON(ApiClient.getUrl("PowerToys/Jellywrap/StarterTemplate")),
+          ])
+            .then(([config, users, tasks, serverConfig, validTemplates, years, starterTemplate]) => {
+              templates = validTemplates;
+              // The button styles override the hidden attribute.
+              document.querySelector("#AddStarterTemplate").style.display = starterTemplate.CanAdd ? "" : "none";
+              const cleanTask = tasks.find((t) => t.Key === "CleanActivityLog");
+              const retentionDays = serverConfig.ActivityLogRetentionDays;
+              const cleans = cleanTask !== undefined && cleanTask.Triggers.length > 0 && retentionDays !== null && retentionDays !== undefined;
+              document.querySelector("#CleanActivityLogWarning").hidden = !cleans;
+              if (cleans) {
+                document.querySelector("#CleanActivityLogTaskName").textContent = cleanTask.Name;
+                document.querySelector("#CleanActivityLogText").textContent =
+                  "This task deletes activity older than " + retentionDays + " days. Jellywrap can only cover what is left.";
+              }
+
+              document.querySelector("#GenerationMonth").value = config.GenerationMonth;
+              document.querySelector("#GenerationDay").value = config.GenerationDay;
+              document.querySelector("#IndividualVisibleToAll").checked = config.IndividualVisibleToAll;
+              document.querySelector("#CustomTemplateFolder").value = config.CustomTemplateFolder || "";
+              setOptions(
+                document.querySelector("#Year"),
+                years.map((year) => [String(year), String(year)]),
+                null,
+              );
+              document.querySelector("#RegenerateNow").disabled = years.length === 0;
+              renderVideoRows(users, config);
+              document.querySelector("#Save").disabled = false;
+              Dashboard.hideLoadingMsg();
+            })
+            .catch((error) => {
+              console.error("Configuration load error:", error);
+              document.querySelector("#LoadError").hidden = false;
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#JellywrapConfigForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(JellywrapConfig.pluginUniqueId).then((config) => {
+            const everyone = document.querySelector('#VideoRows [data-row="' + everyoneRow + '"]');
+            config.GenerationMonth = parseInt(document.querySelector("#GenerationMonth").value);
+            config.GenerationDay = parseInt(document.querySelector("#GenerationDay").value) || 1;
+            config.IndividualVisibleToAll = document.querySelector("#IndividualVisibleToAll").checked;
+            config.UserSettings = Array.from(document.querySelectorAll("#VideoRows [data-row]"))
+              .filter((row) => fieldOf(row, "demographic") !== null)
+              .map((row) => ({
+                UserId: row.dataset.row,
+                Generate: fieldOf(row, "generate").checked,
+                IsKid: demographicIsKid[fieldOf(row, "demographic").value],
+                TemplateId: fieldOf(row, "template").value || null,
+              }));
+            config.GenerateServerVideo = fieldOf(everyone, "generate").checked;
+            config.ServerTemplateId = fieldOf(everyone, "template").value || null;
+            config.CustomTemplateFolder = document.querySelector("#CustomTemplateFolder").value.trim() || null;
+
+            ApiClient.updatePluginConfiguration(JellywrapConfig.pluginUniqueId, config)
+              .then((result) => {
+                Dashboard.processPluginConfigurationUpdateResult(result);
+                // The folder may hold new templates, so the rows are loaded again.
+                document.querySelector("#JellywrapConfigPage").dispatchEvent(new Event("pageshow"));
+              })
+              .catch((error) => {
+                console.error("Configuration save error:", error);
+                Dashboard.hideLoadingMsg();
+              });
+          });
+
+          return false;
+        });
+
+        document.querySelector("#AddStarterTemplate").addEventListener("click", () => {
+          Dashboard.showLoadingMsg();
+          ApiClient.ajax({ type: "POST", url: ApiClient.getUrl("PowerToys/Jellywrap/StarterTemplate") })
+            .then(() => document.querySelector("#JellywrapConfigPage").dispatchEvent(new Event("pageshow")))
+            .catch((error) => {
+              console.error("Add starter template error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+
+        document.querySelector("#RegenerateNow").addEventListener("click", () => {
+          Dashboard.showLoadingMsg();
+          ApiClient.getPluginConfiguration(JellywrapConfig.pluginUniqueId)
+            .then((config) => {
+              config.ForceYear = parseInt(document.querySelector("#Year").value);
+              return ApiClient.updatePluginConfiguration(JellywrapConfig.pluginUniqueId, config);
+            })
+            .then(() => ApiClient.getScheduledTasks())
+            .then((tasks) => ApiClient.startScheduledTask(tasks.find((t) => t.Key === JellywrapConfig.taskKey).Id))
+            .then(() => {
+              Dashboard.hideLoadingMsg();
+              Dashboard.alert("Jellywrap generation started");
+            })
+            .catch((error) => {
+              console.error("Regenerate error:", error);
+              Dashboard.hideLoadingMsg();
+            });
+        });
+      </script>
+    </div>
+  </body>
+</html>

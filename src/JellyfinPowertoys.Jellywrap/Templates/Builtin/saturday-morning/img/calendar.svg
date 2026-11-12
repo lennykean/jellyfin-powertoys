@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="133 191 774 796" width="774" height="796">
+  <rect id="page" x="140" y="220" width="760" height="760" rx="44" fill="#FFFFFF"/>
+  <path id="header" d="M140 390 V264 A44 44 0 0 1 184 220 H856 A44 44 0 0 1 900 264 V390 Z" fill="#FF5A36"/>
+  <line id="rule" x1="140" y1="390" x2="900" y2="390" fill="none" stroke="#1E1B4B" stroke-width="10"/>
+  <rect id="outline" x="140" y="220" width="760" height="760" rx="44" fill="none" stroke="#1E1B4B" stroke-width="12" stroke-linejoin="round"/>
+  <circle id="ring1" cx="300" cy="222" r="26" fill="#4CC3F1" stroke="#1E1B4B" stroke-width="8"/>
+  <circle id="ring2" cx="740" cy="222" r="26" fill="#4CC3F1" stroke="#1E1B4B" stroke-width="8"/>
+</svg>

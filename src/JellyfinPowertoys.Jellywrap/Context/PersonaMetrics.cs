@@ -1,0 +1,25 @@
+namespace JellyfinPowertoys.Jellywrap.Context;
+
+internal sealed record PersonaMetrics(
+    double TotalMinutes,
+    double NightShare,
+    double EarlyShare,
+    double BreakfastShare,
+    double WeekendShare,
+    int Streak,
+    int BingeEpisodes,
+    double TopTitleShare,
+    int Started,
+    double CompletedShare,
+    double AbandonedShare,
+    int RepeatCompletions,
+    double RepeatShare,
+    double ClassicShare,
+    double RecentShare,
+    double TopGenreShare,
+    int GenresOverAnHour,
+    int MoviesCompleted,
+    double MovieShare,
+    double MusicShare,
+    double MusicMinutes,
+    int TitlesCompleted);

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-361 -181 722 362" width="722" height="362">
+  <rect id="paper" x="-360" y="-180" width="720" height="360" fill="#F5EBD7"/>
+  <rect id="rule" x="-342" y="-162" width="684" height="324" fill="none" stroke="#5A0F1B" stroke-width="5"/>
+  <polygon id="star" points="0,-142 6.35,-126.74 22.83,-125.42 10.27,-114.66 14.11,-98.58 0,-107.2 -14.11,-98.58 -10.27,-114.66 -22.83,-125.42 -6.35,-126.74" fill="#E3B04B"/>
+</svg>

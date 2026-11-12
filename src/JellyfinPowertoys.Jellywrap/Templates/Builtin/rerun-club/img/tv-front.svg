@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="351 111 1218 730" width="1218" height="730">
+  <rect id="screen" x="352" y="112" width="1216" height="640" rx="88" fill="#2F6F73"/>
+  <rect id="plate" x="840" y="780" width="240" height="60" rx="14" fill="#E0A526"/>
+  <circle id="knob1" cx="660" cy="810" r="28" fill="#E0A526"/>
+  <rect id="mark1" x="656" y="784" width="8" height="26" fill="#3A2A1F"/>
+  <circle id="knob2" cx="1260" cy="810" r="28" fill="#E0A526"/>
+  <rect id="mark2" x="1256" y="784" width="8" height="26" fill="#3A2A1F"/>
+</svg>

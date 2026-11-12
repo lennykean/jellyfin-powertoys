@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-281 -281 562 562" width="562" height="562">
+  <circle id="disc" cx="0" cy="0" r="280" fill="#120C08"/>
+  <circle cx="0" cy="0" r="250" fill="none" stroke="#2E241D" stroke-width="3"/>
+  <circle cx="0" cy="0" r="220" fill="none" stroke="#2E241D" stroke-width="3"/>
+  <circle cx="0" cy="0" r="190" fill="none" stroke="#2E241D" stroke-width="3"/>
+  <circle cx="0" cy="0" r="160" fill="none" stroke="#2E241D" stroke-width="3"/>
+  <circle cx="0" cy="0" r="130" fill="none" stroke="#2E241D" stroke-width="3"/>
+  <path id="sheen" d="M193.95 -132.69 A235 235 0 0 1 233.83 23.46" fill="none" stroke="#F6EBD92E" stroke-width="14" stroke-linecap="round"/>
+  <circle id="label" cx="0" cy="0" r="100" fill="#B5532F"/>
+  <circle id="label-ring" cx="0" cy="0" r="78" fill="none" stroke="#E0A526" stroke-width="8"/>
+  <circle id="hole" cx="0" cy="0" r="10" fill="#120C08"/>
+</svg>

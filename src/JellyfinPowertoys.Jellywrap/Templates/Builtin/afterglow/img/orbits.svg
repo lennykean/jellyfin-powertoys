@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1040 369 800 342" width="800" height="342">
+  <ellipse id="ring1" cx="1440" cy="540" rx="330" ry="120" fill="none" stroke="#2F3A86" stroke-width="3" transform="rotate(-12 1440 540)"/>
+  <ellipse id="ring2" cx="1440" cy="540" rx="400" ry="160" fill="none" stroke="#2F3A86" stroke-width="3" transform="rotate(8 1440 540)"/>
+</svg>

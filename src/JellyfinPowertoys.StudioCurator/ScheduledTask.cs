@@ -117,7 +117,7 @@ public class ScheduledTask(
                             var child = collection.LinkedChildren.FirstOrDefault(c => c.ItemId == item.Id);
                             if (child is not null)
                             {
-                                collection.LinkedChildren = collection.LinkedChildren.Except([child]).ToArray();
+                                collection.LinkedChildren = [.. collection.LinkedChildren.Except([child])];
                                 collectionChanged = true;
                             }
                             collectionItems.Remove(itemId);

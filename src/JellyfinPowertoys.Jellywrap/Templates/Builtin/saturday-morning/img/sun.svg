@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-192 -195 384 390" width="384" height="390">
+  <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  <g transform="rotate(36)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(72)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(108)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(144)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(180)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(216)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(252)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(288)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(324)">
+    <rect x="-18" y="-190" width="36" height="64" rx="18" fill="#FFD23F" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <circle id="disc" cx="0" cy="0" r="120" fill="#FFD23F" stroke="#1E1B4B" stroke-width="12"/>
+</svg>

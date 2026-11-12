@@ -1,0 +1,335 @@
+{
+  "id": "server",
+  "name": "Server (base)",
+  "audience": "base",
+  "fonts": { "body": "pkg:adult/fonts/Manrope-700.ttf" },
+  "palette": { "bg": "#101418", "ink": "#F2F2F2", "accent": "#7DE2D1" },
+  "background": "#000000",
+  "transition": { "type": "crossfade", "duration": 0.8 },
+  "open": { "type": "fade", "duration": 0.5, "ease": "out" },
+  "close": { "type": "fade", "duration": 0.8, "ease": "in-out" },
+  "card": { "slide": "intro", "time": 5 },
+  "vars": {
+    "kidSlot": "server.whoOwnsWhen | where:\"shareOfMinutes\",\">=\",0.05 | where:\"kidsShare\",\">=\",0.6 | sortBy:\"kidsShare\" | first",
+    "grownSlot": "server.whoOwnsWhen | where:\"shareOfMinutes\",\">=\",0.05 | where:\"kidsShare\",\"<=\",0.4 | sortBy:\"kidsShare\",\"asc\" | first",
+    "kidsWin": "groups.moreHoursPerPerson == \"kids\"",
+    "twist": "groups.moreEpisodes != null && groups.moreEpisodes != groups.moreHoursPerPerson"
+  },
+  "slides": {
+    "intro": {
+      "duration": 6,
+      "audioGroup": 1,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 120,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "fade-up",
+          "text": "{{server.possessive}} {{year}} on Jellyfin"
+        }
+      ]
+    },
+    "totals": {
+      "duration": 8,
+      "audioGroup": 1,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1700,
+          "in": "fade-up",
+          "text": "{{server.totals.hours | number}} hours · {{server.totals.plays | number}} plays · {{server.totals.viewers}} viewers · {{server.totals.titles | number}} titles"
+        }
+      ]
+    },
+    "growth": {
+      "duration": 8,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "server.growth.movies > 0 || server.growth.episodes > 0 || server.growth.albums > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1700,
+          "in": "fade-up",
+          "text": "New this year: {{server.growth.movies | number}} movies, {{server.growth.episodes | number}} episodes, {{server.growth.albums | number}} albums."
+        }
+      ]
+    },
+    "kids-vs-grownups": {
+      "duration": 8,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "groups.hasSplit",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{kidsWin | then:\"The kids out-watched the grown-ups\",\"The grown-ups out-watched the kids\"}}: {{groups.kids.hoursPerPerson | round}} h each vs {{groups.grownups.hoursPerPerson | round}} h."
+        }
+      ]
+    },
+    "busiest": {
+      "duration": 7,
+      "audioGroup": 2,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "Busiest day: {{server.busiest.day | date:\"dddd, MMMM d\"}} ({{server.busiest.dayHours | hours:\"number\"}} h). Busiest hour: {{server.busiest.hour | hour}}."
+        }
+      ]
+    },
+    "who-owns-when": {
+      "duration": 8,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "groups.hasSplit && (kidSlot != null || grownSlot != null)",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{grownSlot.weekday}} {{grownSlot.part}}s belong to the grown-ups ({{grownSlot.kidsShare | sub:1 | mul:-1 | percent}})."
+        }
+      ]
+    },
+    "top-genre": {
+      "duration": 8,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "server.topGenres | count > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "fade-up",
+          "text": "Top genres: {{server.topGenres | take:3 | pluck:\"name\" | join:\", \"}}."
+        }
+      ]
+    },
+    "top-series": {
+      "duration": 10,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "server.topSeries | count >= 3",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Top shows" }
+      ]
+    },
+    "top-movies": {
+      "duration": 10,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "server.topMovies | count >= 3",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Top movies" }
+      ]
+    },
+    "kids-1-vs-grownups-1": {
+      "duration": 8,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "groups.hasSplit && groups.kids.top != null && groups.grownups.top != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "Kids' #1: {{groups.kids.top.title}}. Grown-ups' #1: {{groups.grownups.top.title}}."
+        }
+      ]
+    },
+    "common-ground": {
+      "duration": 7,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "server.commonGround != null || server.mostShared != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "The one everyone agrees on: {{server.commonGround.title | default:server.mostShared.title}}."
+        }
+      ]
+    },
+    "leaderboard": {
+      "duration": 8,
+      "audioGroup": 4,
+      "background": "bg",
+      "when": "server.leaderboard | count > 1",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Leaderboard" }
+      ]
+    },
+    "superlatives": {
+      "duration": 10,
+      "audioGroup": 4,
+      "background": "bg",
+      "when": "server.superlatives.mostMovies != null || server.superlatives.mostEpisodes != null || server.superlatives.mostRewatches != null || server.superlatives.mostMusic != null",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Superlatives" }
+      ]
+    },
+    "music": {
+      "duration": 8,
+      "audioGroup": 4,
+      "background": "bg",
+      "when": "server.music != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 72,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 52,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "Top artist: {{server.music.topArtist.name}}. Top songs: {{server.music.topSongs | take:3 | pluck:\"title\" | join:\", \"}}."
+        }
+      ]
+    },
+    "lineup": {
+      "duration": "{{server.lineup | count | mul:2.5 | atLeast:8}}",
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "The lineup" }
+      ]
+    },
+    "summary": {
+      "duration": 10,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 64,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 48,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "fade-up",
+          "text": "{{server.totals.hours | number}} hours · #1 {{server.topSeries[0].title}} · #1 {{server.topMovies[0].title}}"
+        }
+      ]
+    },
+    "outro": {
+      "duration": 5,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 96,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "in": "fade-up",
+          "text": "That was {{server.possessiveInline}} {{year}}."
+        }
+      ]
+    }
+  }
+}

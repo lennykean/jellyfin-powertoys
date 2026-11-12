@@ -46,6 +46,7 @@ jobs:
           ["6a65ce4e-fb35-4e99-8f37-02bc3979fe7e"]="JellyfinPowertoys.ThumbnailPreviews"
           ["5513dce4-a436-495c-8925-30845bf2c1dd"]="JellyfinPowertoys.WatchHistoryJanitor"
           ["36eb87e0-0373-423b-a547-2acb96e33430"]="JellyfinPowertoys.JellyTag"
+          ["79f37cbb-74db-44cb-a2ac-e95a5e7fbd9f"]="JellyfinPowertoys.Jellywrap"
         )
 
         for guid in "${!plugins[@]}"; do
@@ -75,6 +76,7 @@ jobs:
           ["6a65ce4e-fb35-4e99-8f37-02bc3979fe7e"]="JellyfinPowertoys.ThumbnailPreviews"
           ["5513dce4-a436-495c-8925-30845bf2c1dd"]="JellyfinPowertoys.WatchHistoryJanitor"
           ["36eb87e0-0373-423b-a547-2acb96e33430"]="JellyfinPowertoys.JellyTag"
+          ["79f37cbb-74db-44cb-a2ac-e95a5e7fbd9f"]="JellyfinPowertoys.Jellywrap"
         )
 
         for guid in "${!plugins[@]}"; do

@@ -1,0 +1,4515 @@
+{
+  "id": "saturday-morning",
+  "name": "Saturday Morning",
+  "audience": "general",
+  "extends": { "individual": "adult", "server": "server" },
+  "fonts": {
+    "d7": ["fonts/Fredoka-700.ttf", "fonts/Nunito-700.ttf"],
+    "d6": ["fonts/Fredoka-600.ttf", "fonts/Nunito-600.ttf"],
+    "b8": ["fonts/Nunito-800.ttf"]
+  },
+  "palette": {
+    "sky": "#4CC3F1",
+    "sun": "#FFD23F",
+    "tom": "#FF5A36",
+    "grass": "#2FB36D",
+    "grass2": "#3FC97F",
+    "ink": "#1E1B4B",
+    "milk": "#FFF8E7",
+    "white": "#FFFFFF",
+    "coral": "#FF7F6E",
+    "night": "#2A2670"
+  },
+  "background": "#000000",
+  "transition": { "type": "push", "duration": 0.8, "ease": "back:1", "direction": "left" },
+  "open": { "type": "iris", "duration": 0.5, "ease": "out" },
+  "close": { "type": "iris", "duration": 1.0, "ease": "in", "end": 0.2 },
+  "card": { "slide": "intro", "time": 5 },
+  "presets": {
+    "pop": [
+      {
+        "prop": "scale",
+        "keys": [
+          [0, 0],
+          ["{{pd | default:0.45 | mul:0.6}}", "{{pk | default:1.15}}", "out"],
+          ["{{pd | default:0.45}}", 1, "sine-in-out"]
+        ]
+      }
+    ],
+    "bump": [
+      {
+        "prop": "scale",
+        "keys": [
+          [0, 1],
+          ["{{bd | default:0.4 | div:2}}", "{{ba | default:0.12 | add:1}}", "sine-out"],
+          ["{{bd | default:0.4}}", 1, "sine-in"]
+        ]
+      }
+    ]
+  },
+  "fallbacks": {
+    "poster": [
+      {
+        "id": "fb-fill",
+        "type": "shape",
+        "shape": "rect",
+        "x": 0,
+        "y": 0,
+        "width": "{{box.width}}",
+        "height": "{{box.height}}",
+        "fill": "{{title | hash | mod:4 | pick:\"sky\",\"sun\",\"tom\",\"grass\"}}"
+      },
+      {
+        "id": "fb-band",
+        "type": "shape",
+        "shape": "rect",
+        "x": 0,
+        "width": "{{box.width}}",
+        "fill": "rgba(30,27,75,0.78)",
+        "y": "{{measure.fbt.lines | mul:1.08 | add:0.8 | mul:measure.fbt.size | sub:box.height | mul:-1}}",
+        "height": "{{measure.fbt.lines | mul:1.08 | add:0.8 | mul:measure.fbt.size}}"
+      },
+      {
+        "id": "fbt",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "d7",
+        "color": "milk",
+        "align": "center",
+        "fit": "wraplines",
+        "lines": 3,
+        "size": "{{box.width | mul:0.11 | round | atLeast:12}}",
+        "maxWidth": "{{box.width | mul:0.82}}",
+        "lineHeight": 1.08,
+        "roundLineHeight": false,
+        "x": "{{box.width | div:2}}",
+        "y": 0,
+        "y2": "{{box.width | mul:0.11 | round | atLeast:12 | mul:-0.73 | add:box.height}}"
+      }
+    ]
+  },
+  "slides": {
+    "intro": {
+      "background": "sky",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "cloud1",
+          "type": "group",
+          "x": -280,
+          "y": 70,
+          "animate": [{ "prop": "x", "rate": 28 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "cloud2",
+          "type": "group",
+          "x": 700,
+          "y": 300,
+          "scale": 0.7,
+          "animate": [{ "prop": "x", "rate": 18 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "sun",
+          "type": "group",
+          "x": 1640,
+          "y": 240,
+          "in": { "preset": "pop", "at": 0.25 },
+          "animate": [{ "prop": "rotation", "wave": { "amplitude": 4, "frequency": 2.2 } }],
+          "children": [{ "id": "sun", "type": "image", "src": "img/sun.svg", "x": -192, "y": -195, "width": 384, "height": 390, "fit": "fill" }]
+        },
+        {
+          "id": "hills",
+          "type": "group",
+          "animate": [
+            {
+              "prop": "y",
+              "keys": [
+                [0, "+520"],
+                [0.7, "+0", "back:1.2"]
+              ]
+            }
+          ],
+          "children": [{ "id": "hills", "type": "image", "src": "img/hills.svg", "x": 0, "y": 803, "width": 1920, "height": 317, "fit": "fill" }]
+        },
+        {
+          "id": "card",
+          "type": "group",
+          "pivot": [960, 430],
+          "in": { "preset": "pop", "at": 0.55, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "box",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 300,
+              "y": 200,
+              "width": 1320,
+              "height": 460,
+              "radius": 80,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 12,
+              "lineJoin": "round"
+            },
+            {
+              "id": "name",
+              "type": "text",
+              "text": "{{me.name}},",
+              "x": 960,
+              "y": 410,
+              "size": 200,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1180
+            }
+          ]
+        },
+        {
+          "id": "year",
+          "type": "group",
+          "pivot": [960, 545],
+          "in": { "preset": "pop", "at": 0.95 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "your {{year}} on Jellyfin",
+              "x": 960,
+              "y": 578,
+              "size": 100,
+              "font": "d6",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1180
+            }
+          ]
+        },
+        {
+          "id": "brand",
+          "type": "group",
+          "pivot": [960, 700],
+          "rotation": -4.010705,
+          "in": { "preset": "pop", "at": 1.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "JELLYWRAP",
+              "x": 960,
+              "y": 700,
+              "size": 52,
+              "font": "b8",
+              "color": "ink",
+              "align": "center",
+              "box": { "padX": 36.4, "height": 80.6, "fill": "sun", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        },
+        {
+          "id": "since",
+          "type": "group",
+          "when": "dataStartsLate",
+          "pivot": [960, 815],
+          "in": { "preset": "pop", "at": 1.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "since {{dataStart | date:\"MMM d\"}}",
+              "x": 960,
+              "y": 835,
+              "size": 56,
+              "font": "b8",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 700
+            }
+          ]
+        }
+      ]
+    },
+    "total-time": {
+      "background": "sun",
+      "vars": { "hasDays": "(me.totals.days | round) >= 1" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "s1",
+          "type": "shape",
+          "shape": "star",
+          "x": 190,
+          "y": 190,
+          "radius": 95,
+          "fill": "white",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 20.053523 }]
+        },
+        {
+          "id": "s2",
+          "type": "shape",
+          "shape": "star",
+          "x": 1710,
+          "y": 880,
+          "radius": 125,
+          "fill": "tom",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -17.188734 }]
+        },
+        {
+          "id": "s3",
+          "type": "shape",
+          "shape": "star",
+          "x": 250,
+          "y": 900,
+          "radius": 58,
+          "fill": "sky",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 22.918312 }]
+        },
+        { "id": "dot", "type": "shape", "shape": "circle", "x": 1630, "y": 180, "radius": 52, "fill": "sky", "stroke": "ink", "strokeWidth": 10 },
+        {
+          "id": "spent",
+          "type": "group",
+          "pivot": [960, 210],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "You spent", "x": 960, "y": 238, "size": 84, "font": "d6", "color": "ink", "align": "center" }]
+        },
+        {
+          "id": "counter",
+          "type": "group",
+          "pivot": [960, 490],
+          "in": [
+            { "preset": "pop", "at": 0.5 },
+            { "preset": "bump", "at": 3.0 }
+          ],
+          "animate": [{ "prop": "rotation", "wave": { "amplitude": 2.005352, "frequency": 28, "grow": [0.6, 3.0] }, "end": 3.0 }],
+          "children": [
+            {
+              "id": "box",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": "{{measure.num.width | add:180 | div:-2 | add:960}}",
+              "y": 330,
+              "width": "{{measure.num.width | add:180}}",
+              "height": 320,
+              "radius": 70,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 14,
+              "lineJoin": "round"
+            },
+            {
+              "id": "num",
+              "type": "text",
+              "value": "{{me.totals.hours}}",
+              "text": "{{value | hours:\"number\"}}",
+              "x": 960,
+              "y": 597,
+              "size": 300,
+              "font": "d7",
+              "color": "tom",
+              "align": "center",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.6, 0],
+                    [3.0, 1, "steps:8"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "unit",
+          "type": "group",
+          "pivot": [960, 760],
+          "in": { "preset": "pop", "at": 1.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{hasDays | then:\"hours with Jellyfin —\",\"hours with Jellyfin.\"}}",
+              "x": 960,
+              "y": 792,
+              "size": 96,
+              "font": "d7",
+              "color": "ink",
+              "align": "center"
+            }
+          ]
+        },
+        {
+          "id": "days",
+          "type": "group",
+          "when": "hasDays",
+          "pivot": [960, 925],
+          "rotation": -2.005352,
+          "in": { "preset": "pop", "at": 3.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "that's {{me.totals.days | round}} days.",
+              "x": 960,
+              "y": 925,
+              "size": 76,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "box": { "padX": 53.2, "height": 117.8, "fill": "sky", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "rhythm": {
+      "background": "grass",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "polka",
+          "type": "repeat",
+          "count": 56,
+          "vars": { "row": "index | div:7 | floor", "px": "{{row | mod:2 | mul:150}}" },
+          "template": [
+            { "id": "dot", "type": "shape", "shape": "circle", "radius": 22, "fill": "grass2", "x": "{{index | mod:7 | mul:300 | add:px}}", "y": "{{row | mul:150 | add:60}}" }
+          ]
+        },
+        {
+          "id": "up",
+          "type": "group",
+          "pivot": [960, 150],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "You showed up on", "x": 960, "y": 178, "size": 80, "font": "d6", "color": "ink", "align": "center" }]
+        },
+        {
+          "id": "days",
+          "type": "group",
+          "pivot": [960, 320],
+          "in": { "preset": "pop", "at": 0.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.rhythm.activeDays}}",
+              "text": "{{value | round}} days.",
+              "x": 960,
+              "y": 395,
+              "size": 200,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.4, 0],
+                    [2.6, 1, "steps:8"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "streak",
+          "type": "group",
+          "pivot": [960, 730],
+          "in": { "preset": "pop", "at": 1.2, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "box",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 190,
+              "y": 470,
+              "width": 1540,
+              "height": 520,
+              "radius": 60,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 12,
+              "lineJoin": "round"
+            },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Longest streak: {{me.rhythm.streak}} days ({{me.rhythm.streakFrom | date:\"MMM d\"}} – {{me.rhythm.streakTo | date:\"MMM d\"}}).",
+              "x": 960,
+              "y": 578,
+              "size": 62,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1420
+            }
+          ]
+        },
+        {
+          "id": "stars",
+          "type": "repeat",
+          "count": "{{me.rhythm.streak}}",
+          "x": 960,
+          "y": 782,
+          "layout": "grid",
+          "columns": 13,
+          "rows": 2,
+          "fit": "area",
+          "spread": true,
+          "pitch": [108, 140],
+          "align": "center-rows",
+          "vars": { "m": "count | atLeast:26", "at": "{{1.69 | div:m | mul:index | add:1.6}}" },
+          "template": [
+            {
+              "id": "s",
+              "type": "group",
+              "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": 0.4 } },
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    ["{{at}}", 180],
+                    ["{{at | add:0.24}}", -27, "out"]
+                  ],
+                  "min": 0
+                }
+              ],
+              "children": [
+                {
+                  "id": "star",
+                  "type": "shape",
+                  "shape": "star",
+                  "x": 0,
+                  "y": 0,
+                  "radius": 52,
+                  "fill": "{{index | mod:3 | pick:\"sun\",\"tom\",\"sky\"}}",
+                  "stroke": "ink",
+                  "strokeWidth": 7,
+                  "lineJoin": "round"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "mix": {
+      "background": "milk",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "frame",
+          "type": "shape",
+          "shape": "roundRect",
+          "x": 26,
+          "y": 26,
+          "width": 1868,
+          "height": 1028,
+          "radius": 54,
+          "stroke": "ink",
+          "strokeWidth": 14,
+          "lineJoin": "round"
+        },
+        {
+          "id": "pie",
+          "type": "group",
+          "pivot": [560, 560],
+          "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+          "children": [
+            { "id": "base", "type": "shape", "shape": "circle", "x": 560, "y": 560, "radius": 330, "fill": "white" },
+            {
+              "id": "wedges",
+              "type": "pie",
+              "x": 560,
+              "y": 560,
+              "radius": 330,
+              "stroke": "ink",
+              "strokeWidth": 10,
+              "lineJoin": "round",
+              "parts": [
+                { "value": "{{me.mix.tv}}", "fill": "tom" },
+                { "value": "{{me.mix.movies}}", "fill": "sky" },
+                { "value": "{{me.mix.music}}", "fill": "sun" }
+              ],
+              "animate": [
+                {
+                  "prop": "sweep",
+                  "keys": [
+                    [0.4, 0],
+                    [2.0, 1, "out"]
+                  ]
+                }
+              ]
+            },
+            { "id": "rim", "type": "shape", "shape": "circle", "x": 560, "y": 560, "radius": 330, "stroke": "ink", "strokeWidth": 12 }
+          ]
+        },
+        {
+          "id": "labels",
+          "type": "repeat",
+          "x": 1080,
+          "y": 560,
+          "layout": "column",
+          "pitch": 230,
+          "items": [
+            { "p": "{{me.mix.tv}}", "label": "TV", "c": "tom" },
+            { "p": "{{me.mix.movies}}", "label": "movies", "c": "sky" },
+            { "p": "{{me.mix.music}}", "label": "music", "c": "sun" }
+          ],
+          "where": "item.p | round:2 > 0",
+          "vars": { "at": "{{index | mul:0.4 | add:0.8}}" },
+          "template": [
+            {
+              "id": "l",
+              "type": "group",
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "children": [
+                { "id": "dot", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 54, "fill": "{{item.c}}", "stroke": "ink", "strokeWidth": 10 },
+                {
+                  "id": "t",
+                  "type": "text",
+                  "value": "{{item.p}}",
+                  "text": "{{value | percent}} {{item.label}}",
+                  "x": 95,
+                  "y": 44,
+                  "size": 120,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "left",
+                  "fit": "line",
+                  "maxWidth": 680,
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        ["{{at}}", 0],
+                        [3.0, 1, "steps:6"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "top-genre": {
+      "background": "sky",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "cloud1",
+          "type": "group",
+          "x": -280,
+          "y": 70,
+          "animate": [{ "prop": "x", "rate": 28 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "cloud2",
+          "type": "group",
+          "x": 700,
+          "y": 300,
+          "scale": 0.7,
+          "animate": [{ "prop": "x", "rate": 18 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "head",
+          "type": "group",
+          "pivot": [960, 120],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Your genre:", "x": 960, "y": 145, "size": 84, "font": "d6", "color": "ink", "align": "center" }]
+        },
+        {
+          "id": "burst",
+          "type": "group",
+          "pivot": [960, 545],
+          "in": { "preset": "pop", "at": 0.5, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "b",
+              "type": "shape",
+              "shape": "star",
+              "points": 14,
+              "inner": 0.74,
+              "x": 960,
+              "y": 545,
+              "radius": 360,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 12,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 14.323945 }]
+            }
+          ]
+        },
+        {
+          "id": "genre",
+          "type": "group",
+          "pivot": [960, 545],
+          "in": { "preset": "pop", "at": 0.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topGenres[0].name}}",
+              "x": 960,
+              "y": 612,
+              "size": 190,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "block",
+              "maxWidth": 640,
+              "maxHeight": 360,
+              "size2": 0,
+              "lineHeight": 1.15,
+              "shift": 0.35
+            }
+          ]
+        },
+        {
+          "id": "share",
+          "type": "group",
+          "when": "me.topGenres[0].share > 0",
+          "pivot": [1320, 300],
+          "rotation": -8.021409,
+          "in": { "preset": "pop", "at": 1.3 },
+          "children": [
+            { "id": "d", "type": "shape", "shape": "circle", "x": 1320, "y": 300, "radius": 100, "fill": "tom", "stroke": "ink", "strokeWidth": 12 },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topGenres[0].share | percent}}",
+              "x": 1320,
+              "y": 328,
+              "size": 78,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 170
+            }
+          ]
+        },
+        {
+          "id": "then",
+          "type": "group",
+          "when": "me.topGenres | count > 1",
+          "pivot": [960, 945],
+          "in": { "preset": "pop", "at": 2.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Then {{me.topGenres | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}.",
+              "x": 960,
+              "y": 945,
+              "size": 72,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1640,
+              "box": { "padX": 50.4, "height": 111.6, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "top-series": {
+      "background": "milk",
+      "vars": { "n": "me.topSeries | take:5 | count", "bx": "{{n | sub:1 | mul:-160 | add:960}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "frame",
+          "type": "shape",
+          "shape": "roundRect",
+          "x": 26,
+          "y": 26,
+          "width": 1868,
+          "height": 1028,
+          "radius": 54,
+          "stroke": "ink",
+          "strokeWidth": 14,
+          "lineJoin": "round"
+        },
+        {
+          "id": "head",
+          "type": "group",
+          "pivot": [960, 130],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Your top shows", "x": 960, "y": 165, "size": 104, "font": "d7", "color": "ink", "align": "center" }]
+        },
+        {
+          "id": "burst",
+          "type": "group",
+          "pivot": ["{{bx}}", 437],
+          "in": { "preset": "pop", "at": 4.0, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "b",
+              "type": "shape",
+              "shape": "star",
+              "points": 14,
+              "inner": 0.74,
+              "x": "{{bx}}",
+              "y": 437,
+              "radius": 250,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 17.188734 }]
+            }
+          ]
+        },
+        {
+          "id": "shows",
+          "type": "repeat",
+          "items": "{{me.topSeries | take:5}}",
+          "x": 960,
+          "y": 0,
+          "layout": "row",
+          "pitch": 320,
+          "vars": {
+            "first": "index == 0",
+            "other": "{{count | sub:1 | sub:index | mul:0.7 | add:0.8}}",
+            "at": "{{first | then:4,other}}",
+            "pd": "{{first | then:0.55,0.45}}",
+            "pk": "{{first | then:1.22,1.15}}",
+            "yy": "{{index | mod:2 | mul:46 | add:250}}"
+          },
+          "template": [
+            {
+              "id": "show",
+              "type": "group",
+              "y": "{{yy}}",
+              "pivot": [0, 187.5],
+              "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": "{{pd}}", "pk": "{{pk}}" } },
+              "children": [
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "src": "{{item.poster}}",
+                  "title": "{{item.title}}",
+                  "x": -125,
+                  "y": 0,
+                  "width": 250,
+                  "height": 375,
+                  "radius": 26,
+                  "border": { "width": 10, "color": "ink" },
+                  "lineJoin": "round",
+                  "fallback": "poster"
+                },
+                {
+                  "id": "rank-dot",
+                  "type": "shape",
+                  "shape": "circle",
+                  "x": -119,
+                  "y": 6,
+                  "radius": 46,
+                  "fill": "{{first | then:\"sun\",\"white\"}}",
+                  "stroke": "ink",
+                  "strokeWidth": 9
+                },
+                { "id": "rank", "type": "text", "text": "{{index | add:1}}", "x": -119, "y": 27, "size": 58, "font": "d7", "color": "ink", "align": "center" },
+                {
+                  "id": "title",
+                  "type": "text",
+                  "text": "{{item.title}}",
+                  "x": 0,
+                  "y": 437,
+                  "size": 40,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "box",
+                  "maxWidth": 300,
+                  "maxHeight": 126,
+                  "lineHeight": 1.15,
+                  "shift": 0.7
+                },
+                {
+                  "id": "hours",
+                  "type": "text",
+                  "text": "{{item.hours | hours:\"number\"}} h",
+                  "x": 0,
+                  "y": 565,
+                  "size": 40,
+                  "font": "b8",
+                  "color": "ink",
+                  "align": "center",
+                  "box": { "padX": 28, "height": 62, "fill": "{{first | then:\"tom\",\"sky\"}}", "stroke": "ink", "strokeWidth": 8, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "top-movies": {
+      "background": "sun",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "s1",
+          "type": "shape",
+          "shape": "star",
+          "x": 1830,
+          "y": 110,
+          "radius": 58,
+          "fill": "white",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 20.053523 }]
+        },
+        {
+          "id": "s2",
+          "type": "shape",
+          "shape": "star",
+          "x": 660,
+          "y": 1000,
+          "radius": 46,
+          "fill": "sky",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -22.918312 }]
+        },
+        {
+          "id": "head",
+          "type": "group",
+          "pivot": [120, 130],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Your top movies", "x": 120, "y": 165, "size": 96, "font": "d7", "color": "ink", "align": "left" }]
+        },
+        {
+          "id": "rest",
+          "type": "repeat",
+          "items": "{{me.topMovies | skip:1 | take:4}}",
+          "x": 0,
+          "y": 615,
+          "layout": "column",
+          "pitch": 200,
+          "vars": { "at": "{{count | sub:1 | sub:index | mul:0.5 | add:0.8}}" },
+          "template": [
+            {
+              "id": "row",
+              "type": "group",
+              "pivot": [1295, 0],
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "children": [
+                {
+                  "id": "card",
+                  "type": "shape",
+                  "shape": "roundRect",
+                  "x": 800,
+                  "y": -85,
+                  "width": 990,
+                  "height": 170,
+                  "radius": 40,
+                  "fill": "white",
+                  "stroke": "ink",
+                  "strokeWidth": 10,
+                  "lineJoin": "round"
+                },
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "src": "{{item.poster}}",
+                  "title": "{{item.title}}",
+                  "x": 830,
+                  "y": -71,
+                  "width": 95,
+                  "height": 142,
+                  "radius": 14,
+                  "border": { "width": 6, "color": "ink" },
+                  "lineJoin": "round",
+                  "fallback": "poster"
+                },
+                { "id": "rank-dot", "type": "shape", "shape": "circle", "x": 990, "y": 0, "radius": 44, "fill": "sky", "stroke": "ink", "strokeWidth": 8 },
+                { "id": "rank", "type": "text", "text": "{{index | add:2}}", "x": 990, "y": 21, "size": 56, "font": "d7", "color": "ink", "align": "center" },
+                {
+                  "id": "title",
+                  "type": "text",
+                  "text": "{{item.title}}",
+                  "x": 1060,
+                  "y": 21,
+                  "y2": 41,
+                  "size": 58,
+                  "size2": 44,
+                  "maxWidth": 700,
+                  "fit": "title",
+                  "font": "d6",
+                  "color": "ink",
+                  "align": "left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "burst",
+          "type": "group",
+          "pivot": [400, 560],
+          "in": { "preset": "pop", "at": 3.3, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "b",
+              "type": "shape",
+              "shape": "star",
+              "points": 16,
+              "inner": 0.74,
+              "x": 400,
+              "y": 560,
+              "radius": 340,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 10,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 17.188734 }]
+            }
+          ]
+        },
+        {
+          "id": "top",
+          "type": "group",
+          "pivot": [400, 520],
+          "in": { "preset": "pop", "at": 3.5, "args": { "pd": 0.55, "pk": 1.22 } },
+          "children": [
+            {
+              "id": "poster",
+              "type": "image",
+              "src": "{{me.topMovies[0].poster}}",
+              "title": "{{me.topMovies[0].title}}",
+              "x": 220,
+              "y": 250,
+              "width": 360,
+              "height": 540,
+              "radius": 34,
+              "border": { "width": 12, "color": "ink" },
+              "lineJoin": "round",
+              "fallback": "poster"
+            },
+            { "id": "rank-dot", "type": "shape", "shape": "circle", "x": 228, "y": 258, "radius": 60, "fill": "tom", "stroke": "ink", "strokeWidth": 10 },
+            { "id": "rank", "type": "text", "text": "1", "x": 228, "y": 284, "size": 72, "font": "d7", "color": "ink", "align": "center" }
+          ]
+        },
+        {
+          "id": "top-title",
+          "type": "group",
+          "pivot": [400, 905],
+          "in": { "preset": "pop", "at": 3.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topMovies[0].title}}",
+              "x": 400,
+              "y": 935,
+              "y2": 962,
+              "size": 76,
+              "size2": 56,
+              "maxWidth": 700,
+              "fit": "title",
+              "font": "d7",
+              "color": "ink",
+              "align": "center"
+            }
+          ]
+        }
+      ]
+    },
+    "top-actor": {
+      "background": "grass",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "polka",
+          "type": "repeat",
+          "count": 56,
+          "vars": { "row": "index | div:7 | floor", "px": "{{row | mod:2 | mul:150}}" },
+          "template": [
+            { "id": "dot", "type": "shape", "shape": "circle", "radius": 22, "fill": "grass2", "x": "{{index | mod:7 | mul:300 | add:px}}", "y": "{{row | mul:150 | add:60}}" }
+          ]
+        },
+        {
+          "id": "photo",
+          "type": "group",
+          "pivot": [500, 520],
+          "in": { "preset": "pop", "at": 0.3, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "img",
+              "type": "image",
+              "src": "{{me.topActors[0].image}}",
+              "x": 210,
+              "y": 230,
+              "width": 580,
+              "height": 580,
+              "clip": { "shape": "circle", "x": 500, "y": 520, "radius": 290 },
+              "border": { "width": 14, "color": "ink" },
+              "fallback": [
+                { "id": "fill", "type": "shape", "shape": "rect", "x": 0, "y": 0, "width": 580, "height": 580, "fill": "sun" },
+                {
+                  "id": "initials",
+                  "type": "text",
+                  "text": "{{me.topActors[0].name | initials}}",
+                  "x": 290,
+                  "y": 370,
+                  "size": 230,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 480
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "star",
+          "type": "group",
+          "pivot": [780, 250],
+          "in": { "preset": "pop", "at": 0.6 },
+          "children": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "x": 780,
+              "y": 250,
+              "radius": 80,
+              "fill": "tom",
+              "stroke": "ink",
+              "strokeWidth": 9,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 22.918312 }]
+            }
+          ]
+        },
+        {
+          "id": "spent",
+          "type": "group",
+          "pivot": [1000, 250],
+          "in": { "preset": "pop", "at": 0.5 },
+          "children": [{ "id": "t", "type": "text", "text": "You spent", "x": 1000, "y": 272, "size": 80, "font": "d6", "color": "ink", "align": "left" }]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "pivot": [1000, 400],
+          "in": { "preset": "pop", "at": 0.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.topActors[0].hours}}",
+              "text": "{{value | hours:\"number\"}} hours",
+              "x": 1000,
+              "y": 470,
+              "size": 200,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 880,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.7, 0],
+                    [2.7, 1, "steps:8"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "with",
+          "type": "group",
+          "pivot": [1000, 575],
+          "in": { "preset": "pop", "at": 1.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "with {{me.topActors[0].name}}.",
+              "x": 1000,
+              "y": 610,
+              "size": 100,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "then",
+          "type": "group",
+          "when": "me.topActors | count > 1",
+          "pivot": [1000, 740],
+          "in": { "preset": "pop", "at": 2.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Then {{me.topActors | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}.",
+              "x": 1000,
+              "y": 762,
+              "size": 58,
+              "font": "d6",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "costars",
+          "type": "repeat",
+          "items": "{{me.topActors | skip:1 | take:2}}",
+          "x": 1075,
+          "y": 885,
+          "layout": "row",
+          "pitch": 170,
+          "align": "start",
+          "vars": { "at": "{{index | mul:0.2 | add:2.5}}" },
+          "template": [
+            {
+              "id": "c",
+              "type": "group",
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "children": [
+                { "id": "d", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 70, "fill": "{{index | pick:\"sky\",\"tom\"}}", "stroke": "ink", "strokeWidth": 10 },
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{item.name | initials}}",
+                  "x": 0,
+                  "y": 23,
+                  "size": 62,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 116
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "binge": {
+      "background": "tom",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "s1",
+          "type": "shape",
+          "shape": "star",
+          "x": 120,
+          "y": 120,
+          "radius": 56,
+          "fill": "sun",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 20.053523 }]
+        },
+        {
+          "id": "s2",
+          "type": "shape",
+          "shape": "star",
+          "x": 1810,
+          "y": 990,
+          "radius": 64,
+          "fill": "sun",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -17.188734 }]
+        },
+        {
+          "id": "date",
+          "type": "group",
+          "pivot": [960, 170],
+          "rotation": -1.718873,
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.binge.date | date:\"dddd, MMMM d\"}}:",
+              "x": 960,
+              "y": 170,
+              "size": 76,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1640,
+              "box": { "padX": 53.2, "height": 117.8, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        },
+        {
+          "id": "tvs",
+          "type": "repeat",
+          "count": "{{me.binge.episodes}}",
+          "x": 960,
+          "y": 460,
+          "layout": "grid",
+          "fit": "box",
+          "fitBox": [1680, 340],
+          "pitch": [240, 246],
+          "cell": [240, 222],
+          "maxRows": 6,
+          "align": "center-rows",
+          "vars": { "nm1": "count | sub:1", "step": "{{1.5 | div:nm1 | atMost:0.25}}", "at": "{{step | mul:index | add:0.6}}" },
+          "template": [
+            {
+              "id": "tv",
+              "type": "group",
+              "rotation": "{{index | mod:2 | mul:5.729578 | sub:2.864789}}",
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "children": [
+                { "id": "tv", "type": "image", "src": "img/tv.svg", "x": -106, "y": -147, "width": 212, "height": 233, "fit": "fill" },
+                { "id": "n", "type": "text", "text": "{{index | add:1}}", "x": 0, "y": 28, "size": 78, "font": "d7", "color": "ink", "align": "center" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "of",
+          "type": "group",
+          "pivot": [960, 700],
+          "in": { "preset": "pop", "at": 2.6 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.binge.episodes}} episodes of {{me.binge.series.title}}",
+              "x": 960,
+              "y": 730,
+              "y2": 775,
+              "size": 84,
+              "size2": 64,
+              "maxWidth": 1720,
+              "fit": "title",
+              "font": "d7",
+              "color": "ink",
+              "align": "center"
+            }
+          ]
+        },
+        {
+          "id": "sitting",
+          "type": "group",
+          "pivot": [960, 880],
+          "in": { "preset": "pop", "at": 3.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "in one sitting.",
+              "x": 960,
+              "y": 880,
+              "size": 96,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "box": { "padX": 67.2, "height": 148.8, "fill": "sun", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "clock": {
+      "background": "night",
+      "vars": { "late": "me.clock.nightShare | round:2 >= 0.2", "H": "{{me.clock.peakHour | mod:12 | mul:30 | add:720}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stars",
+          "type": "repeat",
+          "items": [
+            { "x": 150, "y": 140, "r": 26 },
+            { "x": 880, "y": 90, "r": 18 },
+            { "x": 1500, "y": 960, "r": 22 },
+            { "x": 1840, "y": 560, "r": 16 },
+            { "x": 930, "y": 990, "r": 20 }
+          ],
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "x": "{{item.x}}",
+              "y": "{{item.y}}",
+              "radius": "{{item.r}}",
+              "fill": "{{index | mod:2 | pick:\"sun\",\"milk\"}}",
+              "stroke": "ink",
+              "strokeWidth": 5,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": "{{index | mod:2 | mul:-57.29578 | add:28.64789}}" }]
+            }
+          ]
+        },
+        { "id": "moon", "type": "image", "src": "img/moon.svg", "x": 1682, "y": 77, "width": 159, "height": 154, "fit": "fill" },
+        {
+          "id": "clock",
+          "type": "group",
+          "pivot": [540, 600],
+          "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "wobble",
+              "type": "group",
+              "pivot": [540, 600],
+              "animate": [{ "prop": "rotation", "wave": { "amplitude": 2.005352, "frequency": 40 }, "start": 0.5, "end": 1.8 }],
+              "children": [
+                { "id": "alarm-clock", "type": "image", "src": "img/alarm-clock.svg", "x": 232, "y": 258, "width": 616, "height": 667, "fit": "fill" },
+                {
+                  "id": "minute",
+                  "type": "shape",
+                  "shape": "line",
+                  "x1": 540,
+                  "y1": 600,
+                  "x2": 540,
+                  "y2": 400,
+                  "stroke": "ink",
+                  "strokeWidth": 14,
+                  "lineCap": "round",
+                  "pivot": [540, 600],
+                  "animate": [
+                    {
+                      "prop": "rotation",
+                      "keys": [
+                        [0.5, 0],
+                        [1.8, "{{H | mul:12}}", "back:1"]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "hour",
+                  "type": "shape",
+                  "shape": "line",
+                  "x1": 540,
+                  "y1": 600,
+                  "x2": 540,
+                  "y2": 455,
+                  "stroke": "ink",
+                  "strokeWidth": 24,
+                  "lineCap": "round",
+                  "pivot": [540, 600],
+                  "animate": [
+                    {
+                      "prop": "rotation",
+                      "keys": [
+                        [0.5, 0],
+                        [1.8, "{{H}}", "back:1"]
+                      ]
+                    }
+                  ]
+                },
+                { "id": "hub", "type": "shape", "shape": "circle", "x": 540, "y": 600, "radius": 22, "fill": "sun", "stroke": "ink", "strokeWidth": 8 }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "peak",
+          "type": "group",
+          "pivot": [1000, 280],
+          "in": { "preset": "pop", "at": 0.4 },
+          "children": [{ "id": "t", "type": "text", "text": "Your peak hour:", "x": 1000, "y": 300, "size": 80, "font": "d6", "color": "milk", "align": "left" }]
+        },
+        {
+          "id": "hour-label",
+          "type": "group",
+          "pivot": [1000, 440],
+          "in": { "preset": "pop", "at": 1.8, "args": { "pd": 0.5, "pk": 1.22 } },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.clock.peakHour | hour}}.",
+              "x": 1000,
+              "y": 520,
+              "size": 230,
+              "font": "d7",
+              "color": "sun",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "share",
+          "type": "group",
+          "when": "late",
+          "pivot": [1000, 700],
+          "in": { "preset": "pop", "at": 2.0 },
+          "children": [
+            {
+              "id": "t1",
+              "type": "text",
+              "value": "{{me.clock.nightShare}}",
+              "text": "{{value | percent}} of your viewing",
+              "x": 1000,
+              "y": 700,
+              "size": 80,
+              "font": "d7",
+              "color": "milk",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [2.0, 0],
+                    [3.2, 1, "steps:6"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "started after 10 pm.",
+              "x": 1000,
+              "y": 800,
+              "size": 80,
+              "font": "d7",
+              "color": "milk",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        }
+      ]
+    },
+    "busiest": {
+      "background": "sun",
+      "vars": {
+        "d": "me.busiest.day",
+        "first": "d | firstWeekday",
+        "days": "d | daysInMonth",
+        "circled": "d | date:\"%d\" | add:0",
+        "py": "{{first | add:days | div:7 | ceil | sub:5 | atLeast:0 | atMost:1 | mul:-18 | add:90}}",
+        "ck": "circled | sub:1 | add:first",
+        "ccol": "ck | mod:7",
+        "cx": "{{ck | mod:7 | mul:97 | add:228}}",
+        "cy": "{{ck | div:7 | floor | mul:py | add:535}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "s1",
+          "type": "shape",
+          "shape": "star",
+          "x": 1820,
+          "y": 990,
+          "radius": 64,
+          "fill": "tom",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 17.188734 }]
+        },
+        {
+          "id": "s2",
+          "type": "shape",
+          "shape": "star",
+          "x": 1830,
+          "y": 110,
+          "radius": 44,
+          "fill": "white",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -22.918312 }]
+        },
+        {
+          "id": "calendar",
+          "type": "group",
+          "pivot": [520, 600],
+          "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+          "children": [
+            { "id": "calendar", "type": "image", "src": "img/calendar.svg", "x": 133, "y": 191, "width": 774, "height": 796, "fit": "fill" },
+            {
+              "id": "month",
+              "type": "text",
+              "text": "{{d | month}}",
+              "x": 520,
+              "y": 345,
+              "size": 100,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 680
+            },
+            {
+              "id": "weekdays",
+              "type": "repeat",
+              "count": 7,
+              "template": [
+                {
+                  "id": "w",
+                  "type": "text",
+                  "text": "{{index | pick:\"S\",\"M\",\"T\",\"W\",\"T\",\"F\",\"S\"}}",
+                  "x": "{{index | mul:97 | add:228}}",
+                  "y": 458,
+                  "size": 36,
+                  "font": "b8",
+                  "color": "ink",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "days",
+              "type": "repeat",
+              "count": "{{days}}",
+              "vars": { "k": "index | add:first" },
+              "template": [
+                {
+                  "id": "n",
+                  "type": "text",
+                  "text": "{{index | add:1}}",
+                  "x": "{{k | mod:7 | mul:97 | add:228}}",
+                  "y": "{{k | div:7 | floor | mul:py | add:535}}",
+                  "size": 44,
+                  "font": "{{((index | add:1) == circled) | then:\"d7\",\"d6\"}}",
+                  "color": "ink",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "circle",
+              "type": "group",
+              "when": "circled >= 1",
+              "x": "{{cx}}",
+              "y": "{{cy | sub:16}}",
+              "rotation": -6.875494,
+              "children": [
+                {
+                  "id": "e",
+                  "type": "shape",
+                  "shape": "ellipse",
+                  "x": 0,
+                  "y": 0,
+                  "rx": 52,
+                  "ry": 42,
+                  "startAngle": -108,
+                  "endAngle": -108,
+                  "stroke": "tom",
+                  "strokeWidth": 10,
+                  "lineCap": "round",
+                  "start": 1.6001,
+                  "animate": [
+                    {
+                      "prop": "endAngle",
+                      "keys": [
+                        [1.6, -108],
+                        [2.2, 270, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sticker-sat",
+          "type": "group",
+          "when": "circled >= 1 && ccol == 6",
+          "pivot": ["{{cx | add:62}}", "{{cy | sub:77}}"],
+          "in": { "preset": "pop", "at": 2.3 },
+          "children": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "x": "{{cx | add:62}}",
+              "y": "{{cy | sub:77}}",
+              "radius": 40,
+              "angle": 17.188734,
+              "fill": "tom",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round"
+            }
+          ]
+        },
+        {
+          "id": "sticker-sun",
+          "type": "group",
+          "when": "circled >= 1 && ccol == 0",
+          "pivot": ["{{cx | sub:62}}", "{{cy | sub:77}}"],
+          "in": { "preset": "pop", "at": 2.3 },
+          "children": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "x": "{{cx | sub:62}}",
+              "y": "{{cy | sub:77}}",
+              "radius": 40,
+              "angle": 17.188734,
+              "fill": "tom",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round"
+            }
+          ]
+        },
+        {
+          "id": "sticker-mid",
+          "type": "group",
+          "when": "circled >= 1 && ccol != 0 && ccol != 6",
+          "pivot": ["{{cx | add:48}}", "{{py | add:31 | div:-2 | add:cy}}"],
+          "in": { "preset": "pop", "at": 2.3 },
+          "children": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "x": "{{cx | add:48}}",
+              "y": "{{py | add:31 | div:-2 | add:cy}}",
+              "radius": "{{py | sub:31 | div:2 | sub:2 | atMost:24}}",
+              "angle": 17.188734,
+              "fill": "tom",
+              "stroke": "ink",
+              "strokeWidth": "{{py | sub:31 | div:2 | sub:2 | atMost:24 | div:5}}",
+              "lineJoin": "round"
+            }
+          ]
+        },
+        {
+          "id": "cap1",
+          "type": "group",
+          "pivot": [1000, 280],
+          "in": { "preset": "pop", "at": 0.4 },
+          "children": [{ "id": "t", "type": "text", "text": "Busiest month:", "x": 1000, "y": 300, "size": 72, "font": "d6", "color": "ink", "align": "left" }]
+        },
+        {
+          "id": "month",
+          "type": "group",
+          "pivot": [1000, 390],
+          "in": { "preset": "pop", "at": 0.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.busiest.month}} ({{me.busiest.monthHours | hours:\"number\"}} h).",
+              "x": 1000,
+              "y": 435,
+              "size": 130,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "cap2",
+          "type": "group",
+          "pivot": [1000, 590],
+          "in": { "preset": "pop", "at": 1.3 },
+          "children": [{ "id": "t", "type": "text", "text": "Busiest day:", "x": 1000, "y": 610, "size": 72, "font": "d6", "color": "ink", "align": "left" }]
+        },
+        {
+          "id": "day",
+          "type": "group",
+          "pivot": [1000, 700],
+          "in": { "preset": "pop", "at": 1.6 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{d | date:\"dddd, MMMM d\"}}",
+              "x": 1000,
+              "y": 730,
+              "size": 100,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "hm",
+          "type": "group",
+          "pivot": [1000, 820],
+          "in": { "preset": "pop", "at": 1.9 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "({{me.busiest.dayHours | hm}}).",
+              "x": 1000,
+              "y": 850,
+              "size": 100,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        }
+      ]
+    },
+    "rewatches": {
+      "background": "sky",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "cloud1",
+          "type": "group",
+          "x": -280,
+          "y": 70,
+          "animate": [{ "prop": "x", "rate": 28 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "cloud2",
+          "type": "group",
+          "x": 700,
+          "y": 300,
+          "scale": 0.7,
+          "animate": [{ "prop": "x", "rate": 18 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "fan",
+          "type": "repeat",
+          "count": "{{me.mostReplayed.completions}}",
+          "vars": {
+            "nm1": "count | sub:1",
+            "step": "{{0.8 | div:nm1 | atMost:0.4}}",
+            "half": "index | div:2 | floor",
+            "odd": "index | mod:2 == 1",
+            "far": "{{nm1 | sub:half}}",
+            "j": "{{odd | then:far,half}}",
+            "rot": "{{j | mul:25.210143 | div:nm1 | add:-12.605071}}",
+            "at": "{{step | mul:index | add:0.5}}"
+          },
+          "template": [
+            {
+              "id": "copy",
+              "type": "group",
+              "x": 520,
+              "y": 900,
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.27}}", "{{rot | mul:1.15}}", "out"]
+                  ],
+                  "min": "{{rot | atMost:0}}",
+                  "max": "{{rot | atLeast:0}}"
+                }
+              ],
+              "children": [
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "src": "{{me.mostReplayed.poster}}",
+                  "title": "{{replayedName}}",
+                  "x": -165,
+                  "y": -560,
+                  "width": 330,
+                  "height": 495,
+                  "radius": 32,
+                  "border": { "width": 12, "color": "ink" },
+                  "lineJoin": "round",
+                  "fallback": "poster"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "back",
+          "type": "group",
+          "pivot": [1400, 310],
+          "in": { "preset": "pop", "at": 0.3 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "You came back to",
+              "x": 1400,
+              "y": 330,
+              "size": 80,
+              "font": "d6",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "title",
+          "type": "group",
+          "pivot": [1400, 470],
+          "in": { "preset": "pop", "at": 0.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{replayedName}}",
+              "x": 1400,
+              "y": 510,
+              "size": 150,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "block",
+              "maxWidth": 860,
+              "maxHeight": 240,
+              "size2": 100,
+              "lineHeight": 1.15,
+              "shift": 0.35
+            }
+          ]
+        },
+        {
+          "id": "times",
+          "type": "group",
+          "pivot": [1400, 700],
+          "in": { "preset": "pop", "at": 1.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.mostReplayed.completions}} times.",
+              "x": 1400,
+              "y": 700,
+              "size": 110,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "box": { "padX": 77, "height": 170.5, "fill": "sun", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "new-vs-classic": {
+      "background": "milk",
+      "vars": { "W": "{{me.newVsClassic.recentShare | mul:1080}}", "old": "me.newVsClassic.oldest != null && me.newVsClassic.oldest.year <= year | sub:20" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "frame",
+          "type": "shape",
+          "shape": "roundRect",
+          "x": 26,
+          "y": 26,
+          "width": 1868,
+          "height": 1028,
+          "radius": 54,
+          "stroke": "ink",
+          "strokeWidth": 14,
+          "lineJoin": "round"
+        },
+        {
+          "id": "pct",
+          "type": "group",
+          "pivot": [140, 300],
+          "in": { "preset": "pop", "at": 0.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.newVsClassic.recentShare}}",
+              "text": "{{value | percent}}",
+              "x": 140,
+              "y": 380,
+              "size": 260,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.3, 0],
+                    [2.5, 1, "steps:8"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "of",
+          "type": "group",
+          "pivot": [140, 540],
+          "in": { "preset": "pop", "at": 0.6 },
+          "children": [
+            { "id": "t1", "type": "text", "text": "of your watching was", "x": 140, "y": 500, "size": 80, "font": "d7", "color": "ink", "align": "left" },
+            { "id": "t2", "type": "text", "text": "from {{year | sub:1}}–{{year}}.", "x": 140, "y": 590, "size": 80, "font": "d7", "color": "ink", "align": "left" }
+          ]
+        },
+        {
+          "id": "bar",
+          "type": "group",
+          "pivot": [680, 720],
+          "in": { "preset": "pop", "at": 0.8 },
+          "children": [
+            { "id": "track", "type": "shape", "shape": "roundRect", "x": 140, "y": 660, "width": 1080, "height": 120, "radius": 60, "fill": "white" },
+            {
+              "id": "fill",
+              "type": "group",
+              "when": "W > 1",
+              "clip": { "shape": "roundRect", "x": 140, "y": 660, "width": 1080, "height": 120, "radius": 60 },
+              "children": [
+                {
+                  "id": "f",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": 140,
+                  "y": 660,
+                  "width": 0,
+                  "height": 120,
+                  "fill": "grass",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [1.0, 0],
+                        [2.0, "{{W}}", "back:1.4"]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "edge",
+                  "type": "shape",
+                  "shape": "line",
+                  "x1": 140,
+                  "y1": 660,
+                  "x2": 140,
+                  "y2": 780,
+                  "stroke": "ink",
+                  "strokeWidth": 10,
+                  "start": 1.01,
+                  "animate": [
+                    {
+                      "prop": "x1",
+                      "keys": [
+                        [1.0, 140],
+                        [2.0, "{{W | add:140}}", "back:1.4"]
+                      ]
+                    },
+                    {
+                      "prop": "x2",
+                      "keys": [
+                        [1.0, 140],
+                        [2.0, "{{W | add:140}}", "back:1.4"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "outline",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 140,
+              "y": 660,
+              "width": 1080,
+              "height": 120,
+              "radius": 60,
+              "stroke": "ink",
+              "strokeWidth": 12,
+              "lineJoin": "round"
+            }
+          ]
+        },
+        {
+          "id": "poster",
+          "type": "group",
+          "when": "old",
+          "pivot": [1530, 455],
+          "rotation": 3.437747,
+          "in": { "preset": "pop", "at": 2.4 },
+          "children": [
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.newVsClassic.oldest.poster}}",
+              "title": "{{me.newVsClassic.oldest.title}}",
+              "x": 1340,
+              "y": 170,
+              "width": 380,
+              "height": 570,
+              "radius": 36,
+              "border": { "width": 12, "color": "ink" },
+              "lineJoin": "round",
+              "fallback": "poster"
+            }
+          ]
+        },
+        {
+          "id": "oldest",
+          "type": "group",
+          "when": "old",
+          "pivot": [140, 890],
+          "in": { "preset": "pop", "at": 2.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Oldest: {{me.newVsClassic.oldest.title}} ({{me.newVsClassic.oldest.year}}).",
+              "x": 140,
+              "y": 920,
+              "y2": 950,
+              "size": 84,
+              "size2": 64,
+              "maxWidth": 1640,
+              "fit": "title",
+              "font": "d7",
+              "color": "ink",
+              "align": "left"
+            }
+          ]
+        }
+      ]
+    },
+    "music": {
+      "background": "grass",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "polka",
+          "type": "repeat",
+          "count": 56,
+          "vars": { "row": "index | div:7 | floor", "px": "{{row | mod:2 | mul:150}}" },
+          "template": [
+            { "id": "dot", "type": "shape", "shape": "circle", "radius": 22, "fill": "grass2", "x": "{{index | mod:7 | mul:300 | add:px}}", "y": "{{row | mul:150 | add:60}}" }
+          ]
+        },
+        {
+          "id": "record",
+          "type": "group",
+          "pivot": [540, 560],
+          "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+          "children": [
+            { "id": "record", "type": "image", "src": "img/record.svg", "x": 193, "y": 213, "width": 694, "height": 694, "fit": "fill" },
+            {
+              "id": "spin",
+              "type": "group",
+              "x": 540,
+              "y": 560,
+              "animate": [{ "prop": "rotation", "rate": 183.346494 }],
+              "children": [{ "id": "record-label", "type": "image", "src": "img/record-label.svg", "x": -126, "y": -135, "width": 393, "height": 261, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "note1",
+          "type": "group",
+          "pivot": [935, 330],
+          "in": { "preset": "pop", "at": 0.9 },
+          "children": [
+            {
+              "id": "n",
+              "type": "group",
+              "x": 925,
+              "y": 330,
+              "animate": [{ "prop": "y", "wave": { "amplitude": 18, "frequency": 4 } }],
+              "children": [{ "id": "note-yellow", "type": "image", "src": "img/note-yellow.svg", "x": -39, "y": -141, "width": 130, "height": 173, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "note2",
+          "type": "group",
+          "pivot": [900, 880],
+          "in": { "preset": "pop", "at": 1.1 },
+          "children": [
+            {
+              "id": "n",
+              "type": "group",
+              "x": 890,
+              "y": 880,
+              "animate": [{ "prop": "y", "wave": { "amplitude": 18, "frequency": 4, "phase": 1.6 } }],
+              "children": [{ "id": "note-red", "type": "image", "src": "img/note-red.svg", "x": -39, "y": -141, "width": 130, "height": 173, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "pivot": [1000, 240],
+          "in": { "preset": "pop", "at": 0.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.music.hours}}",
+              "text": "{{value | hours:\"number\"}} hours of music.",
+              "x": 1000,
+              "y": 260,
+              "size": 104,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.4, 0],
+                    [3.6, 1, "steps:8"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "artist",
+          "type": "group",
+          "pivot": [1000, 360],
+          "in": { "preset": "pop", "at": 1.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Top artist: {{me.music.topArtist.name}}.",
+              "x": 1000,
+              "y": 380,
+              "size": 68,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "songs-head",
+          "type": "group",
+          "when": "me.music.topSongs | count > 0",
+          "pivot": [1000, 490],
+          "in": { "preset": "pop", "at": 1.9 },
+          "children": [{ "id": "t", "type": "text", "text": "Top songs:", "x": 1000, "y": 505, "size": 60, "font": "d6", "color": "ink", "align": "left" }]
+        },
+        {
+          "id": "songs",
+          "type": "repeat",
+          "items": "{{me.music.topSongs | take:3}}",
+          "x": 0,
+          "y": 600,
+          "layout": "column",
+          "pitch": 130,
+          "align": "start",
+          "vars": { "at": "{{index | mul:0.4 | add:2.4}}" },
+          "template": [
+            {
+              "id": "pill",
+              "type": "group",
+              "pivot": ["{{measure.song.width | add:89.6 | div:2 | add:1000}}", 0],
+              "in": { "preset": "pop", "at": "{{at}}" },
+              "children": [
+                {
+                  "id": "song",
+                  "type": "text",
+                  "text": "{{item.title}}",
+                  "x": 1044.8,
+                  "y": 0,
+                  "size": 64,
+                  "font": "d6",
+                  "color": "ink",
+                  "align": "left",
+                  "fit": "line",
+                  "maxWidth": 770,
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "persona": {
+      "background": "tom",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "burst",
+          "type": "group",
+          "pivot": [960, 520],
+          "in": [
+            { "preset": "pop", "at": 0.3, "args": { "pd": 0.6 } },
+            { "preset": "bump", "at": 3.2, "args": { "bd": 0.5, "ba": 0.08 } }
+          ],
+          "children": [
+            {
+              "id": "b",
+              "type": "shape",
+              "shape": "star",
+              "points": 12,
+              "inner": 0.74,
+              "x": 960,
+              "y": 520,
+              "radius": 640,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 10,
+              "lineJoin": "round",
+              "animate": [
+                {
+                  "prop": "angle",
+                  "keys": [
+                    [0.3, 0],
+                    [3.2, 80.214091, "sine-in-out"]
+                  ]
+                },
+                { "prop": "angle", "rate": 8.594367 }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "youre",
+          "type": "group",
+          "pivot": [960, 300],
+          "in": { "preset": "pop", "at": 0.6 },
+          "children": [{ "id": "t", "type": "text", "text": "You're", "x": 960, "y": 330, "size": 96, "font": "d6", "color": "ink", "align": "center" }]
+        },
+        {
+          "id": "fly",
+          "type": "repeat",
+          "count": 10,
+          "vars": { "an": "{{index | mul:0.6283185307179586 | add:0.3}}", "cx": "an | cos", "sy": "an | sin | mul:0.7" },
+          "template": [
+            {
+              "id": "s",
+              "type": "shape",
+              "shape": "star",
+              "radius": 34,
+              "fill": "{{index | mod:3 | pick:\"white\",\"sky\",\"grass\"}}",
+              "stroke": "ink",
+              "strokeWidth": 6,
+              "lineJoin": "round",
+              "x": 0,
+              "y": 0,
+              "start": 3.2001,
+              "end": 4.1,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [3.2, "{{cx | mul:220 | add:960}}"],
+                    [4.1, "{{cx | mul:840 | add:960}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.2, "{{sy | mul:220 | add:520}}"],
+                    [4.1, "{{sy | mul:840 | add:520}}", "out"]
+                  ]
+                },
+                {
+                  "prop": "opacity",
+                  "keys": [
+                    [3.6, 1],
+                    [4.1, 0]
+                  ]
+                },
+                { "prop": "angle", "rate": 171.887339 }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "name",
+          "type": "group",
+          "pivot": [960, 500],
+          "in": { "preset": "pop", "at": 3.2, "args": { "pd": 0.55, "pk": 1.25 } },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.persona.name}}.",
+              "x": 960,
+              "y": 565,
+              "size": 190,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1600
+            }
+          ]
+        },
+        {
+          "id": "owl",
+          "type": "group",
+          "pivot": [1690, 800],
+          "in": { "preset": "pop", "at": 3.8 },
+          "children": [
+            { "id": "owl", "type": "image", "src": "img/owl.svg", "x": 1568, "y": 644, "width": 244, "height": 293, "fit": "fill" },
+            {
+              "id": "pupil1",
+              "type": "shape",
+              "shape": "ellipse",
+              "x": 1644,
+              "y": 764,
+              "rx": 17,
+              "ry": 17,
+              "fill": "ink",
+              "animate": [
+                {
+                  "prop": "ry",
+                  "keys": [
+                    [0, 17],
+                    [3.02, 2.55, "step"],
+                    [3.2, 2.55]
+                  ],
+                  "loop": 3.2
+                }
+              ]
+            },
+            {
+              "id": "pupil2",
+              "type": "shape",
+              "shape": "ellipse",
+              "x": 1736,
+              "y": 764,
+              "rx": 17,
+              "ry": 17,
+              "fill": "ink",
+              "animate": [
+                {
+                  "prop": "ry",
+                  "keys": [
+                    [0, 17],
+                    [3.02, 2.55, "step"],
+                    [3.2, 2.55]
+                  ],
+                  "loop": 3.2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "liner",
+          "type": "group",
+          "pivot": [900, 890],
+          "in": { "preset": "pop", "at": 4.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.persona.oneLiner}}",
+              "x": 900,
+              "y": 890,
+              "size": 60,
+              "font": "b8",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1230,
+              "box": { "padX": 42, "height": 93, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "summary": {
+      "background": "sun",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "s1",
+          "type": "shape",
+          "shape": "star",
+          "x": 130,
+          "y": 140,
+          "radius": 70,
+          "fill": "white",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 17.188734 }]
+        },
+        {
+          "id": "s2",
+          "type": "shape",
+          "shape": "star",
+          "x": 1800,
+          "y": 950,
+          "radius": 80,
+          "fill": "tom",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -17.188734 }]
+        },
+        {
+          "id": "s3",
+          "type": "shape",
+          "shape": "star",
+          "x": 1820,
+          "y": 150,
+          "radius": 46,
+          "fill": "sky",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": 22.918312 }]
+        },
+        {
+          "id": "s4",
+          "type": "shape",
+          "shape": "star",
+          "x": 110,
+          "y": 960,
+          "radius": 50,
+          "fill": "grass",
+          "stroke": "ink",
+          "strokeWidth": 8,
+          "lineJoin": "round",
+          "animate": [{ "prop": "angle", "rate": -20.053523 }]
+        },
+        {
+          "id": "card",
+          "type": "group",
+          "pivot": [960, 540],
+          "in": { "preset": "pop", "at": 0.3, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "c",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 260,
+              "y": 100,
+              "width": 1400,
+              "height": 880,
+              "radius": 64,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 14,
+              "lineJoin": "round"
+            }
+          ]
+        },
+        {
+          "id": "initial",
+          "type": "group",
+          "pivot": [420, 260],
+          "in": { "preset": "pop", "at": 0.6 },
+          "children": [
+            { "id": "d", "type": "shape", "shape": "circle", "x": 420, "y": 260, "radius": 95, "fill": "coral", "stroke": "ink", "strokeWidth": 12 },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.name | initial}}",
+              "x": 420,
+              "y": 300,
+              "size": 110,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 150
+            }
+          ]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "pivot": [560, 260],
+          "in": { "preset": "pop", "at": 0.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.totals.hours | hours:\"number\"}} h",
+              "x": 560,
+              "y": 325,
+              "size": 190,
+              "font": "d7",
+              "color": "tom",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 1040
+            }
+          ]
+        },
+        {
+          "id": "show",
+          "type": "group",
+          "when": "me.topSeries | count > 0",
+          "pivot": [360, 502],
+          "in": { "preset": "pop", "at": 1.2 },
+          "children": [
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.topSeries[0].poster}}",
+              "title": "{{me.topSeries[0].title}}",
+              "x": 360,
+              "y": 420,
+              "width": 110,
+              "height": 165,
+              "radius": 16,
+              "border": { "width": 7, "color": "ink" },
+              "lineJoin": "round",
+              "fallback": "poster"
+            },
+            { "id": "label", "type": "text", "text": "#1 show", "x": 510, "y": 478, "size": 44, "font": "b8", "color": "ink", "align": "left" },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topSeries[0].title}}",
+              "x": 510,
+              "y": 560,
+              "y2": 594,
+              "size": 80,
+              "size2": 56,
+              "maxWidth": 1060,
+              "fit": "title",
+              "font": "d7",
+              "color": "ink",
+              "align": "left"
+            }
+          ]
+        },
+        {
+          "id": "movie",
+          "type": "group",
+          "when": "me.topMovies | count > 0",
+          "pivot": [360, 697],
+          "in": { "preset": "pop", "at": 1.6 },
+          "children": [
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.topMovies[0].poster}}",
+              "title": "{{me.topMovies[0].title}}",
+              "x": 360,
+              "y": 615,
+              "width": 110,
+              "height": 165,
+              "radius": 16,
+              "border": { "width": 7, "color": "ink" },
+              "lineJoin": "round",
+              "fallback": "poster"
+            },
+            { "id": "label", "type": "text", "text": "#1 movie", "x": 510, "y": 673, "size": 44, "font": "b8", "color": "ink", "align": "left" },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topMovies[0].title}}",
+              "x": 510,
+              "y": 755,
+              "y2": 789,
+              "size": 80,
+              "size2": 56,
+              "maxWidth": 1060,
+              "fit": "title",
+              "font": "d7",
+              "color": "ink",
+              "align": "left"
+            }
+          ]
+        },
+        {
+          "id": "genre-chip",
+          "type": "group",
+          "when": "me.topGenres | count > 0",
+          "pivot": ["{{measure.genre.width | add:89.6 | div:2 | add:360}}", 880],
+          "in": { "preset": "pop", "at": 2.0 },
+          "children": [
+            {
+              "id": "genre",
+              "type": "text",
+              "text": "{{me.topGenres[0].name}}",
+              "x": 404.8,
+              "y": 880,
+              "size": 64,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": 495,
+              "box": { "padX": 44.8, "height": 99.2, "fill": "sky", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+            }
+          ]
+        },
+        {
+          "id": "persona-chip",
+          "type": "group",
+          "pivot": ["{{measure.persona.width | add:89.6 | div:2 | add:measure.genre.width | default:-119.6 | add:479.6}}", 880],
+          "in": { "preset": "pop", "at": 2.3 },
+          "children": [
+            {
+              "id": "persona",
+              "type": "text",
+              "text": "{{me.persona.name}}",
+              "x": "{{measure.genre.width | default:-119.6 | add:524.4}}",
+              "y": 880,
+              "size": 64,
+              "font": "d7",
+              "color": "ink",
+              "align": "left",
+              "fit": "line",
+              "maxWidth": "{{measure.genre.width | default:-119.6 | mul:-1 | add:990.8}}",
+              "box": { "padX": 44.8, "height": 99.2, "fill": "grass", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    },
+    "outro": {
+      "background": "sky",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "cloud1",
+          "type": "group",
+          "x": -280,
+          "y": 70,
+          "animate": [{ "prop": "x", "rate": 28 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "cloud2",
+          "type": "group",
+          "x": 700,
+          "y": 300,
+          "scale": 0.7,
+          "animate": [{ "prop": "x", "rate": 18 }],
+          "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+        },
+        {
+          "id": "sun",
+          "type": "group",
+          "x": 1640,
+          "y": 240,
+          "animate": [
+            { "prop": "rotation", "wave": { "amplitude": 4, "frequency": 2.2 } },
+            {
+              "prop": "y",
+              "keys": [
+                [0, 240],
+                [5, 360, "sine-in-out"]
+              ]
+            }
+          ],
+          "children": [{ "id": "sun", "type": "image", "src": "img/sun.svg", "x": -192, "y": -195, "width": 384, "height": 390, "fit": "fill" }]
+        },
+        { "id": "hills", "type": "image", "src": "img/hills.svg", "x": 0, "y": 803, "width": 1920, "height": 317, "fit": "fill" },
+        {
+          "id": "card",
+          "type": "group",
+          "pivot": [960, 400],
+          "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+          "children": [
+            {
+              "id": "box",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 300,
+              "y": 260,
+              "width": 1320,
+              "height": 280,
+              "radius": 80,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 12,
+              "lineJoin": "round"
+            },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "That was your {{year}}.",
+              "x": 960,
+              "y": 442,
+              "size": 120,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1160
+            }
+          ]
+        },
+        {
+          "id": "bye",
+          "type": "group",
+          "pivot": [960, 650],
+          "rotation": -3.437747,
+          "in": { "preset": "pop", "at": 0.6 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "See you next year.",
+              "x": 960,
+              "y": 650,
+              "size": 84,
+              "font": "d7",
+              "color": "ink",
+              "align": "center",
+              "box": { "padX": 58.8, "height": 130.2, "fill": "tom", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "byBase": {
+    "server": {
+      "vars": {
+        "kOne": "groups.oneKid",
+        "kName": "groups.kids.names[0]",
+        "kOwn1": "kName | possessive",
+        "kSubj": "kOne | then:kName,\"the kids\"",
+        "kSubjCap": "kOne | then:kName,\"The kids\"",
+        "kCap": "kOne | then:kName,\"Kids\"",
+        "kOwn": "kOne | then:kOwn1,\"Kids'\"",
+        "kAvg": "kOne | then:kName,\"the average kid\"",
+        "gOne": "groups.grownups.count == 1",
+        "gName": "groups.grownups.names[0]",
+        "gSubj": "gOne | then:gName,\"the grown-ups\"",
+        "gSubjCap": "gOne | then:gName,\"The grown-ups\"",
+        "gAvg": "gOne | then:gName,\"the average grown-up\"",
+        "gAvgCap": "gOne | then:gName,\"The average grown-up\""
+      },
+      "fallbacks": {
+        "avatar": [
+          {
+            "id": "fb-fill",
+            "type": "shape",
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "width": "{{box.width}}",
+            "height": "{{box.height}}",
+            "fill": "{{title | hash | mod:4 | pick:\"sun\",\"tom\",\"grass\",\"coral\"}}"
+          },
+          {
+            "id": "fb-ini",
+            "type": "text",
+            "text": "{{title | initials}}",
+            "x": "{{box.width | div:2}}",
+            "y": "{{box.height | mul:0.66}}",
+            "size": "{{box.width | mul:0.44 | round}}",
+            "font": "d7",
+            "color": "ink",
+            "align": "center",
+            "fit": "line",
+            "maxWidth": "{{box.width | mul:0.8}}"
+          }
+        ]
+      },
+      "slides": {
+        "intro": {
+          "elements": [
+            { "id": "card", "children": [{ "id": "name", "text": "{{server.possessive}}", "fit": "title", "size2": 96, "y2": 420 }] },
+            { "id": "year", "children": [{ "id": "t", "text": "{{year}} on Jellyfin" }] }
+          ]
+        },
+        "totals": {
+          "background": "sun",
+          "vars": { "H": "server.totals.hours" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "s1",
+              "type": "shape",
+              "shape": "star",
+              "x": 190,
+              "y": 190,
+              "radius": 95,
+              "fill": "white",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 20.053523 }]
+            },
+            {
+              "id": "s2",
+              "type": "shape",
+              "shape": "star",
+              "x": 1720,
+              "y": 640,
+              "radius": 110,
+              "fill": "tom",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": -17.188734 }]
+            },
+            {
+              "id": "s3",
+              "type": "shape",
+              "shape": "star",
+              "x": 200,
+              "y": 660,
+              "radius": 58,
+              "fill": "sky",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 22.918312 }]
+            },
+            { "id": "dot", "type": "shape", "shape": "circle", "x": 1630, "y": 180, "radius": 52, "fill": "sky", "stroke": "ink", "strokeWidth": 10 },
+            {
+              "id": "counter",
+              "type": "group",
+              "pivot": [960, 400],
+              "in": [
+                { "preset": "pop", "at": 0.3 },
+                { "preset": "bump", "at": 2.8 }
+              ],
+              "animate": [{ "prop": "rotation", "wave": { "amplitude": 2.005352, "frequency": 28, "grow": [0.4, 2.8] }, "end": 2.8 }],
+              "children": [
+                {
+                  "id": "box",
+                  "type": "shape",
+                  "shape": "roundRect",
+                  "x": "{{measure.num.width | add:180 | div:-2 | add:960}}",
+                  "y": 230,
+                  "width": "{{measure.num.width | add:180}}",
+                  "height": 320,
+                  "radius": 70,
+                  "fill": "white",
+                  "stroke": "ink",
+                  "strokeWidth": 14,
+                  "lineJoin": "round"
+                },
+                {
+                  "id": "num",
+                  "type": "text",
+                  "value": "{{H}}",
+                  "text": "{{value | number}}",
+                  "x": 960,
+                  "y": 497,
+                  "size": 300,
+                  "font": "d7",
+                  "color": "tom",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1400,
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [0.4, 0],
+                        [2.8, 1, "steps:8"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "unit",
+              "type": "group",
+              "pivot": [960, 660],
+              "in": { "preset": "pop", "at": 0.9 },
+              "children": [{ "id": "t", "type": "text", "text": "{{H | noun:\"hour\"}}", "x": 960, "y": 690, "size": 96, "font": "d7", "color": "ink", "align": "center" }]
+            },
+            {
+              "id": "counts",
+              "type": "group",
+              "x": 895,
+              "y": 860,
+              "layout": "row",
+              "align": "center",
+              "maxWidth": 1500,
+              "pivot": [65, 0],
+              "in": { "preset": "pop", "at": 3.2, "args": { "pd": 0.5 } },
+              "children": [
+                {
+                  "id": "plays",
+                  "type": "text",
+                  "text": "{{server.totals.plays | number}} {{server.totals.plays | noun:\"play\"}}",
+                  "y": 0,
+                  "gap": 130,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                },
+                {
+                  "id": "viewers",
+                  "type": "text",
+                  "text": "{{server.totals.viewers | number}} {{server.totals.viewers | noun:\"viewer\"}}",
+                  "y": 0,
+                  "gap": 130,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "sky", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                },
+                {
+                  "id": "titles",
+                  "type": "text",
+                  "text": "{{server.totals.titles | number}} {{server.totals.titles | noun:\"title\"}}",
+                  "y": 0,
+                  "gap": 130,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "grass2", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        },
+        "growth": {
+          "background": "grass",
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "polka",
+              "type": "repeat",
+              "count": 56,
+              "vars": { "row": "index | div:7 | floor", "px": "{{row | mod:2 | mul:150}}" },
+              "template": [
+                { "id": "dot", "type": "shape", "shape": "circle", "radius": 22, "fill": "grass2", "x": "{{index | mod:7 | mul:300 | add:px}}", "y": "{{row | mul:150 | add:60}}" }
+              ]
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "pivot": [960, 170],
+              "in": { "preset": "pop", "at": 0.2 },
+              "children": [{ "id": "t", "type": "text", "text": "New this year:", "x": 960, "y": 200, "size": 104, "font": "d7", "color": "ink", "align": "center" }]
+            },
+            {
+              "id": "tvs",
+              "type": "repeat",
+              "x": 960,
+              "y": 0,
+              "layout": "row",
+              "pitch": 580,
+              "items": [
+                { "v": "{{server.growth.movies}}", "w": "movie", "c": "#4CC3F1" },
+                { "v": "{{server.growth.episodes}}", "w": "episode", "c": "#FF5A36" },
+                { "v": "{{server.growth.albums}}", "w": "album", "c": "#FFD23F" }
+              ],
+              "where": "item.v > 0",
+              "vars": { "at": "{{index | mul:0.5 | add:0.6}}", "end": "(index < count | sub:1) | then:\",\",\".\"" },
+              "template": [
+                {
+                  "id": "tv",
+                  "type": "group",
+                  "pivot": [0, 560],
+                  "rotation": "{{index | mod:2 | mul:4 | sub:2}}",
+                  "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": 0.5 } },
+                  "children": [
+                    { "id": "tv-large", "type": "image", "src": "img/tv-large.svg", "x": -242, "y": 278, "width": 484, "height": 469, "fit": "fill" },
+                    {
+                      "id": "n",
+                      "type": "text",
+                      "value": "{{item.v}}",
+                      "text": "{{value | number}}",
+                      "x": 0,
+                      "y": 612,
+                      "size": 140,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 350,
+                      "animate": [
+                        {
+                          "prop": "count",
+                          "keys": [
+                            ["{{at}}", 0],
+                            ["{{at | add:1.8}}", 1, "steps:8"]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "w",
+                      "type": "text",
+                      "text": "{{item.v | noun:item.w}}{{end}}",
+                      "x": 0,
+                      "y": 860,
+                      "size": 64,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 420,
+                      "box": { "padX": 44.8, "height": 99.2, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "kids-vs-grownups": {
+          "background": "milk",
+          "vars": {
+            "hk0": "groups.kids.hoursPerPerson",
+            "hg0": "groups.grownups.hoursPerPerson",
+            "hkR": "hk0 | round",
+            "hkR1": "hk0 | round:1 | atLeast:0.1",
+            "hgR": "hg0 | round",
+            "hgR1": "hg0 | round:1 | atLeast:0.1",
+            "hK": "(hk0 >= 10) | then:hkR,hkR1",
+            "hG": "(hg0 >= 10) | then:hgR,hgR1",
+            "h1": "kidsWin | then:hK,hG",
+            "h2": "kidsWin | then:hG,hK",
+            "d1": "(h1 < 10) | then:1,0",
+            "d2": "(h2 < 10) | then:1,0",
+            "winCap": "kidsWin | then:kSubjCap,gSubjCap",
+            "loseSubj": "kidsWin | then:gSubj,kSubj",
+            "winAvg": "kidsWin | then:kAvg,gAvg",
+            "loseAvg": "kidsWin | then:gAvg,kAvg",
+            "eK": "groups.kids.episodes | div:groups.kids.count",
+            "eG": "groups.grownups.episodes | div:groups.grownups.count",
+            "eKidsWon": "groups.moreEpisodes == \"kids\"",
+            "eTop": "eKidsWon | then:eK,eG",
+            "eWin": "kidsWin | then:eK,eG",
+            "xr": "eTop | div:eWin | round:1",
+            "xsn": "{{xr}} times",
+            "xs4": "(xr == 4) | then:\"four times\",xsn",
+            "xs3": "(xr == 3) | then:\"three times\",xs4",
+            "xs": "(xr == 2) | then:\"twice\",xs3",
+            "gAvgOf": "eKidsWon | then:kAvg,gAvg",
+            "epA": "{{kName}}: {{eK | round | number}} episodes. {{gAvgCap}}: {{eG | round | number}}.",
+            "epB": "But {{gAvgOf}} watched {{xs}} as many episodes ({{eTop | round | number}} vs {{eWin | round | number}}).",
+            "epLine": "kOne | then:epA,epB"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "frame",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 26,
+              "y": 26,
+              "width": 1868,
+              "height": 1028,
+              "radius": 54,
+              "stroke": "ink",
+              "strokeWidth": 14,
+              "lineJoin": "round"
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "pivot": [960, 140],
+              "in": { "preset": "pop", "at": 0.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{winCap}} out-watched {{loseSubj}}:",
+                  "x": 960,
+                  "y": 175,
+                  "size": 88,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1700
+                }
+              ]
+            },
+            {
+              "id": "burst",
+              "type": "group",
+              "pivot": [540, 520],
+              "in": { "preset": "pop", "at": 2.4, "args": { "pd": 0.5 } },
+              "children": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 14,
+                  "inner": 0.74,
+                  "x": 540,
+                  "y": 520,
+                  "radius": 330,
+                  "fill": "sun",
+                  "stroke": "ink",
+                  "strokeWidth": 10,
+                  "lineJoin": "round",
+                  "animate": [{ "prop": "angle", "rate": 14.323945 }]
+                }
+              ]
+            },
+            {
+              "id": "sides",
+              "type": "repeat",
+              "x": 960,
+              "y": 0,
+              "layout": "row",
+              "pitch": 840,
+              "items": [
+                { "h": "{{h1}}", "d": "{{d1}}", "who": "{{winAvg}}", "c": "tom", "at": 0.6, "b": "sun" },
+                { "h": "{{h2}}", "d": "{{d2}}", "who": "{{loseAvg}}", "c": "ink", "at": 1.2, "b": "sky" }
+              ],
+              "template": [
+                {
+                  "id": "card",
+                  "type": "group",
+                  "pivot": [0, 520],
+                  "in": { "preset": "pop", "at": "{{item.at}}", "args": { "pd": 0.5 } },
+                  "children": [
+                    {
+                      "id": "box",
+                      "type": "shape",
+                      "shape": "roundRect",
+                      "x": -300,
+                      "y": 330,
+                      "width": 600,
+                      "height": 380,
+                      "radius": 64,
+                      "fill": "white",
+                      "stroke": "ink",
+                      "strokeWidth": 14,
+                      "lineJoin": "round"
+                    },
+                    {
+                      "id": "n",
+                      "type": "text",
+                      "value": "{{item.h}}",
+                      "text": "{{value | number:item.d}} h",
+                      "x": 0,
+                      "y": 560,
+                      "size": 190,
+                      "font": "d7",
+                      "color": "{{item.c}}",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 540,
+                      "animate": [
+                        {
+                          "prop": "count",
+                          "keys": [
+                            ["{{item.at}}", 0],
+                            ["{{item.at | add:1.4}}", 1, "steps:8"]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "who",
+                      "type": "text",
+                      "text": "{{item.who}}",
+                      "x": 0,
+                      "y": 710,
+                      "size": 54,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 520,
+                      "box": { "padX": 37.8, "height": 83.7, "fill": "{{item.b}}", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "vs",
+              "type": "group",
+              "pivot": [960, 520],
+              "rotation": -8,
+              "in": { "preset": "pop", "at": 1.8 },
+              "children": [
+                { "id": "d", "type": "shape", "shape": "circle", "x": 960, "y": 520, "radius": 80, "fill": "sky", "stroke": "ink", "strokeWidth": 12 },
+                { "id": "t", "type": "text", "text": "vs", "x": 960, "y": 548, "size": 84, "font": "d7", "color": "ink", "align": "center" }
+              ]
+            },
+            {
+              "id": "eps",
+              "type": "group",
+              "when": "twist && eWin > 0",
+              "pivot": [960, 900],
+              "rotation": -1.5,
+              "in": { "preset": "pop", "at": 3.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{epLine}}",
+                  "x": 960,
+                  "y": 900,
+                  "size": 60,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1620,
+                  "box": { "padX": 42, "height": 93, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        },
+        "busiest": {
+          "vars": { "d": "server.busiest.day" },
+          "elements": [
+            { "id": "cap1", "children": [{ "id": "t", "text": "Busiest day:" }] },
+            { "id": "month", "children": [{ "id": "t", "text": "{{d | date:\"dddd, MMMM d\"}}", "size": 110 }] },
+            {
+              "id": "hm",
+              "pivot": [1000, 520],
+              "in": { "preset": "pop", "at": 1.0 },
+              "children": [{ "id": "t", "text": "({{server.busiest.dayHours | hours:\"number\"}} h).", "y": 550, "size": 84 }]
+            },
+            { "id": "cap2", "pivot": [1000, 690], "in": { "preset": "pop", "at": 1.6 }, "children": [{ "id": "t", "text": "Busiest hour:", "y": 710 }] },
+            {
+              "id": "day",
+              "pivot": [1000, 800],
+              "in": { "preset": "pop", "at": 1.9 },
+              "children": [{ "id": "t", "text": "{{server.busiest.hour | hour}}.", "y": 850, "size": 130 }]
+            }
+          ]
+        },
+        "who-owns-when": {
+          "background": "night",
+          "vars": { "mx0": "server.whoOwnsWhen | max:\"shareOfMinutes\"", "mx": "(mx0 > 0) | then:mx0,1" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "stars",
+              "type": "repeat",
+              "items": [
+                { "x": 150, "y": 140, "r": 26 },
+                { "x": 1500, "y": 110, "r": 18 },
+                { "x": 1640, "y": 640, "r": 22 },
+                { "x": 120, "y": 620, "r": 16 },
+                { "x": 1840, "y": 980, "r": 20 }
+              ],
+              "template": [
+                {
+                  "id": "s",
+                  "type": "shape",
+                  "shape": "star",
+                  "x": "{{item.x}}",
+                  "y": "{{item.y}}",
+                  "radius": "{{item.r}}",
+                  "fill": "{{index | mod:2 | pick:\"sun\",\"milk\"}}",
+                  "stroke": "ink",
+                  "strokeWidth": 5,
+                  "lineJoin": "round",
+                  "animate": [{ "prop": "angle", "rate": "{{index | mod:2 | mul:-57.29578 | add:28.64789}}" }]
+                }
+              ]
+            },
+            { "id": "moon", "type": "image", "src": "img/moon.svg", "x": 1682, "y": 77, "width": 159, "height": 154, "fit": "fill" },
+            {
+              "id": "board",
+              "type": "group",
+              "pivot": [960, 400],
+              "in": { "preset": "pop", "at": 0.2, "args": { "pd": 0.5 } },
+              "children": [
+                {
+                  "id": "panel",
+                  "type": "shape",
+                  "shape": "roundRect",
+                  "x": 330,
+                  "y": 100,
+                  "width": 1260,
+                  "height": 650,
+                  "radius": 56,
+                  "fill": "#3B3786",
+                  "stroke": "ink",
+                  "strokeWidth": 12,
+                  "lineJoin": "round"
+                },
+                {
+                  "id": "days",
+                  "type": "repeat",
+                  "count": 7,
+                  "template": [
+                    {
+                      "id": "d",
+                      "type": "text",
+                      "text": "{{index | pick:\"M\",\"T\",\"W\",\"T\",\"F\",\"S\",\"S\"}}",
+                      "x": "{{index | mul:120 | add:745}}",
+                      "y": 172,
+                      "size": 44,
+                      "font": "d7",
+                      "color": "milk",
+                      "align": "center"
+                    }
+                  ]
+                },
+                {
+                  "id": "parts",
+                  "type": "repeat",
+                  "items": [{ "p": "mornings" }, { "p": "afternoons" }, { "p": "evenings" }, { "p": "nights" }],
+                  "template": [
+                    { "id": "p", "type": "text", "text": "{{item.p}}", "x": 670, "y": "{{index | mul:115 | add:260}}", "size": 42, "font": "d6", "color": "milk", "align": "right" }
+                  ]
+                },
+                {
+                  "id": "grid",
+                  "type": "repeat",
+                  "items": "{{server.whoOwnsWhen | take:28}}",
+                  "vars": {
+                    "k": "item.kidsShare",
+                    "c1": "(k <= 0.4) | then:\"sky\",\"milk\"",
+                    "c": "(k >= 0.6) | then:\"tom\",c1",
+                    "s": "{{item.shareOfMinutes | div:mx | mul:0.55 | add:0.45 | atMost:1}}",
+                    "cx": "{{index | div:4 | floor | mul:120 | add:745}}",
+                    "cy": "{{index | mod:4 | mul:115 | add:245}}",
+                    "at": "{{index | div:4 | floor | mul:0.12 | add:0.6}}",
+                    "hiK": "item.weekday == kidSlot.weekday && item.part == kidSlot.part",
+                    "hiG": "item.weekday == grownSlot.weekday && item.part == grownSlot.part"
+                  },
+                  "template": [
+                    {
+                      "id": "cell",
+                      "type": "group",
+                      "x": "{{cx}}",
+                      "y": "{{cy}}",
+                      "scale": "{{s}}",
+                      "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": 0.35 } },
+                      "children": [
+                        {
+                          "id": "sq",
+                          "type": "shape",
+                          "shape": "roundRect",
+                          "x": -50,
+                          "y": -50,
+                          "width": 100,
+                          "height": 100,
+                          "radius": 24,
+                          "fill": "{{c}}",
+                          "stroke": "ink",
+                          "strokeWidth": 9,
+                          "lineJoin": "round"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "star",
+                      "type": "group",
+                      "when": "hiK || hiG",
+                      "x": "{{cx | add:44}}",
+                      "y": "{{cy | sub:44}}",
+                      "in": { "preset": "pop", "at": 2.4, "args": { "pd": 0.5, "pk": 1.3 } },
+                      "children": [
+                        {
+                          "id": "s",
+                          "type": "shape",
+                          "shape": "star",
+                          "x": 0,
+                          "y": 0,
+                          "radius": 36,
+                          "angle": 17.188734,
+                          "fill": "sun",
+                          "stroke": "ink",
+                          "strokeWidth": 7,
+                          "lineJoin": "round"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "legend",
+              "type": "repeat",
+              "x": 1010,
+              "y": 0,
+              "layout": "row",
+              "pitch": 360,
+              "items": [
+                { "t": "{{kCap}}", "c": "tom" },
+                { "t": "Grown-ups", "c": "sky" }
+              ],
+              "template": [
+                {
+                  "id": "l",
+                  "type": "group",
+                  "in": { "preset": "pop", "at": 1.6 },
+                  "children": [
+                    {
+                      "id": "sq",
+                      "type": "shape",
+                      "shape": "roundRect",
+                      "x": -150,
+                      "y": 675,
+                      "width": 50,
+                      "height": 50,
+                      "radius": 12,
+                      "fill": "{{item.c}}",
+                      "stroke": "ink",
+                      "strokeWidth": 7,
+                      "lineJoin": "round"
+                    },
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": -80,
+                      "y": 716,
+                      "size": 44,
+                      "font": "d7",
+                      "color": "milk",
+                      "align": "left",
+                      "fit": "line",
+                      "maxWidth": 230
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "lines",
+              "type": "repeat",
+              "x": 960,
+              "y": 880,
+              "layout": "column",
+              "pitch": 125,
+              "items": [
+                { "t": "{{kidSlot.weekday}} {{kidSlot.part}}s belong to {{kSubj}} ({{kidSlot.kidsShare | percent}}).", "c": "tom", "has": "{{kidSlot != null}}" },
+                {
+                  "t": "{{grownSlot.weekday}} {{grownSlot.part}}s belong to the grown-ups ({{grownSlot.kidsShare | sub:1 | mul:-1 | percent}}).",
+                  "c": "sky",
+                  "has": "{{grownSlot != null}}"
+                }
+              ],
+              "where": "item.has",
+              "vars": { "at": "{{index | mul:0.5 | add:2.8}}" },
+              "template": [
+                {
+                  "id": "l",
+                  "type": "group",
+                  "rotation": "{{index | mul:3 | sub:1.5}}",
+                  "in": { "preset": "pop", "at": "{{at}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": 0,
+                      "y": 0,
+                      "size": 60,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 1620,
+                      "box": { "padX": 42, "height": 93, "fill": "{{item.c}}", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "top-genre": {
+          "vars": { "gk": "groups.kids.topGenre.name", "gg": "groups.grownups.topGenre.name" },
+          "elements": [
+            { "id": "head", "children": [{ "id": "t", "text": "Top genres:" }] },
+            { "id": "genre", "children": [{ "id": "t", "text": "{{server.topGenres[0].name}}" }] },
+            { "id": "share", "when": "server.topGenres[0].share > 0", "children": [{ "id": "t", "text": "{{server.topGenres[0].share | percent}}" }] },
+            {
+              "id": "then",
+              "when": "server.topGenres | count > 1",
+              "children": [{ "id": "t", "text": "Then {{server.topGenres | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}." }]
+            },
+            {
+              "id": "kid-genre",
+              "type": "group",
+              "when": "groups.hasSplit && gk != null",
+              "pivot": [330, 440],
+              "rotation": -6,
+              "in": { "preset": "pop", "at": 2.6 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{kCap}}: {{gk}}",
+                  "x": 330,
+                  "y": 440,
+                  "size": 56,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 440,
+                  "box": { "padX": 39.2, "height": 86.8, "fill": "tom", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            },
+            {
+              "id": "grown-genre",
+              "type": "group",
+              "when": "groups.hasSplit && gg != null",
+              "pivot": [1590, 660],
+              "rotation": 5,
+              "in": { "preset": "pop", "at": 3.0 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "Grown-ups: {{gg}}",
+                  "x": 1590,
+                  "y": 660,
+                  "size": 56,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 440,
+                  "box": { "padX": 39.2, "height": 86.8, "fill": "white", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        },
+        "top-series": {
+          "vars": { "n": "server.topSeries | take:5 | count" },
+          "elements": [
+            { "id": "head", "children": [{ "id": "t", "text": "Top shows" }] },
+            {
+              "id": "shows",
+              "items": "{{server.topSeries | take:5}}",
+              "template": [
+                {
+                  "id": "show",
+                  "children": [
+                    { "id": "viewers", "type": "text", "text": "{{item.viewers}} of you", "x": 0, "y": 640, "size": 36, "font": "b8", "color": "ink", "align": "center" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "top-movies": {
+          "elements": [
+            { "id": "head", "children": [{ "id": "t", "text": "Top movies" }] },
+            { "id": "rest", "items": "{{server.topMovies | skip:1 | take:4}}" },
+            { "id": "top", "children": [{ "id": "poster", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" }] },
+            { "id": "top-title", "children": [{ "id": "t", "text": "{{server.topMovies[0].title}}" }] }
+          ]
+        },
+        "kids-1-vs-grownups-1": {
+          "background": "tom",
+          "vars": { "same": "groups.kids.top.id == groups.grownups.top.id" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "s1",
+              "type": "shape",
+              "shape": "star",
+              "x": 120,
+              "y": 120,
+              "radius": 56,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 20.053523 }]
+            },
+            {
+              "id": "s2",
+              "type": "shape",
+              "shape": "star",
+              "x": 1810,
+              "y": 990,
+              "radius": 64,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": -17.188734 }]
+            },
+            {
+              "id": "picks",
+              "type": "repeat",
+              "items": [
+                { "cap": "{{kOwn}} #1:", "t": "{{groups.kids.top.title}}", "p": "{{groups.kids.top.poster}}", "x": 520, "c": "sun", "at": 0.4, "show": "{{!same}}" },
+                { "cap": "Grown-ups' #1:", "t": "{{groups.grownups.top.title}}", "p": "{{groups.grownups.top.poster}}", "x": 1400, "c": "sky", "at": 1.4, "show": "{{!same}}" },
+                { "cap": "Everyone's #1:", "t": "{{groups.kids.top.title}}", "p": "{{groups.kids.top.poster}}", "x": 960, "c": "sun", "at": 0.4, "show": "{{same}}" }
+              ],
+              "where": "item.show",
+              "template": [
+                {
+                  "id": "cap",
+                  "type": "group",
+                  "pivot": ["{{item.x}}", 150],
+                  "in": { "preset": "pop", "at": "{{item.at}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.cap}}",
+                      "x": "{{item.x}}",
+                      "y": 150,
+                      "size": 64,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 640,
+                      "box": { "padX": 44.8, "height": 99.2, "fill": "{{item.c}}", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                    }
+                  ]
+                },
+                {
+                  "id": "burst",
+                  "type": "group",
+                  "pivot": ["{{item.x}}", 500],
+                  "in": { "preset": "pop", "at": "{{item.at | add:0.3}}", "args": { "pd": 0.5 } },
+                  "children": [
+                    {
+                      "id": "b",
+                      "type": "shape",
+                      "shape": "star",
+                      "points": 16,
+                      "inner": 0.74,
+                      "x": "{{item.x}}",
+                      "y": 500,
+                      "radius": 300,
+                      "fill": "white",
+                      "stroke": "ink",
+                      "strokeWidth": 10,
+                      "lineJoin": "round",
+                      "animate": [{ "prop": "angle", "rate": 17.188734 }]
+                    }
+                  ]
+                },
+                {
+                  "id": "poster",
+                  "type": "group",
+                  "pivot": ["{{item.x}}", 480],
+                  "in": { "preset": "pop", "at": "{{item.at | add:0.5}}", "args": { "pd": 0.55, "pk": 1.22 } },
+                  "children": [
+                    {
+                      "id": "p",
+                      "type": "image",
+                      "src": "{{item.p}}",
+                      "title": "{{item.t}}",
+                      "x": "{{item.x | sub:150}}",
+                      "y": 275,
+                      "width": 300,
+                      "height": 450,
+                      "radius": 30,
+                      "border": { "width": 12, "color": "ink" },
+                      "lineJoin": "round",
+                      "fallback": "poster"
+                    }
+                  ]
+                },
+                {
+                  "id": "title",
+                  "type": "group",
+                  "pivot": ["{{item.x}}", 860],
+                  "in": { "preset": "pop", "at": "{{item.at | add:0.8}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": "{{item.x}}",
+                      "y": 890,
+                      "y2": 915,
+                      "size": 76,
+                      "size2": 56,
+                      "maxWidth": 780,
+                      "fit": "title",
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "vs",
+              "type": "group",
+              "when": "!same",
+              "pivot": [960, 500],
+              "rotation": -8,
+              "in": { "preset": "pop", "at": 1.1 },
+              "children": [
+                { "id": "d", "type": "shape", "shape": "circle", "x": 960, "y": 500, "radius": 80, "fill": "sky", "stroke": "ink", "strokeWidth": 12 },
+                { "id": "t", "type": "text", "text": "vs", "x": 960, "y": 528, "size": 84, "font": "d7", "color": "ink", "align": "center" }
+              ]
+            }
+          ]
+        },
+        "common-ground": {
+          "background": "grass",
+          "vars": { "cg": "server.commonGround | default:server.mostShared", "split": "server.commonGround != null" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "polka",
+              "type": "repeat",
+              "count": 56,
+              "vars": { "row": "index | div:7 | floor", "px": "{{row | mod:2 | mul:150}}" },
+              "template": [
+                { "id": "dot", "type": "shape", "shape": "circle", "radius": 22, "fill": "grass2", "x": "{{index | mod:7 | mul:300 | add:px}}", "y": "{{row | mul:150 | add:60}}" }
+              ]
+            },
+            {
+              "id": "burst",
+              "type": "group",
+              "pivot": [470, 540],
+              "in": { "preset": "pop", "at": 0.3, "args": { "pd": 0.5 } },
+              "children": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "star",
+                  "points": 16,
+                  "inner": 0.74,
+                  "x": 470,
+                  "y": 540,
+                  "radius": 360,
+                  "fill": "sun",
+                  "stroke": "ink",
+                  "strokeWidth": 10,
+                  "lineJoin": "round",
+                  "animate": [{ "prop": "angle", "rate": 17.188734 }]
+                }
+              ]
+            },
+            {
+              "id": "poster",
+              "type": "group",
+              "pivot": [470, 540],
+              "in": { "preset": "pop", "at": 0.5, "args": { "pd": 0.55, "pk": 1.22 } },
+              "children": [
+                {
+                  "id": "p",
+                  "type": "image",
+                  "src": "{{cg.poster}}",
+                  "title": "{{cg.title}}",
+                  "x": 290,
+                  "y": 270,
+                  "width": 360,
+                  "height": 540,
+                  "radius": 34,
+                  "border": { "width": 12, "color": "ink" },
+                  "lineJoin": "round",
+                  "fallback": "poster"
+                }
+              ]
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "pivot": [1000, 260],
+              "in": { "preset": "pop", "at": 0.9 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "The one everyone agrees on:",
+                  "x": 1000,
+                  "y": 285,
+                  "size": 72,
+                  "font": "d6",
+                  "color": "ink",
+                  "align": "left",
+                  "fit": "line",
+                  "maxWidth": 840
+                }
+              ]
+            },
+            {
+              "id": "title",
+              "type": "group",
+              "pivot": [1000, 420],
+              "in": { "preset": "pop", "at": 1.3, "args": { "pd": 0.5, "pk": 1.2 } },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{cg.title}}{{split | then:\" —\",\".\"}}",
+                  "x": 1000,
+                  "y": 450,
+                  "y2": 520,
+                  "size": 130,
+                  "size2": 84,
+                  "maxWidth": 840,
+                  "fit": "title",
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "left"
+                }
+              ]
+            },
+            {
+              "id": "kids",
+              "type": "group",
+              "when": "split",
+              "pivot": [1000, 680],
+              "rotation": -2,
+              "in": { "preset": "pop", "at": 2.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{server.commonGroundKidsHours | hours}} from {{kSubj}},",
+                  "x": 1044.8,
+                  "y": 680,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "left",
+                  "fit": "line",
+                  "maxWidth": 760,
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "tom", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            },
+            {
+              "id": "grown",
+              "type": "group",
+              "when": "split",
+              "pivot": [1000, 820],
+              "rotation": 1.5,
+              "in": { "preset": "pop", "at": 2.7 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{server.commonGroundGrownupsHours | hours}} from the grown-ups.",
+                  "x": 1044.8,
+                  "y": 820,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "left",
+                  "fit": "line",
+                  "maxWidth": 760,
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "sky", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            },
+            {
+              "id": "viewers",
+              "type": "group",
+              "when": "!split && cg.viewers > 1",
+              "pivot": [1000, 690],
+              "rotation": -2,
+              "in": { "preset": "pop", "at": 2.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{cg.viewers}} of you",
+                  "x": 1044.8,
+                  "y": 690,
+                  "size": 64,
+                  "font": "d7",
+                  "color": "ink",
+                  "align": "left",
+                  "box": { "padX": 44.8, "height": 99.2, "fill": "sky", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                }
+              ]
+            }
+          ]
+        },
+        "leaderboard": {
+          "background": "milk",
+          "vars": {
+            "rows": "server.leaderboard | take:5",
+            "n": "rows | count",
+            "mx0": "rows | max:\"hours\"",
+            "mx": "(mx0 > 0) | then:mx0,1",
+            "y0": "{{n | sub:1 | mul:-75 | add:610}}"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "frame",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": 26,
+              "y": 26,
+              "width": 1868,
+              "height": 1028,
+              "radius": 54,
+              "stroke": "ink",
+              "strokeWidth": 14,
+              "lineJoin": "round"
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "pivot": [960, 130],
+              "in": { "preset": "pop", "at": 0.2 },
+              "children": [{ "id": "t", "type": "text", "text": "Leaderboard", "x": 960, "y": 165, "size": 104, "font": "d7", "color": "ink", "align": "center" }]
+            },
+            {
+              "id": "rows",
+              "type": "repeat",
+              "items": "{{rows}}",
+              "vars": {
+                "y": "{{index | mul:150 | add:y0}}",
+                "first": "item.rank == 1",
+                "at": "{{count | sub:1 | sub:index | mul:0.45 | add:0.6}}",
+                "full": "{{item.hours | mul:650 | div:mx | atLeast:90}}",
+                "te": "{{at | add:1.0}}"
+              },
+              "template": [
+                {
+                  "id": "row",
+                  "type": "group",
+                  "pivot": [400, "{{y}}"],
+                  "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": "{{first | then:0.55,0.45}}", "pk": "{{first | then:1.22,1.15}}" } },
+                  "children": [
+                    {
+                      "id": "rank-dot",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 170,
+                      "y": "{{y}}",
+                      "radius": 46,
+                      "fill": "{{first | then:\"sun\",\"white\"}}",
+                      "stroke": "ink",
+                      "strokeWidth": 9
+                    },
+                    { "id": "rank", "type": "text", "text": "{{item.rank}}", "x": 170, "y": "{{y | add:21}}", "size": 58, "font": "d7", "color": "ink", "align": "center" },
+                    {
+                      "id": "img",
+                      "type": "image",
+                      "src": "{{item.user.avatar}}",
+                      "title": "{{item.user.name}}",
+                      "x": 248,
+                      "y": "{{y | sub:58}}",
+                      "width": 116,
+                      "height": 116,
+                      "clip": { "shape": "circle", "x": 306, "y": "{{y}}", "radius": 58 },
+                      "border": { "width": 9, "color": "ink" },
+                      "fallback": "avatar"
+                    },
+                    {
+                      "id": "name",
+                      "type": "text",
+                      "text": "{{item.user.name}}",
+                      "x": 395,
+                      "y": "{{y | add:22}}",
+                      "size": 64,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "left",
+                      "fit": "step",
+                      "minSize": 40,
+                      "maxWidth": 520
+                    },
+                    {
+                      "id": "bar",
+                      "type": "shape",
+                      "shape": "roundRect",
+                      "x": 950,
+                      "y": "{{y | sub:42}}",
+                      "width": 90,
+                      "height": 84,
+                      "radius": 42,
+                      "fill": "{{index | mod:5 | pick:\"tom\",\"sky\",\"grass2\",\"sun\",\"coral\"}}",
+                      "stroke": "ink",
+                      "strokeWidth": 10,
+                      "lineJoin": "round",
+                      "animate": [
+                        {
+                          "prop": "width",
+                          "keys": [
+                            ["{{at}}", 90],
+                            ["{{te}}", "{{full}}", "back:1.2"]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "h",
+                      "type": "text",
+                      "text": "{{item.hours | hours:\"number\"}} h",
+                      "x": 1070,
+                      "y": "{{y | add:20}}",
+                      "size": 56,
+                      "font": "b8",
+                      "color": "ink",
+                      "align": "left",
+                      "animate": [
+                        {
+                          "prop": "x",
+                          "keys": [
+                            ["{{at}}", 1070],
+                            ["{{te}}", "{{full | add:980}}", "back:1.2"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "superlatives": {
+          "background": "tom",
+          "vars": { "sp": "server.superlatives" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "s1",
+              "type": "shape",
+              "shape": "star",
+              "x": 90,
+              "y": 1000,
+              "radius": 46,
+              "fill": "sun",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": 20.053523 }]
+            },
+            {
+              "id": "s2",
+              "type": "shape",
+              "shape": "star",
+              "x": 1820,
+              "y": 990,
+              "radius": 64,
+              "fill": "sky",
+              "stroke": "ink",
+              "strokeWidth": 8,
+              "lineJoin": "round",
+              "animate": [{ "prop": "angle", "rate": -17.188734 }]
+            },
+            {
+              "id": "cards",
+              "type": "repeat",
+              "x": 960,
+              "y": 545,
+              "layout": "grid",
+              "columns": 2,
+              "pitch": [830, 440],
+              "items": [
+                { "label": "Most movies:", "u": "{{sp.mostMovies.user.name}}", "v": "{{sp.mostMovies.value}}", "t": "({{sp.mostMovies.value | number}})", "c": "sky" },
+                { "label": "Most episodes:", "u": "{{sp.mostEpisodes.user.name}}", "v": "{{sp.mostEpisodes.value}}", "t": "({{sp.mostEpisodes.value | number}})", "c": "sun" },
+                {
+                  "label": "Most rewatches:",
+                  "u": "{{sp.mostRewatches.user.name}}",
+                  "v": "{{sp.mostRewatches.value}}",
+                  "t": "({{sp.mostRewatches.value | number}})",
+                  "c": "grass2"
+                },
+                { "label": "Most music:", "u": "{{sp.mostMusic.user.name}}", "v": "{{sp.mostMusic.value}}", "t": "({{sp.mostMusic.value | hours}})", "c": "coral" }
+              ],
+              "where": "item.v > 0",
+              "vars": { "at": "{{index | mul:0.8 | add:0.4}}" },
+              "template": [
+                {
+                  "id": "card",
+                  "type": "group",
+                  "rotation": "{{index | pick:-2,1.5,1.5,-2}}",
+                  "in": { "preset": "pop", "at": "{{at}}", "args": { "pd": 0.5 } },
+                  "children": [
+                    {
+                      "id": "box",
+                      "type": "shape",
+                      "shape": "roundRect",
+                      "x": -380,
+                      "y": -190,
+                      "width": 760,
+                      "height": 380,
+                      "radius": 60,
+                      "fill": "white",
+                      "stroke": "ink",
+                      "strokeWidth": 12,
+                      "lineJoin": "round"
+                    },
+                    {
+                      "id": "badge",
+                      "type": "shape",
+                      "shape": "star",
+                      "x": -350,
+                      "y": -165,
+                      "radius": 62,
+                      "fill": "{{item.c}}",
+                      "stroke": "ink",
+                      "strokeWidth": 9,
+                      "lineJoin": "round",
+                      "animate": [{ "prop": "angle", "rate": 22.918312 }]
+                    },
+                    { "id": "label", "type": "text", "text": "{{item.label}}", "x": 0, "y": -80, "size": 60, "font": "d6", "color": "ink", "align": "center" },
+                    {
+                      "id": "who",
+                      "type": "text",
+                      "text": "{{item.u}}",
+                      "x": 0,
+                      "y": 55,
+                      "size": 120,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 640
+                    },
+                    {
+                      "id": "v",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": 0,
+                      "y": 125,
+                      "size": 54,
+                      "font": "d7",
+                      "color": "ink",
+                      "align": "center",
+                      "box": { "padX": 37.8, "height": 83.7, "fill": "{{item.c}}", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "music": {
+          "elements": [
+            { "id": "hours", "children": [{ "id": "t", "value": "{{server.music.hours}}" }] },
+            { "id": "artist", "children": [{ "id": "t", "text": "Top artist: {{server.music.topArtist.name}}." }] },
+            { "id": "songs-head", "when": "server.music.topSongs | count > 0" },
+            { "id": "songs", "items": "{{server.music.topSongs | take:3}}" }
+          ]
+        },
+        "lineup": {
+          "background": "sky",
+          "vars": {
+            "all": "server.lineup",
+            "grown": "all | where:\"isKid\",false",
+            "kids": "all | where:\"isKid\",true",
+            "gN": "grown | count",
+            "kN": "kids | count",
+            "gp": "gN | div:6 | ceil",
+            "kp": "kN | div:6 | ceil",
+            "pages": "gp | atLeast:kp | atLeast:1",
+            "gper": "gN | div:pages | ceil",
+            "kper": "kN | div:pages | ceil",
+            "pgd": "slide.duration | div:pages"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "cloud1",
+              "type": "group",
+              "x": -280,
+              "y": 10,
+              "animate": [{ "prop": "x", "rate": 28 }],
+              "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+            },
+            {
+              "id": "cloud2",
+              "type": "group",
+              "x": 1500,
+              "y": 930,
+              "scale": 0.7,
+              "animate": [{ "prop": "x", "rate": 18 }],
+              "children": [{ "id": "cloud", "type": "image", "src": "img/cloud.svg", "x": -1, "y": -33, "width": 332, "height": 170, "fit": "fill" }]
+            },
+            {
+              "id": "pages",
+              "type": "repeat",
+              "count": "{{pages}}",
+              "vars": {
+                "glo": "{{index | mul:gper}}",
+                "klo": "{{index | mul:kper}}",
+                "gs": "grown | skip:glo | take:gper",
+                "ks": "kids | skip:klo | take:kper",
+                "gc": "gs | count",
+                "kc": "ks | count",
+                "both": "gc > 0 && kc > 0",
+                "yG": "{{both | then:290,520}}",
+                "yK": "{{both | then:760,520}}",
+                "rowN": "gc | atLeast:kc",
+                "pitch": "{{1800 | div:rowN | atMost:380}}",
+                "ps": "{{index | mul:pgd}}",
+                "gAt": "{{ps | add:0.3}}",
+                "kAt": "{{gc | mul:0.3 | add:gAt | add:0.3}}",
+                "last": "index | add:1 >= pages",
+                "pe": "{{index | add:1 | mul:pgd}}",
+                "pend": "{{last | then:100000,pe}}"
+              },
+              "template": [
+                {
+                  "id": "page",
+                  "type": "group",
+                  "end": "{{pend}}",
+                  "children": [
+                    {
+                      "id": "gHead",
+                      "type": "group",
+                      "when": "gc > 0",
+                      "pivot": [960, "{{yG | sub:150}}"],
+                      "in": { "preset": "pop", "at": "{{gAt}}" },
+                      "children": [
+                        {
+                          "id": "t",
+                          "type": "text",
+                          "text": "Grown-ups",
+                          "x": 960,
+                          "y": "{{yG | sub:150}}",
+                          "size": 56,
+                          "font": "d7",
+                          "color": "ink",
+                          "align": "center",
+                          "box": { "padX": 39.2, "height": 86.8, "fill": "sun", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "gRow",
+                      "type": "repeat",
+                      "items": "{{gs}}",
+                      "x": 960,
+                      "y": "{{yG}}",
+                      "layout": "row",
+                      "pitch": "{{pitch}}",
+                      "vars": { "at": "{{index | mul:0.3 | add:gAt | add:0.3}}" },
+                      "template": [
+                        {
+                          "id": "who",
+                          "type": "group",
+                          "in": { "preset": "pop", "at": "{{at}}" },
+                          "children": [
+                            {
+                              "id": "img",
+                              "type": "image",
+                              "src": "{{item.avatar}}",
+                              "title": "{{item.name}}",
+                              "x": -80,
+                              "y": -80,
+                              "width": 160,
+                              "height": 160,
+                              "clip": { "shape": "circle", "x": 0, "y": 0, "radius": 80 },
+                              "border": { "width": 11, "color": "ink" },
+                              "fallback": "avatar"
+                            },
+                            {
+                              "id": "name",
+                              "type": "text",
+                              "text": "{{item.name}}",
+                              "x": 0,
+                              "y": 125,
+                              "size": 46,
+                              "font": "d7",
+                              "color": "ink",
+                              "align": "center",
+                              "fit": "step",
+                              "minSize": 32,
+                              "maxWidth": "{{pitch | sub:100}}",
+                              "box": { "padX": 30, "height": 72, "fill": "white", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+                            },
+                            {
+                              "id": "role",
+                              "type": "text",
+                              "text": "{{item.persona.name}}",
+                              "x": 0,
+                              "y": 205,
+                              "size": 34,
+                              "font": "b8",
+                              "color": "ink",
+                              "align": "center",
+                              "fit": "wraplines",
+                              "lines": 2,
+                              "maxWidth": "{{pitch | sub:24}}",
+                              "lineHeight": 1.05
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "kHead",
+                      "type": "group",
+                      "when": "kc > 0",
+                      "pivot": [960, "{{yK | sub:150}}"],
+                      "in": { "preset": "pop", "at": "{{kAt}}" },
+                      "children": [
+                        {
+                          "id": "t",
+                          "type": "text",
+                          "text": "Kids",
+                          "x": 960,
+                          "y": "{{yK | sub:150}}",
+                          "size": 56,
+                          "font": "d7",
+                          "color": "ink",
+                          "align": "center",
+                          "box": { "padX": 39.2, "height": 86.8, "fill": "tom", "stroke": "ink", "strokeWidth": 12, "shift": 0.36 }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "kRow",
+                      "type": "repeat",
+                      "items": "{{ks}}",
+                      "x": 960,
+                      "y": "{{yK}}",
+                      "layout": "row",
+                      "pitch": "{{pitch}}",
+                      "vars": { "at": "{{index | mul:0.3 | add:kAt | add:0.3}}" },
+                      "template": [
+                        {
+                          "id": "who",
+                          "type": "group",
+                          "in": { "preset": "pop", "at": "{{at}}" },
+                          "children": [
+                            {
+                              "id": "img",
+                              "type": "image",
+                              "src": "{{item.avatar}}",
+                              "title": "{{item.name}}",
+                              "x": -80,
+                              "y": -80,
+                              "width": 160,
+                              "height": 160,
+                              "clip": { "shape": "circle", "x": 0, "y": 0, "radius": 80 },
+                              "border": { "width": 11, "color": "ink" },
+                              "fallback": "avatar"
+                            },
+                            {
+                              "id": "name",
+                              "type": "text",
+                              "text": "{{item.name}}",
+                              "x": 0,
+                              "y": 125,
+                              "size": 46,
+                              "font": "d7",
+                              "color": "ink",
+                              "align": "center",
+                              "fit": "step",
+                              "minSize": 32,
+                              "maxWidth": "{{pitch | sub:100}}",
+                              "box": { "padX": 30, "height": 72, "fill": "sun", "stroke": "ink", "strokeWidth": 10, "shift": 0.36 }
+                            },
+                            {
+                              "id": "role",
+                              "type": "text",
+                              "text": "{{item.persona.name}}",
+                              "x": 0,
+                              "y": 205,
+                              "size": 34,
+                              "font": "b8",
+                              "color": "ink",
+                              "align": "center",
+                              "fit": "wraplines",
+                              "lines": 2,
+                              "maxWidth": "{{pitch | sub:24}}",
+                              "lineHeight": 1.05
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "summary": {
+          "vars": {
+            "sayK": "kOne | then:kName,\"kids\"",
+            "sayW": "kidsWin | then:sayK,\"grown-ups\"",
+            "sayE": "(groups.moreEpisodes == \"kids\") | then:sayK,\"grown-ups\"",
+            "eKs": "groups.kids.episodes | div:groups.kids.count",
+            "eGs": "groups.grownups.episodes | div:groups.grownups.count",
+            "wTwist": "{{sayW}} by hours, {{sayE}} by episodes",
+            "wOut": "{{sayW}} out-watched",
+            "eWs": "kidsWin | then:eKs,eGs",
+            "tw": "twist && eWs > 0",
+            "wText": "tw | then:wTwist,wOut",
+            "winner": "groups.hasSplit | then:wText"
+          },
+          "elements": [
+            { "id": "initial", "children": [{ "id": "t", "text": "{{server.name | initial}}" }] },
+            { "id": "hours", "children": [{ "id": "t", "text": "{{server.totals.hours | hours:\"number\"}} h" }] },
+            {
+              "id": "show",
+              "when": "server.topSeries | count > 0",
+              "children": [
+                { "id": "p", "src": "{{server.topSeries[0].poster}}", "title": "{{server.topSeries[0].title}}" },
+                { "id": "t", "text": "{{server.topSeries[0].title}}" }
+              ]
+            },
+            {
+              "id": "movie",
+              "when": "server.topMovies | count > 0",
+              "children": [
+                { "id": "p", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" },
+                { "id": "t", "text": "{{server.topMovies[0].title}}" }
+              ]
+            },
+            { "id": "genre-chip", "when": "server.topGenres | count > 0", "children": [{ "id": "genre", "text": "{{server.topGenres[0].name}}" }] },
+            { "id": "persona-chip", "when": "winner", "children": [{ "id": "persona", "text": "{{winner}}" }] }
+          ]
+        },
+        "outro": {
+          "elements": [{ "id": "card", "children": [{ "id": "t", "text": "That was {{server.possessiveInline}} {{year}}.", "fit": "title", "size2": 72, "y2": 470 }] }]
+        }
+      }
+    }
+  }
+}

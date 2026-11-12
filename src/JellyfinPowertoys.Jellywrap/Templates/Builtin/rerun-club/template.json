@@ -1,0 +1,4022 @@
+{
+  "id": "rerun-club",
+  "name": "Rerun Club",
+  "audience": "general",
+  "extends": { "individual": "adult", "server": "server" },
+  "fonts": {
+    "d": ["fonts/Shrikhand-400.ttf"],
+    "b": ["fonts/Karla-800.ttf"]
+  },
+  "palette": {
+    "mustard": "#E0A526",
+    "rust": "#B5532F",
+    "teal": "#2F6F73",
+    "cream": "#F6EBD9",
+    "walnut": "#3A2A1F",
+    "rustDark": "#8E3E20",
+    "paper": "#FFFBF3",
+    "wood2": "#4A3628",
+    "wood3": "#2B1F16",
+    "off": "#120C08",
+    "coral": "#FF7F6E",
+    "glow": "#FFFAEE"
+  },
+  "background": "#120C08",
+  "transition": { "type": "switch", "duration": 0.8 },
+  "open": { "type": "switch", "duration": 0.5, "ease": "linear" },
+  "close": { "type": "switch", "duration": 1.0, "ease": "linear", "end": 0.1 },
+  "card": { "slide": "intro", "time": 5 },
+  "presets": {
+    "up": [
+      {
+        "prop": "opacity",
+        "keys": [
+          [0, 0],
+          ["{{dur | default:0.7}}", 1, "out"]
+        ]
+      },
+      {
+        "prop": "y",
+        "keys": [
+          [0, "+{{dist | default:50}}"],
+          ["{{dur | default:0.7}}", "+0", "out"]
+        ]
+      }
+    ],
+    "tick": [
+      {
+        "prop": "scaleY",
+        "keys": [
+          [0, 0],
+          [0.3, 1, "back:1.2"]
+        ],
+        "min": 0.02
+      },
+      {
+        "prop": "opacity",
+        "keys": [
+          [0, 0],
+          [0.000001, 1, "step"]
+        ]
+      }
+    ]
+  },
+  "fallbacks": {
+    "poster": [
+      { "id": "fb-fill", "type": "shape", "shape": "rect", "x": 0, "y": 0, "width": "{{box.width}}", "height": "{{box.height}}", "fill": "rust" },
+      {
+        "id": "fb-band",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "b",
+        "color": "rgba(0, 0, 0, 0)",
+        "align": "center",
+        "fit": "wraplines",
+        "lines": 3,
+        "size": "{{box.width | mul:0.12 | round | atLeast:12}}",
+        "maxWidth": "{{box.width | mul:0.82}}",
+        "lineHeight": 1.1,
+        "roundLineHeight": false,
+        "x": "{{box.width | div:2}}",
+        "y": 0,
+        "y2": "{{box.width | mul:0.12 | round | atLeast:12 | mul:-0.75 | add:box.height}}",
+        "box": { "padX": "{{box.width}}", "height": "{{box.width | mul:0.12 | round | atLeast:12 | mul:2.3}}", "radius": 0, "fill": "#6B3A25", "shift": 0 }
+      },
+      {
+        "id": "fbt",
+        "type": "text",
+        "text": "{{title}}",
+        "font": "b",
+        "color": "cream",
+        "align": "center",
+        "fit": "wraplines",
+        "lines": 3,
+        "size": "{{box.width | mul:0.12 | round | atLeast:12}}",
+        "maxWidth": "{{box.width | mul:0.82}}",
+        "lineHeight": 1.1,
+        "roundLineHeight": false,
+        "x": "{{box.width | div:2}}",
+        "y": 0,
+        "y2": "{{box.width | mul:0.12 | round | atLeast:12 | mul:-0.75 | add:box.height}}"
+      }
+    ]
+  },
+  "slides": {
+    "intro": {
+      "background": "cream",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "items": [
+            { "y": 840, "c": "mustard" },
+            { "y": 932, "c": "rust" },
+            { "y": 1024, "c": "teal" }
+          ],
+          "vars": { "at": "{{index | mul:0.15 | add:0.3}}" },
+          "template": [
+            {
+              "id": "s",
+              "type": "group",
+              "x": 960,
+              "y": "{{item.y}}",
+              "rotation": -6.016056848873643,
+              "children": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": -1300,
+                  "y": -40,
+                  "width": 0,
+                  "height": 80,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 2600, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tv",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.9, "dist": 90 } },
+          "children": [
+            { "id": "tv-legs", "type": "image", "src": "img/tv-legs.svg", "x": 439, "y": 859, "width": 1042, "height": 92, "fit": "fill" },
+            { "id": "cabinet", "type": "effect", "effect": "wood", "x": 300, "y": 60, "width": 1320, "height": 820, "radius": 112 },
+            { "id": "tv-front", "type": "image", "src": "img/tv-front.svg", "x": 351, "y": 111, "width": 1218, "height": 730, "fit": "fill" },
+            { "id": "brand", "type": "text", "text": "JELLYWRAP", "x": 960, "y": 822, "size": 32, "font": "b", "color": "walnut", "align": "center" },
+            {
+              "id": "picture",
+              "type": "group",
+              "clip": { "shape": "roundRect", "x": 352, "y": 112, "width": 1216, "height": 640, "radius": 88 },
+              "children": [
+                {
+                  "id": "name",
+                  "type": "group",
+                  "in": { "preset": "up", "at": 0.9 },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{me.name}},",
+                      "x": 960,
+                      "y": 430,
+                      "size": 200,
+                      "font": "d",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 1080
+                    }
+                  ]
+                },
+                {
+                  "id": "year",
+                  "type": "group",
+                  "in": { "preset": "up", "at": 1.2 },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "your {{year}} on Jellyfin",
+                      "x": 960,
+                      "y": 560,
+                      "size": 76,
+                      "font": "b",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 1080
+                    }
+                  ]
+                },
+                {
+                  "id": "since",
+                  "type": "group",
+                  "when": "dataStartsLate",
+                  "in": { "preset": "up", "at": 1.5 },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "since {{dataStart | date:\"MMM d\"}}",
+                      "x": 960,
+                      "y": 660,
+                      "size": 56,
+                      "font": "b",
+                      "color": "mustard",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 1080
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "total-time": {
+      "background": "mustard",
+      "vars": {
+        "mins": "me.totals.hours < 1",
+        "m": "me.totals.hours | mul:60 | round | atLeast:1",
+        "unitM": "(m == 1) | then:\"minute\",\"minutes\"",
+        "unit": "mins | then:unitM,\"hours\"",
+        "hasDays": "(me.totals.days | round) >= 1"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "band1",
+          "type": "shape",
+          "shape": "rect",
+          "x": -240,
+          "y": 0,
+          "width": 120,
+          "height": 1080,
+          "fill": "rust",
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0.1, -240],
+                [0.9, 0, "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "band2",
+          "type": "shape",
+          "shape": "rect",
+          "x": -120,
+          "y": 0,
+          "width": 120,
+          "height": 1080,
+          "fill": "teal",
+          "animate": [
+            {
+              "prop": "x",
+              "keys": [
+                [0.25, -120],
+                [1.05, 120, "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "spent",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "You spent", "x": 380, "y": 210, "size": 68, "font": "b", "color": "walnut" }]
+        },
+        {
+          "id": "count",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.5, "args": { "dur": 0.9 } },
+          "children": [
+            {
+              "id": "h",
+              "type": "text",
+              "when": "!mins",
+              "value": "{{me.totals.hours}}",
+              "text": "{{value | mul:10 | round | div:10 | add:0.000001 | hours:\"number\"}}",
+              "x": 370,
+              "y": 585,
+              "size": 380,
+              "font": "d",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 1460,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.6, 0],
+                    [3.0, 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.0, "+0"],
+                    [3.175, "+14", "sine-out"],
+                    [3.35, "+0", "sine-in"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "m",
+              "type": "text",
+              "when": "mins",
+              "value": "{{m}}",
+              "text": "{{value | round}}",
+              "x": 370,
+              "y": 585,
+              "size": 380,
+              "font": "d",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 1460,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.6, 0],
+                    [3.0, 1, "out"]
+                  ]
+                },
+                {
+                  "prop": "y",
+                  "keys": [
+                    [3.0, "+0"],
+                    [3.175, "+14", "sine-out"],
+                    [3.35, "+0", "sine-in"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "underline",
+          "type": "shape",
+          "shape": "rect",
+          "x": 380,
+          "y": 640,
+          "width": 0,
+          "height": 24,
+          "fill": "teal",
+          "animate": [
+            {
+              "prop": "width",
+              "keys": [
+                [3.0, 0],
+                [3.6, 780, "out"]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "unit",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{unit}} with Jellyfin{{hasDays | then:\" —\",\".\"}}",
+              "x": 380,
+              "y": 800,
+              "size": 116,
+              "font": "d",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 1460
+            }
+          ]
+        },
+        {
+          "id": "days",
+          "type": "group",
+          "when": "hasDays",
+          "in": { "preset": "up", "at": 3.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "that's {{me.totals.days | round}} days.",
+              "x": 380,
+              "y": 930,
+              "size": 64,
+              "font": "b",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 1460
+            }
+          ]
+        }
+      ]
+    },
+    "rhythm": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "up",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "You showed up on", "x": 160, "y": 190, "size": 72, "font": "b", "color": "cream" }]
+        },
+        {
+          "id": "days",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.rhythm.activeDays}}",
+              "text": "{{value | round}} days.",
+              "x": 160,
+              "y": 400,
+              "size": 220,
+              "font": "d",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 1600,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.4, 0],
+                    [2.6, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "streak",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Longest streak: {{me.rhythm.streak}} days ({{me.rhythm.streakFrom | date:\"MMM d\"}} – {{me.rhythm.streakTo | date:\"MMM d\"}}).",
+              "x": 160,
+              "y": 545,
+              "size": 60,
+              "font": "b",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 1600
+            }
+          ]
+        },
+        {
+          "id": "board",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.2 },
+          "children": [
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 160, "y": 610, "width": 1600, "height": 360, "radius": 40 },
+            {
+              "id": "bulbs",
+              "type": "repeat",
+              "count": "{{me.rhythm.streak}}",
+              "x": 960,
+              "y": 790,
+              "layout": "grid",
+              "columns": 13,
+              "rows": 2,
+              "fit": "area",
+              "balance": true,
+              "pitch": [118, 150],
+              "align": "center",
+              "vars": { "step": "{{1.69 | div:count | atMost:0.065}}", "at": "{{step | mul:index | add:1.6}}" },
+              "template": [
+                { "id": "socket", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 34, "fill": "wood3" },
+                {
+                  "id": "lit",
+                  "type": "group",
+                  "animate": [
+                    {
+                      "prop": "opacity",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.2}}", 1]
+                      ]
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "halo",
+                      "type": "shape",
+                      "shape": "circle",
+                      "x": 0,
+                      "y": 0,
+                      "radius": 72,
+                      "fill": {
+                        "type": "radial",
+                        "from": [0, 0, 20],
+                        "to": [0, 0, 72],
+                        "stops": [
+                          [0, "rgba(240, 190, 80, 0.75)"],
+                          [1, "rgba(240, 190, 80, 0)"]
+                        ]
+                      }
+                    },
+                    { "id": "bulb", "type": "shape", "shape": "circle", "x": 0, "y": 0, "radius": 34, "fill": "mustard" },
+                    { "id": "shine", "type": "shape", "shape": "circle", "x": -10, "y": -10, "radius": 9, "fill": "#FFE7A6" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "mix": {
+      "background": "cream",
+      "vars": { "tvp": "me.mix.tv | mul:100 | round", "mvp": "me.mix.movies | mul:100 | round", "mup": "me.mix.music | mul:100 | round" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "mtv", "type": "text", "text": "{{tvp}}% TV", "size": 110, "font": "d", "opacity": 0 },
+        { "id": "mmv", "type": "text", "text": "{{mvp}}% movies", "size": 110, "font": "d", "opacity": 0 },
+        { "id": "mmu", "type": "text", "text": "{{mup}}% music", "size": 110, "font": "d", "opacity": 0 },
+        {
+          "id": "parts",
+          "type": "repeat",
+          "x": 0,
+          "y": 450,
+          "layout": "column",
+          "pitch": 200,
+          "items": [
+            { "p": "{{tvp}}", "name": "TV", "c": "mustard" },
+            { "p": "{{mvp}}", "name": "movies", "c": "rust" },
+            { "p": "{{mup}}", "name": "music", "c": "teal" }
+          ],
+          "where": "item.p > 0",
+          "vars": {
+            "ft": "{{measure.mtv.width | mul:-1 | add:1800 | mul:100 | div:tvp}}",
+            "fm": "{{measure.mmv.width | mul:-1 | add:1800 | mul:100 | div:mvp}}",
+            "fu": "{{measure.mmu.width | mul:-1 | add:1800 | mul:100 | div:mup}}",
+            "full": "{{ft | atMost:fm | atMost:fu | atMost:1500}}",
+            "len": "{{full | mul:item.p | div:100}}",
+            "at": "{{index | mul:0.3 | add:0.4}}"
+          },
+          "template": [
+            {
+              "id": "bar",
+              "type": "shape",
+              "shape": "rect",
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 150,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:1.4}}", "{{len}}", "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "label",
+              "type": "group",
+              "in": { "preset": "up", "at": "{{at | add:0.5}}" },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "value": "{{item.p}}",
+                  "text": "{{value | round}}% {{item.name}}",
+                  "x": 40,
+                  "y": 112,
+                  "size": 110,
+                  "font": "d",
+                  "color": "walnut",
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:1.4}}", 1, "out"]
+                      ]
+                    },
+                    {
+                      "prop": "x",
+                      "keys": [
+                        ["{{at}}", 40],
+                        ["{{at | add:1.4}}", "{{len | add:40}}", "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "top-genre": {
+      "background": "rust",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "items": [
+            { "y": 972, "c": "mustard" },
+            { "y": 1010, "c": "cream" },
+            { "y": 1048, "c": "teal" }
+          ],
+          "vars": { "at": "{{index | mul:0.15 | add:0.2}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": -340,
+              "y": "{{item.y}}",
+              "width": 0,
+              "height": 30,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.9}}", 2600, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dial",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.8, "dist": 60 } },
+          "children": [
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 260, "y": 340, "width": 520, "height": 520, "radius": 260 },
+            { "id": "dial", "type": "image", "src": "img/dial.svg", "x": 304, "y": 384, "width": 432, "height": 432, "fit": "fill" },
+            {
+              "id": "g1",
+              "type": "text",
+              "text": "{{me.topGenres[0].name}}",
+              "x": 304.6661507550093,
+              "y": 358.3751115551424,
+              "size": 44,
+              "font": "b",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 240,
+              "color": "rgba(246, 235, 217, 0.5)",
+              "animate": [
+                {
+                  "prop": "color",
+                  "keys": [
+                    [0, "rgba(246, 235, 217, 0.5)"],
+                    [1.6467521711797446, "cream", "step"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "g2",
+              "type": "text",
+              "when": "me.topGenres | count > 1",
+              "text": "{{me.topGenres[1].name}}",
+              "x": 520,
+              "y": 280,
+              "size": 44,
+              "font": "b",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 480,
+              "color": "rgba(246, 235, 217, 0.5)",
+              "animate": [
+                {
+                  "prop": "color",
+                  "keys": [
+                    [0, "rgba(246, 235, 217, 0.5)"],
+                    [1.0467521711797445, "cream", "step"],
+                    [1.6467521711797446, "rgba(246, 235, 217, 0.5)", "step"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "g3",
+              "type": "text",
+              "when": "me.topGenres | count > 2",
+              "text": "{{me.topGenres[2].name}}",
+              "x": 735.3338492449907,
+              "y": 358.3751115551424,
+              "size": 44,
+              "font": "b",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 240,
+              "color": "cream",
+              "animate": [
+                {
+                  "prop": "color",
+                  "keys": [
+                    [0, "cream"],
+                    [1.0467521711797445, "rgba(246, 235, 217, 0.5)", "step"]
+                  ]
+                }
+              ]
+            },
+            { "id": "knob", "type": "effect", "effect": "wood", "x": 390, "y": 470, "width": 260, "height": 260, "radius": 130 },
+            {
+              "id": "hand",
+              "type": "shape",
+              "shape": "line",
+              "x1": 520,
+              "y1": 600,
+              "x2": 520,
+              "y2": 482,
+              "stroke": "mustard",
+              "strokeWidth": 16,
+              "lineCap": "round",
+              "pivot": [520, 600],
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    [1.0, 40],
+                    [1.35, 0, "back:1.5"],
+                    [1.6, 0],
+                    [1.95, -40, "back:1.5"]
+                  ]
+                }
+              ]
+            },
+            { "id": "hub", "type": "shape", "shape": "circle", "x": 520, "y": 600, "radius": 30, "fill": "wood3" }
+          ]
+        },
+        {
+          "id": "head",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.4 },
+          "children": [{ "id": "t", "type": "text", "text": "Your genre:", "x": 1020, "y": 300, "size": 72, "font": "b", "color": "cream" }]
+        },
+        {
+          "id": "genre",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.0 },
+          "children": [
+            { "id": "t", "type": "text", "text": "{{me.topGenres[0].name}}", "x": 1020, "y": 520, "size": 220, "font": "d", "color": "cream", "fit": "line", "maxWidth": 860 }
+          ]
+        },
+        {
+          "id": "share",
+          "type": "group",
+          "when": "me.topGenres[0].share != null",
+          "in": { "preset": "up", "at": 2.3 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topGenres[0].share | percent}}",
+              "x": 1060,
+              "y": 635,
+              "size": 72,
+              "font": "b",
+              "color": "mustard",
+              "box": { "padX": 40, "height": 110, "radius": 55, "fill": "walnut", "shift": 0.3472222222222222 }
+            }
+          ]
+        },
+        {
+          "id": "then",
+          "type": "group",
+          "when": "me.topGenres | count > 1",
+          "in": { "preset": "up", "at": 2.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Then {{me.topGenres | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}.",
+              "x": 1020,
+              "y": 820,
+              "size": 60,
+              "font": "b",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        }
+      ]
+    },
+    "top-series": {
+      "background": "cream",
+      "vars": { "n": "(me.topSeries | count >= 5) | then:5,3", "y0": "{{n | mul:-82 | add:610}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "head",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Your top shows", "x": 96, "y": 150, "size": 88, "font": "d", "color": "rust" }]
+        },
+        {
+          "id": "marks",
+          "type": "repeat",
+          "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "teal" }],
+          "vars": { "at": "{{index | mul:0.15 | add:0.3}}" },
+          "template": [
+            {
+              "id": "m",
+              "type": "shape",
+              "shape": "roundRect",
+              "x": "{{index | mul:80 | add:1594}}",
+              "y": 112,
+              "width": 0,
+              "height": 14,
+              "radius": 7,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.9}}", 70, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rows",
+          "type": "repeat",
+          "items": "{{me.topSeries | take:n}}",
+          "x": 0,
+          "y": "{{y0}}",
+          "layout": "column",
+          "pitch": 164,
+          "align": "start",
+          "vars": { "first": "index == 0", "rest": "{{count | sub:1 | sub:index | mul:0.8 | add:0.8}}", "at": "{{first | then:4.4,rest}}" },
+          "template": [
+            {
+              "id": "row",
+              "type": "group",
+              "pivot": [0, 70],
+              "in": { "preset": "tick", "at": "{{at}}" },
+              "children": [
+                { "id": "card", "type": "shape", "shape": "roundRect", "x": 96, "y": 0, "width": 1728, "height": 140, "radius": 22, "fill": "paper" },
+                {
+                  "id": "hl",
+                  "type": "group",
+                  "when": "first",
+                  "clip": { "shape": "roundRect", "x": 96, "y": 0, "width": 1728, "height": 140, "radius": 22 },
+                  "children": [
+                    {
+                      "id": "f",
+                      "type": "shape",
+                      "shape": "rect",
+                      "x": 96,
+                      "y": 0,
+                      "width": 0,
+                      "height": 140,
+                      "fill": "mustard",
+                      "animate": [
+                        {
+                          "prop": "width",
+                          "keys": [
+                            [4.6, 0],
+                            [5.2, 1728, "out"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                { "id": "rank", "type": "text", "text": "{{index | add:1}}.", "x": 136, "y": 92, "size": 60, "font": "b", "color": "walnut" },
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "src": "{{item.poster}}",
+                  "title": "{{item.title}}",
+                  "x": 260,
+                  "y": 10,
+                  "width": 80,
+                  "height": 120,
+                  "radius": 6,
+                  "fallback": "poster"
+                },
+                {
+                  "id": "title",
+                  "type": "text",
+                  "text": "{{item.title}}",
+                  "x": 380,
+                  "y": 94,
+                  "y2": 108,
+                  "size": 60,
+                  "size2": 44,
+                  "maxWidth": 1150,
+                  "fit": "title",
+                  "font": "d",
+                  "color": "walnut"
+                },
+                {
+                  "id": "hours",
+                  "type": "text",
+                  "text": "{{item.hours | default:0 | hours:\"number\"}} h",
+                  "x": 1784,
+                  "y": 92,
+                  "size": 56,
+                  "font": "b",
+                  "color": "walnut",
+                  "align": "right"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "top-movies": {
+      "vars": { "n": "(me.topMovies | count >= 5) | then:5,3", "nm1": "{{n | sub:1}}", "y0": "{{n | mul:-95 | add:695}}" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "wood", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 1920, "height": 1080, "radius": 0, "planks": 240 },
+        {
+          "id": "head",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Your top movies", "x": 96, "y": 150, "size": 88, "font": "d", "color": "mustard" }]
+        },
+        {
+          "id": "rest",
+          "type": "repeat",
+          "items": "{{me.topMovies | skip:1 | take:nm1}}",
+          "x": 0,
+          "y": "{{y0}}",
+          "layout": "column",
+          "pitch": 190,
+          "align": "start",
+          "vars": { "at": "{{count | sub:1 | sub:index | mul:0.5 | add:0.8}}" },
+          "template": [
+            {
+              "id": "row",
+              "type": "group",
+              "pivot": [0, 80],
+              "in": { "preset": "tick", "at": "{{at}}" },
+              "children": [
+                { "id": "card", "type": "shape", "shape": "roundRect", "x": 680, "y": 0, "width": 1144, "height": 160, "radius": 22, "fill": "wood2" },
+                { "id": "rank", "type": "text", "text": "{{index | add:2}}.", "x": 720, "y": 102, "size": 60, "font": "b", "color": "mustard" },
+                {
+                  "id": "poster",
+                  "type": "image",
+                  "src": "{{item.poster}}",
+                  "title": "{{item.title}}",
+                  "x": 810,
+                  "y": 10,
+                  "width": 94,
+                  "height": 140,
+                  "radius": 6,
+                  "fallback": "poster"
+                },
+                {
+                  "id": "title",
+                  "type": "text",
+                  "text": "{{item.title}}",
+                  "x": 940,
+                  "y": 104,
+                  "y2": 120,
+                  "size": 56,
+                  "size2": 44,
+                  "maxWidth": 850,
+                  "fit": "title",
+                  "font": "d",
+                  "color": "cream"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "top",
+          "type": "group",
+          "in": { "preset": "up", "at": 3.3, "args": { "dur": 0.9, "dist": 120 } },
+          "children": [
+            { "id": "frame", "type": "shape", "shape": "roundRect", "x": 140, "y": 210, "width": 440, "height": 640, "radius": 18, "fill": "cream" },
+            {
+              "id": "poster",
+              "type": "image",
+              "src": "{{me.topMovies[0].poster}}",
+              "title": "{{me.topMovies[0].title}}",
+              "x": 180,
+              "y": 250,
+              "width": 360,
+              "height": 540,
+              "radius": 8,
+              "fallback": "poster"
+            },
+            { "id": "tag", "type": "shape", "shape": "roundRect", "x": 120, "y": 190, "width": 120, "height": 90, "radius": 16, "fill": "mustard" },
+            { "id": "rank", "type": "text", "text": "1.", "x": 180, "y": 256, "size": 60, "font": "b", "color": "walnut", "align": "center" }
+          ]
+        },
+        {
+          "id": "top-title",
+          "type": "group",
+          "in": { "preset": "up", "at": 3.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topMovies[0].title}}",
+              "x": 360,
+              "y": 950,
+              "y2": 1000,
+              "size": 72,
+              "size2": 54,
+              "maxWidth": 560,
+              "fit": "title",
+              "font": "d",
+              "color": "cream",
+              "align": "center"
+            }
+          ]
+        }
+      ]
+    },
+    "top-actor": {
+      "background": "teal",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "edges",
+          "type": "repeat",
+          "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "cream" }],
+          "vars": { "at": "{{index | mul:0.15 | add:0.1}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": "{{index | mul:40}}",
+              "y": 0,
+              "width": 40,
+              "height": 1080,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    ["{{at}}", "-120"],
+                    ["{{at | add:0.8}}", "+0", "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "photo",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.3, "args": { "dur": 0.9, "dist": 70 } },
+          "children": [
+            { "id": "portrait-frame", "type": "image", "src": "img/portrait-frame.svg", "x": 259, "y": 209, "width": 562, "height": 702, "fit": "fill" },
+            {
+              "id": "img",
+              "type": "image",
+              "src": "{{me.topActors[0].image}}",
+              "x": 308,
+              "y": 260,
+              "width": 464,
+              "height": 600,
+              "clip": { "shape": "ellipse", "x": 540, "y": 560, "rx": 232, "ry": 300 },
+              "fallback": [
+                { "id": "fill", "type": "shape", "shape": "rect", "x": 0, "y": 0, "width": 464, "height": 600, "fill": "mustard" },
+                {
+                  "id": "initials",
+                  "type": "text",
+                  "text": "{{me.topActors[0].name | initials}}",
+                  "x": 232,
+                  "y": 380,
+                  "size": 220,
+                  "font": "d",
+                  "color": "walnut",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 420
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "spent",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.5 },
+          "children": [{ "id": "t", "type": "text", "text": "You spent", "x": 1000, "y": 250, "size": 72, "font": "b", "color": "cream" }]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.topActors[0].hours}}",
+              "text": "{{value | mul:10 | round | div:10 | add:0.000001 | hours:\"number\"}} hours",
+              "x": 1000,
+              "y": 460,
+              "size": 200,
+              "font": "d",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 860,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.7, 0],
+                    [2.7, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "with",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.4 },
+          "children": [
+            { "id": "t", "type": "text", "text": "with {{me.topActors[0].name}}.", "x": 1000, "y": 600, "size": 96, "font": "d", "color": "cream", "fit": "line", "maxWidth": 860 }
+          ]
+        },
+        {
+          "id": "then",
+          "type": "group",
+          "when": "me.topActors | count > 1",
+          "in": { "preset": "up", "at": 2.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Then {{me.topActors | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}.",
+              "x": 1000,
+              "y": 740,
+              "size": 56,
+              "font": "b",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "costars",
+          "type": "repeat",
+          "items": "{{me.topActors | skip:1 | take:2}}",
+          "x": 1070,
+          "y": 880,
+          "layout": "row",
+          "pitch": 170,
+          "align": "start",
+          "template": [
+            {
+              "id": "c",
+              "type": "group",
+              "in": { "preset": "up", "at": "{{index | mul:0.2 | add:2.5}}" },
+              "children": [
+                { "id": "e", "type": "shape", "shape": "ellipse", "x": 0, "y": 0, "rx": 62, "ry": 78, "fill": "{{index | pick:\"rust\",\"cream\"}}" },
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{item.name | initials}}",
+                  "x": 0,
+                  "y": 17,
+                  "size": 48,
+                  "font": "b",
+                  "color": "{{index | pick:\"cream\",\"walnut\"}}",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 100
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "binge": {
+      "background": "mustard",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "items": [
+            { "y": 915, "c": "rust" },
+            { "y": 975, "c": "teal" },
+            { "y": 1035, "c": "cream" }
+          ],
+          "vars": { "at": "{{index | mul:0.15 | add:0.3}}" },
+          "template": [
+            {
+              "id": "s",
+              "type": "group",
+              "x": 960,
+              "y": "{{item.y}}",
+              "rotation": -2.864788975654116,
+              "children": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": -1300,
+                  "y": -25,
+                  "width": 0,
+                  "height": 50,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 2600, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "date",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.binge.date | date:\"dddd, MMMM d\"}}:",
+              "x": 120,
+              "y": 190,
+              "size": 96,
+              "font": "d",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 1680
+            }
+          ]
+        },
+        {
+          "id": "tvs",
+          "type": "repeat",
+          "count": "{{me.binge.episodes}}",
+          "x": 120,
+          "y": 290,
+          "layout": "grid",
+          "fit": "box",
+          "fitBox": [1686, 230],
+          "pitch": [246, 232],
+          "cell": [210, 202],
+          "maxRows": "{{me.binge.episodes}}",
+          "columns": 1,
+          "align": "start",
+          "vars": {
+            "w1": "{{count | mul:246 | sub:36}}",
+            "k1": "{{1686 | div:w1 | atMost:1}}",
+            "w2": "{{count | div:2 | ceil | mul:246 | sub:36}}",
+            "k2": "{{1686 | div:w2 | atMost:0.5299539170506913}}",
+            "w3": "{{count | div:3 | ceil | mul:246 | sub:36}}",
+            "k3": "{{1686 | div:w3 | atMost:0.34534534534534533}}",
+            "w4": "{{count | div:4 | ceil | mul:246 | sub:36}}",
+            "k4": "{{1686 | div:w4 | atMost:0.2561247216035635}}",
+            "w5": "{{count | div:5 | ceil | mul:246 | sub:36}}",
+            "k5": "{{1686 | div:w5 | atMost:0.20353982300884957}}",
+            "w6": "{{count | div:6 | ceil | mul:246 | sub:36}}",
+            "k6": "{{1686 | div:w6 | atMost:0.16886930983847284}}",
+            "s": "{{k1 | atLeast:k2 | atLeast:k3 | atLeast:k4 | atLeast:k5 | atLeast:k6}}",
+            "nm1": "count | sub:1",
+            "step": "{{1.5 | div:nm1 | atMost:0.25}}",
+            "at": "{{step | mul:index | add:0.4}}",
+            "on": "{{step | mul:index | add:0.6}}",
+            "on2": "{{on | add:0.14}}",
+            "on3": "{{on | add:0.35}}"
+          },
+          "template": [
+            {
+              "id": "tv",
+              "type": "group",
+              "in": { "preset": "up", "at": "{{at}}", "args": { "dur": 0.4, "dist": "{{30 | div:s}}" } },
+              "children": [
+                { "id": "tv-small-legs", "type": "image", "src": "img/tv-small-legs.svg", "x": 29, "y": 175, "width": 152, "height": 28, "fit": "fill" },
+                { "id": "cabinet", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 210, "height": 180, "radius": 30 },
+                { "id": "glass", "type": "shape", "shape": "roundRect", "x": 16, "y": 16, "width": 178, "height": 134, "radius": 20, "fill": "off" },
+                {
+                  "id": "screen",
+                  "type": "group",
+                  "clip": { "shape": "roundRect", "x": 16, "y": 16, "width": 178, "height": 134, "radius": 20 },
+                  "children": [
+                    {
+                      "id": "line",
+                      "type": "shape",
+                      "shape": "rect",
+                      "anchor": "top",
+                      "x": 105,
+                      "y": 80,
+                      "width": 0,
+                      "height": 6,
+                      "fill": "glow",
+                      "end": "{{on2}}",
+                      "animate": [
+                        {
+                          "prop": "width",
+                          "keys": [
+                            ["{{on}}", 0],
+                            ["{{on2}}", 178, "out"]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "picture",
+                      "type": "group",
+                      "start": "{{on2}}",
+                      "clip": {
+                        "shape": "rect",
+                        "anchor": "left",
+                        "x": 16,
+                        "y": 83,
+                        "width": 178,
+                        "height": 6,
+                        "animate": [
+                          {
+                            "prop": "height",
+                            "keys": [
+                              ["{{on2}}", 0],
+                              ["{{on3}}", 134, "in-out"]
+                            ],
+                            "min": 6
+                          }
+                        ]
+                      },
+                      "children": [
+                        { "id": "bg", "type": "shape", "shape": "rect", "x": 16, "y": 16, "width": 178, "height": 134, "fill": "teal" },
+                        {
+                          "id": "n",
+                          "type": "text",
+                          "text": "{{index | add:1}}",
+                          "x": 105,
+                          "y": 111,
+                          "size": 80,
+                          "font": "d",
+                          "color": "cream",
+                          "align": "center",
+                          "fit": "line",
+                          "maxWidth": 162
+                        },
+                        {
+                          "id": "wash",
+                          "type": "shape",
+                          "shape": "rect",
+                          "x": 16,
+                          "y": 16,
+                          "width": 178,
+                          "height": 134,
+                          "fill": "rgba(255, 250, 238, 1)",
+                          "animate": [
+                            {
+                              "prop": "fill",
+                              "keys": [
+                                ["{{on2}}", "rgba(255, 250, 238, 1)"],
+                                ["{{on3}}", "rgba(255, 250, 238, 0)", "out:0.6"]
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "of",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.6 },
+          "children": [
+            { "id": "t1", "type": "text", "text": "{{me.binge.episodes}} episodes of", "x": 120, "y": 610, "size": 64, "font": "b", "color": "walnut" },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "{{me.binge.series.title}}",
+              "x": 120,
+              "y": 735,
+              "y2": 756,
+              "size": 104,
+              "size2": 64,
+              "maxWidth": 1680,
+              "fit": "title",
+              "font": "d",
+              "color": "walnut"
+            }
+          ]
+        },
+        {
+          "id": "sitting",
+          "type": "group",
+          "in": { "preset": "up", "at": 3.0 },
+          "children": [{ "id": "t", "type": "text", "text": "in one sitting.", "x": 120, "y": 840, "size": 64, "font": "b", "color": "walnut" }]
+        }
+      ]
+    },
+    "clock": {
+      "vars": {
+        "h12": "me.clock.peakHour | mod:12",
+        "hh": "(h12 == 0) | then:12,h12",
+        "H": "{{hh | mul:30}}",
+        "nightP": "me.clock.nightShare | mul:100 | round",
+        "late": "nightP >= 20"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "wood", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 1920, "height": 1080, "radius": 0, "planks": 240 },
+        {
+          "id": "clock",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.8, "dist": 60 } },
+          "children": [
+            { "id": "clock", "type": "image", "src": "img/clock.svg", "x": 200, "y": 220, "width": 679, "height": 679, "fit": "fill" },
+            {
+              "id": "minute",
+              "type": "shape",
+              "shape": "line",
+              "x1": 540,
+              "y1": 560,
+              "x2": 540,
+              "y2": 410,
+              "stroke": "walnut",
+              "strokeWidth": 10,
+              "lineCap": "round",
+              "pivot": [540, 560],
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    [0.5, 0],
+                    [2.0, "{{H | mul:12}}", "in-out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "hour",
+              "type": "shape",
+              "shape": "line",
+              "x1": 540,
+              "y1": 560,
+              "x2": 540,
+              "y2": 455,
+              "stroke": "walnut",
+              "strokeWidth": 20,
+              "lineCap": "round",
+              "pivot": [540, 560],
+              "animate": [
+                {
+                  "prop": "rotation",
+                  "keys": [
+                    [0.5, 0],
+                    [2.0, "{{H}}", "in-out"]
+                  ]
+                }
+              ]
+            },
+            { "id": "hub", "type": "shape", "shape": "circle", "x": 540, "y": 560, "radius": 16, "fill": "rust" }
+          ]
+        },
+        {
+          "id": "peak",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.4 },
+          "children": [{ "id": "t", "type": "text", "text": "Your peak hour:", "x": 1000, "y": 300, "size": 72, "font": "b", "color": "cream" }]
+        },
+        {
+          "id": "hour-label",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.clock.peakHour | hour}}.",
+              "x": 1000,
+              "y": 540,
+              "size": 230,
+              "font": "d",
+              "color": "mustard",
+              "fit": "line",
+              "maxWidth": 880
+            }
+          ]
+        },
+        {
+          "id": "share",
+          "type": "group",
+          "when": "late",
+          "in": { "preset": "up", "at": 2.2 },
+          "children": [
+            {
+              "id": "t1",
+              "type": "text",
+              "value": "{{nightP}}",
+              "text": "{{value | round}}% of your viewing",
+              "x": 1000,
+              "y": 720,
+              "size": 72,
+              "font": "b",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 860,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [2.2, 0],
+                    [3.2, 1, "out"]
+                  ]
+                }
+              ]
+            },
+            { "id": "t2", "type": "text", "text": "started after 10 pm.", "x": 1000, "y": 820, "size": 72, "font": "b", "color": "cream", "fit": "line", "maxWidth": 860 }
+          ]
+        }
+      ]
+    },
+    "busiest": {
+      "background": "cream",
+      "vars": {
+        "d0": "me.busiest.day",
+        "inMonth": "(d0 | month) == me.busiest.month",
+        "fwDay": "d0 | firstWeekday",
+        "fwYear": "me.busiest.month | firstWeekday:year",
+        "dmDay": "d0 | daysInMonth",
+        "dmYear": "me.busiest.month | daysInMonth:year",
+        "first": "inMonth | then:fwDay,fwYear",
+        "days": "inMonth | then:dmDay,dmYear",
+        "dnum": "d0 | date:\"%d\" | add:0",
+        "circled": "inMonth | then:dnum,0",
+        "py": "((first | add:days | div:7 | ceil) > 5) | then:80,88",
+        "ck": "circled | sub:1 | add:first",
+        "cx": "{{ck | mod:7 | mul:100 | add:220}}",
+        "cy": "{{ck | div:7 | floor | mul:py | add:520}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "items": [
+            { "y": 992, "c": "mustard" },
+            { "y": 1024, "c": "rust" },
+            { "y": 1056, "c": "teal" }
+          ],
+          "vars": { "at": "{{index | mul:0.15 | add:0.3}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": -340,
+              "y": "{{item.y}}",
+              "width": 0,
+              "height": 24,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.9}}", 2600, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "calendar",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.8, "dist": 60 } },
+          "children": [
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 140, "y": 190, "width": 760, "height": 790, "radius": 24 },
+            { "id": "calendar-page", "type": "image", "src": "img/calendar-page.svg", "x": 169, "y": 219, "width": 702, "height": 732, "fit": "fill" },
+            {
+              "id": "month",
+              "type": "text",
+              "text": "{{me.busiest.month}}",
+              "x": 520,
+              "y": 330,
+              "size": 96,
+              "font": "d",
+              "color": "cream",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 640
+            },
+            {
+              "id": "weekdays",
+              "type": "repeat",
+              "count": 7,
+              "template": [
+                {
+                  "id": "w",
+                  "type": "text",
+                  "text": "{{index | pick:\"S\",\"M\",\"T\",\"W\",\"T\",\"F\",\"S\"}}",
+                  "x": "{{index | mul:100 | add:220}}",
+                  "y": 440,
+                  "size": 34,
+                  "font": "b",
+                  "color": "rustDark",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "days",
+              "type": "repeat",
+              "count": "{{days}}",
+              "vars": { "k": "index | add:first" },
+              "template": [
+                {
+                  "id": "n",
+                  "type": "text",
+                  "text": "{{index | add:1}}",
+                  "x": "{{k | mod:7 | mul:100 | add:220}}",
+                  "y": "{{k | div:7 | floor | mul:py | add:520}}",
+                  "size": 42,
+                  "font": "b",
+                  "color": "walnut",
+                  "align": "center"
+                }
+              ]
+            },
+            {
+              "id": "ring",
+              "type": "shape",
+              "shape": "ellipse",
+              "when": "circled >= 1",
+              "x": "{{cx}}",
+              "y": "{{cy | sub:15}}",
+              "rx": 52,
+              "ry": "{{py | mul:42 | div:88}}",
+              "angle": -5.729577951308232,
+              "startAngle": -108,
+              "endAngle": -108,
+              "stroke": "rust",
+              "strokeWidth": 8,
+              "lineCap": "round",
+              "start": 1.6001,
+              "animate": [
+                {
+                  "prop": "endAngle",
+                  "keys": [
+                    [1.6, -108],
+                    [2.3, 266.4, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cap1",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.4 },
+          "children": [{ "id": "t", "type": "text", "text": "Busiest month:", "x": 1000, "y": 290, "size": 64, "font": "b", "color": "walnut" }]
+        },
+        {
+          "id": "month",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.busiest.month}} ({{me.busiest.monthHours | hours:\"number\"}} h).",
+              "x": 1000,
+              "y": 420,
+              "size": 120,
+              "font": "d",
+              "color": "rust",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        },
+        {
+          "id": "cap2",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.2 },
+          "children": [{ "id": "t", "type": "text", "text": "Busiest day:", "x": 1000, "y": 600, "size": 64, "font": "b", "color": "walnut" }]
+        },
+        {
+          "id": "day",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.5 },
+          "children": [
+            { "id": "t", "type": "text", "text": "{{d0 | date:\"dddd, MMMM d\"}}", "x": 1000, "y": 720, "size": 92, "font": "d", "color": "walnut", "fit": "line", "maxWidth": 860 }
+          ]
+        },
+        {
+          "id": "hm",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.8 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "({{me.busiest.dayHours | hm}}).",
+              "x": 1000,
+              "y": 840,
+              "size": 92,
+              "font": "d",
+              "color": "walnut",
+              "fit": "line",
+              "maxWidth": 860
+            }
+          ]
+        }
+      ]
+    },
+    "rewatches": {
+      "background": "rust",
+      "vars": {
+        "n": "me.mostReplayed.completions",
+        "den": "{{n | sub:1 | mul:40 | div:110 | add:n}}",
+        "sh": "{{410 | div:den | atMost:110}}",
+        "pitch": "{{sh | mul:150 | div:110}}",
+        "nm1": "n | sub:1",
+        "step": "{{1 | div:nm1 | atMost:0.5}}"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "count": "{{n}}",
+          "x": 0,
+          "y": 535,
+          "layout": "column",
+          "pitch": "{{pitch}}",
+          "vars": { "at": "{{step | mul:index | add:0.6}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": 0,
+              "y": "{{sh | div:-2}}",
+              "width": 0,
+              "height": "{{sh}}",
+              "fill": "{{index | pick:\"mustard\",\"cream\",\"teal\"}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.9}}", 980, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "poster",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.3, "args": { "dur": 0.9, "dist": 90 } },
+          "children": [
+            { "id": "frame", "type": "shape", "shape": "roundRect", "x": 300, "y": 240, "width": 420, "height": 600, "radius": 18, "fill": "cream" },
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.mostReplayed.poster}}",
+              "title": "{{replayedName}}",
+              "x": 330,
+              "y": 270,
+              "width": 360,
+              "height": 540,
+              "radius": 8,
+              "fallback": "poster"
+            }
+          ]
+        },
+        {
+          "id": "back",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.5 },
+          "children": [{ "id": "t", "type": "text", "text": "You came back to", "x": 1080, "y": 330, "size": 72, "font": "b", "color": "cream" }]
+        },
+        {
+          "id": "title",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.9 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{replayedName}}",
+              "x": 1080,
+              "y": 540,
+              "y2": 540,
+              "size": 140,
+              "size2": 84,
+              "min2": 50,
+              "shrink": 2,
+              "balance": false,
+              "lineHeight": 1.1,
+              "roundLineHeight": false,
+              "maxWidth": 780,
+              "fit": "title",
+              "single": { "y": 500 },
+              "font": "d",
+              "color": "cream"
+            }
+          ]
+        },
+        {
+          "id": "times",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.mostReplayed.completions}} times.",
+              "x": 1130,
+              "y": 675,
+              "size": 120,
+              "font": "d",
+              "color": "mustard",
+              "box": { "padX": 50, "height": 170, "radius": 30, "fill": "walnut", "shift": 0.35833333333333334 }
+            }
+          ]
+        }
+      ]
+    },
+    "new-vs-classic": {
+      "background": "teal",
+      "vars": {
+        "P": "me.newVsClassic.recentShare | mul:100 | round",
+        "W": "{{P | mul:10.8}}",
+        "old": "me.newVsClassic.oldest != null && me.newVsClassic.oldest.year <= year | sub:20"
+      },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "pct",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{P}}",
+              "text": "{{value | round}}%",
+              "x": 140,
+              "y": 380,
+              "size": 260,
+              "font": "d",
+              "color": "cream",
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.3, 0],
+                    [2.5, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "of",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.6 },
+          "children": [
+            { "id": "t1", "type": "text", "text": "of your watching was", "x": 140, "y": 500, "size": 72, "font": "b", "color": "cream" },
+            { "id": "t2", "type": "text", "text": "from {{year | sub:1}}–{{year}}.", "x": 140, "y": 590, "size": 72, "font": "b", "color": "cream" }
+          ]
+        },
+        {
+          "id": "bar",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.8 },
+          "children": [
+            { "id": "track", "type": "shape", "shape": "roundRect", "x": 140, "y": 660, "width": 1080, "height": 110, "radius": 55, "fill": "walnut" },
+            {
+              "id": "fill",
+              "type": "group",
+              "clip": { "shape": "roundRect", "x": 140, "y": 660, "width": 1080, "height": 110, "radius": 55 },
+              "children": [
+                {
+                  "id": "f",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": 140,
+                  "y": 660,
+                  "width": 0,
+                  "height": 110,
+                  "fill": "mustard",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        [1.0, 0],
+                        [2.2, "{{W}}", "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "poster",
+          "type": "group",
+          "when": "old",
+          "in": { "preset": "up", "at": 2.4, "args": { "dur": 0.9, "dist": 90 } },
+          "children": [
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 1350, "y": 170, "width": 420, "height": 610, "radius": 18 },
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.newVsClassic.oldest.poster}}",
+              "title": "{{me.newVsClassic.oldest.title}}",
+              "x": 1380,
+              "y": 200,
+              "width": 360,
+              "height": 540,
+              "radius": 8,
+              "fallback": "poster"
+            }
+          ]
+        },
+        {
+          "id": "oldest",
+          "type": "group",
+          "when": "old",
+          "in": { "preset": "up", "at": 2.7 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Oldest: {{me.newVsClassic.oldest.title}} ({{me.newVsClassic.oldest.year}}).",
+              "x": 140,
+              "y": 920,
+              "y2": 952,
+              "size": 72,
+              "size2": 56,
+              "maxWidth": 1640,
+              "fit": "title",
+              "font": "b",
+              "color": "cream"
+            }
+          ]
+        }
+      ]
+    },
+    "music": {
+      "vars": { "songs": "me.music.topSongs | take:3", "nSongs": "songs | count" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "wood", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 1920, "height": 1080, "radius": 0, "planks": 240 },
+        {
+          "id": "player",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.8, "dist": 70 } },
+          "children": [
+            {
+              "id": "record",
+              "type": "group",
+              "x": 400,
+              "y": 520,
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [0.6, 400],
+                    [1.6, 680, "out"]
+                  ]
+                },
+                { "prop": "rotation", "rate": 126.05071492878113 }
+              ],
+              "children": [{ "id": "record", "type": "image", "src": "img/record.svg", "x": -281, "y": -281, "width": 562, "height": 562, "fit": "fill" }]
+            },
+            { "id": "sleeve", "type": "shape", "shape": "roundRect", "x": 100, "y": 220, "width": 600, "height": 600, "radius": 10, "fill": "cream" },
+            {
+              "id": "sleeve-art",
+              "type": "group",
+              "clip": { "shape": "roundRect", "x": 100, "y": 220, "width": 600, "height": 600, "radius": 10 },
+              "children": [{ "id": "sleeve-stripes", "type": "image", "src": "img/sleeve-stripes.svg", "x": 98, "y": 245, "width": 604, "height": 577, "fit": "fill" }]
+            }
+          ]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.4 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "value": "{{me.music.hours | default:0}}",
+              "text": "{{value | mul:10 | round | div:10 | add:0.000001 | hours:\"number\"}} hours of music.",
+              "x": 1020,
+              "y": 260,
+              "size": 96,
+              "font": "d",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 820,
+              "animate": [
+                {
+                  "prop": "count",
+                  "keys": [
+                    [0.4, 0],
+                    [3.6, 1, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "artist",
+          "type": "group",
+          "in": { "preset": "up", "at": 1.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "Top artist: {{me.music.topArtist.name}}.",
+              "x": 1020,
+              "y": 370,
+              "size": 60,
+              "font": "b",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": 820
+            }
+          ]
+        },
+        {
+          "id": "songs-head",
+          "type": "group",
+          "when": "nSongs > 0",
+          "in": { "preset": "up", "at": 1.9 },
+          "children": [
+            { "id": "t", "type": "text", "text": "{{(nSongs > 1) | then:\"Top songs:\",\"Top song:\"}}", "x": 1020, "y": 490, "size": 54, "font": "b", "color": "mustard" }
+          ]
+        },
+        {
+          "id": "songs",
+          "type": "repeat",
+          "items": "{{songs}}",
+          "x": 0,
+          "y": 530,
+          "layout": "column",
+          "pitch": 140,
+          "align": "start",
+          "template": [
+            {
+              "id": "song",
+              "type": "group",
+              "pivot": [0, 58],
+              "in": { "preset": "tick", "at": "{{index | mul:0.4 | add:2.4}}" },
+              "children": [
+                { "id": "pill", "type": "shape", "shape": "roundRect", "x": 1020, "y": 0, "width": 800, "height": 116, "radius": 20, "fill": "wood2" },
+                { "id": "t", "type": "text", "text": "{{item.title}}", "x": 1060, "y": 80, "size": 60, "font": "d", "color": "cream", "fit": "line", "maxWidth": 720 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "persona": {
+      "background": "rust",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "band1",
+          "type": "group",
+          "x": 960,
+          "y": 540,
+          "rotation": -34.95042550298022,
+          "children": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": -300,
+              "y": -840,
+              "width": 600,
+              "height": 0,
+              "fill": "teal",
+              "animate": [
+                {
+                  "prop": "height",
+                  "keys": [
+                    [0.3, 0],
+                    [1.5, 1680, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "band2",
+          "type": "group",
+          "x": 960,
+          "y": 540,
+          "rotation": 34.95042550298022,
+          "children": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": -300,
+              "y": -840,
+              "width": 600,
+              "height": 0,
+              "fill": "mustard",
+              "animate": [
+                {
+                  "prop": "height",
+                  "keys": [
+                    [0.6, 0],
+                    [1.8, 1680, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "oval",
+          "type": "shape",
+          "shape": "roundRect",
+          "anchor": "top",
+          "x": 960,
+          "y": 240,
+          "width": 0,
+          "height": 600,
+          "radius": 300,
+          "fill": "cream",
+          "start": 1.4001,
+          "animate": [
+            {
+              "prop": "width",
+              "keys": [
+                [1.4, 0],
+                [2.2, 1440, "out"]
+              ],
+              "min": 40
+            }
+          ]
+        },
+        {
+          "id": "youre",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.2 },
+          "children": [{ "id": "t", "type": "text", "text": "You're", "x": 960, "y": 420, "size": 72, "font": "b", "color": "walnut", "align": "center" }]
+        },
+        {
+          "id": "name",
+          "type": "group",
+          "animate": [
+            {
+              "prop": "opacity",
+              "keys": [
+                [3.2, 0],
+                [3.4, 1]
+              ]
+            },
+            {
+              "prop": "y",
+              "keys": [
+                [3.2, "-70"],
+                [3.8, "+0", "back:1.4"]
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.persona.name}}.",
+              "x": 960,
+              "y": 600,
+              "size": 150,
+              "font": "d",
+              "color": "rust",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1240
+            }
+          ]
+        },
+        {
+          "id": "liner",
+          "type": "group",
+          "in": { "preset": "up", "at": 4.2 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.persona.oneLiner}}",
+              "x": 960,
+              "y": 730,
+              "size": 52,
+              "font": "b",
+              "color": "walnut",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 1200
+            }
+          ]
+        }
+      ]
+    },
+    "summary": {
+      "background": "cream",
+      "vars": { "hasGenre": "me.topGenres | count > 0", "kc": "hasGenre | then:1130,1240" },
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        {
+          "id": "stripes",
+          "type": "repeat",
+          "items": [
+            { "y": 992, "c": "mustard" },
+            { "y": 1024, "c": "rust" },
+            { "y": 1056, "c": "teal" }
+          ],
+          "vars": { "at": "{{index | mul:0.15 | add:0.2}}" },
+          "template": [
+            {
+              "id": "r",
+              "type": "shape",
+              "shape": "rect",
+              "x": -340,
+              "y": "{{item.y}}",
+              "width": 0,
+              "height": 24,
+              "fill": "{{item.c}}",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    ["{{at}}", 0],
+                    ["{{at | add:0.9}}", 2600, "out"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "card",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.3, "args": { "dur": 0.9, "dist": 80 } },
+          "children": [
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 260, "y": 90, "width": 1400, "height": 880, "radius": 40 },
+            {
+              "id": "bands",
+              "type": "repeat",
+              "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "teal" }],
+              "vars": { "at": "{{index | mul:0.15 | add:0.6}}" },
+              "template": [
+                {
+                  "id": "b",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": 300,
+                  "y": "{{index | mul:32 | add:130}}",
+                  "width": 0,
+                  "height": 22,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 1320, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "initial",
+          "type": "group",
+          "in": { "preset": "up", "at": 0.8 },
+          "children": [
+            { "id": "d", "type": "shape", "shape": "circle", "x": 460, "y": 330, "radius": 90, "fill": "coral" },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.name | initials}}",
+              "x": 460,
+              "y": 368,
+              "size": 100,
+              "font": "d",
+              "color": "walnut",
+              "align": "center",
+              "fit": "line",
+              "maxWidth": 150
+            }
+          ]
+        },
+        {
+          "id": "hours",
+          "type": "group",
+          "when": "me.totals.hours != null",
+          "in": { "preset": "up", "at": 1.0 },
+          "children": [
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.totals.hours | hours:\"number\"}} h",
+              "x": 600,
+              "y": 390,
+              "size": 170,
+              "font": "d",
+              "color": "mustard",
+              "fit": "line",
+              "maxWidth": 1020
+            }
+          ]
+        },
+        {
+          "id": "show",
+          "type": "group",
+          "when": "me.topSeries | count > 0",
+          "pivot": [0, 540],
+          "in": { "preset": "tick", "at": 1.4 },
+          "children": [
+            { "id": "card", "type": "shape", "shape": "roundRect", "x": 300, "y": 460, "width": 1320, "height": 160, "radius": 20, "fill": "wood2" },
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.topSeries[0].poster}}",
+              "title": "{{me.topSeries[0].title}}",
+              "x": 320,
+              "y": 470,
+              "width": 94,
+              "height": 140,
+              "radius": 6,
+              "fallback": "poster"
+            },
+            { "id": "label", "type": "text", "text": "#1 show", "x": 450, "y": 522, "size": 38, "font": "b", "color": "mustard" },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topSeries[0].title}}",
+              "x": 450,
+              "y": 592,
+              "y2": 606,
+              "size": 68,
+              "size2": 40,
+              "maxWidth": 1140,
+              "fit": "title",
+              "font": "d",
+              "color": "cream"
+            }
+          ]
+        },
+        {
+          "id": "movie",
+          "type": "group",
+          "when": "me.topMovies | count > 0",
+          "pivot": [0, 730],
+          "in": { "preset": "tick", "at": 1.8 },
+          "children": [
+            { "id": "card", "type": "shape", "shape": "roundRect", "x": 300, "y": 650, "width": 1320, "height": 160, "radius": 20, "fill": "wood2" },
+            {
+              "id": "p",
+              "type": "image",
+              "src": "{{me.topMovies[0].poster}}",
+              "title": "{{me.topMovies[0].title}}",
+              "x": 320,
+              "y": 660,
+              "width": 94,
+              "height": 140,
+              "radius": 6,
+              "fallback": "poster"
+            },
+            { "id": "label", "type": "text", "text": "#1 movie", "x": 450, "y": 712, "size": 38, "font": "b", "color": "mustard" },
+            {
+              "id": "t",
+              "type": "text",
+              "text": "{{me.topMovies[0].title}}",
+              "x": 450,
+              "y": 782,
+              "y2": 796,
+              "size": 68,
+              "size2": 40,
+              "maxWidth": 1140,
+              "fit": "title",
+              "font": "d",
+              "color": "cream"
+            }
+          ]
+        },
+        {
+          "id": "mrow",
+          "type": "group",
+          "layout": "row",
+          "maxWidth": 1000000,
+          "opacity": 0,
+          "children": [
+            { "id": "mg", "type": "text", "when": "hasGenre", "text": "{{me.topGenres[0].name}}", "size": 56, "font": "d" },
+            { "id": "mp", "type": "text", "text": "{{me.persona.name}}", "size": 56, "font": "d" }
+          ]
+        },
+        {
+          "id": "genre-chip",
+          "type": "group",
+          "when": "hasGenre",
+          "in": { "preset": "up", "at": 2.2 },
+          "children": [
+            {
+              "id": "gt",
+              "type": "text",
+              "when": "hasGenre",
+              "text": "{{me.topGenres[0].name}}",
+              "x": 340,
+              "y": 888,
+              "size": 56,
+              "font": "d",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": "{{kc | div:measure.mrow.width | atMost:1 | mul:measure.mg.width}}",
+              "box": { "padX": 40, "height": 96, "radius": 48, "fill": "teal", "shift": 0.32142857142857145 }
+            }
+          ]
+        },
+        {
+          "id": "persona-chip",
+          "type": "group",
+          "in": { "preset": "up", "at": 2.5 },
+          "children": [
+            {
+              "id": "pt",
+              "type": "text",
+              "text": "{{me.persona.name}}",
+              "x": "{{measure.gt.width | default:-110 | add:450}}",
+              "y": 888,
+              "size": 56,
+              "font": "d",
+              "color": "cream",
+              "fit": "line",
+              "maxWidth": "{{kc | div:measure.mrow.width | atMost:1 | mul:measure.mp.width}}",
+              "box": { "padX": 40, "height": 96, "radius": 48, "fill": "rust", "shift": 0.32142857142857145 }
+            }
+          ]
+        }
+      ]
+    },
+    "outro": {
+      "background": "cream",
+      "elements": [
+        { "id": "base-headline", "remove": true },
+        { "id": "stripes-art", "type": "image", "src": "img/stripes.svg", "x": 0, "y": 662, "width": 1920, "height": 418, "fit": "fill" },
+        { "id": "tv-legs", "type": "image", "src": "img/tv-legs.svg", "x": 439, "y": 859, "width": 1042, "height": 92, "fit": "fill" },
+        { "id": "cabinet", "type": "effect", "effect": "wood", "x": 300, "y": 60, "width": 1320, "height": 820, "radius": 112 },
+        { "id": "tv-front", "type": "image", "src": "img/tv-front.svg", "x": 351, "y": 111, "width": 1218, "height": 730, "fit": "fill" },
+        { "id": "brand", "type": "text", "text": "JELLYWRAP", "x": 960, "y": 822, "size": 32, "font": "b", "color": "walnut", "align": "center" },
+        {
+          "id": "picture",
+          "type": "group",
+          "clip": { "shape": "roundRect", "x": 352, "y": 112, "width": 1216, "height": 640, "radius": 88 },
+          "children": [
+            {
+              "id": "that",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.3 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "That was your {{year}}.",
+                  "x": 960,
+                  "y": 420,
+                  "size": 110,
+                  "font": "d",
+                  "color": "cream",
+                  "align": "center",
+                  "fit": "line",
+                  "maxWidth": 1100
+                }
+              ]
+            },
+            {
+              "id": "bye",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.7 },
+              "children": [{ "id": "t", "type": "text", "text": "See you next year.", "x": 960, "y": 560, "size": 76, "font": "b", "color": "cream", "align": "center" }]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "byBase": {
+    "server": {
+      "vars": {
+        "kOne": "groups.oneKid",
+        "kName": "groups.kids.names[0]",
+        "kOwn1": "kName | possessive",
+        "kSubj": "kOne | then:kName,\"the kids\"",
+        "kSubjCap": "kOne | then:kName,\"The kids\"",
+        "kCap": "kOne | then:kName,\"Kids\"",
+        "kOwn": "kOne | then:kOwn1,\"Kids'\"",
+        "kAvg": "kOne | then:kName,\"the average kid\"",
+        "gOne": "groups.grownups.count == 1",
+        "gName": "groups.grownups.names[0]",
+        "gSubj": "gOne | then:gName,\"the grown-ups\"",
+        "gSubjCap": "gOne | then:gName,\"The grown-ups\"",
+        "gAvg": "gOne | then:gName,\"the average grown-up\"",
+        "gAvgCap": "gOne | then:gName,\"The average grown-up\""
+      },
+      "fallbacks": {
+        "avatar": [
+          {
+            "id": "fb-fill",
+            "type": "shape",
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "width": "{{box.width}}",
+            "height": "{{box.height}}",
+            "fill": "{{title | hash | mod:3 | pick:\"mustard\",\"rust\",\"coral\"}}"
+          },
+          {
+            "id": "fb-ini",
+            "type": "text",
+            "text": "{{title | initials}}",
+            "x": "{{box.width | div:2}}",
+            "y": "{{box.width | mul:0.3 | add:box.height | div:2}}",
+            "size": "{{box.width | mul:0.42 | round}}",
+            "font": "d",
+            "color": "walnut",
+            "align": "center",
+            "fit": "line",
+            "maxWidth": "{{box.width | mul:0.8}}"
+          }
+        ]
+      },
+      "slides": {
+        "intro": {
+          "elements": [
+            {
+              "id": "tv",
+              "children": [
+                {
+                  "id": "picture",
+                  "children": [
+                    { "id": "name", "children": [{ "id": "t", "text": "{{server.possessive}}", "fit": "title", "size2": 100, "y2": 445 }] },
+                    { "id": "year", "children": [{ "id": "t", "text": "{{year}} on Jellyfin" }] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "totals": {
+          "background": "mustard",
+          "vars": { "H": "server.totals.hours" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "band1",
+              "type": "shape",
+              "shape": "rect",
+              "x": -240,
+              "y": 0,
+              "width": 120,
+              "height": 1080,
+              "fill": "rust",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [0.1, -240],
+                    [0.9, 0, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "band2",
+              "type": "shape",
+              "shape": "rect",
+              "x": -120,
+              "y": 0,
+              "width": 120,
+              "height": 1080,
+              "fill": "teal",
+              "animate": [
+                {
+                  "prop": "x",
+                  "keys": [
+                    [0.25, -120],
+                    [1.05, 120, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "count",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.3, "args": { "dur": 0.9 } },
+              "children": [
+                {
+                  "id": "h",
+                  "type": "text",
+                  "value": "{{H}}",
+                  "text": "{{value | number}}",
+                  "x": 370,
+                  "y": 500,
+                  "size": 380,
+                  "font": "d",
+                  "color": "walnut",
+                  "fit": "line",
+                  "maxWidth": 1460,
+                  "animate": [
+                    {
+                      "prop": "count",
+                      "keys": [
+                        [0.4, 0],
+                        [2.8, 1, "out"]
+                      ]
+                    },
+                    {
+                      "prop": "y",
+                      "keys": [
+                        [2.8, "+0"],
+                        [2.975, "+14", "sine-out"],
+                        [3.15, "+0", "sine-in"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "underline",
+              "type": "shape",
+              "shape": "rect",
+              "x": 380,
+              "y": 555,
+              "width": 0,
+              "height": 24,
+              "fill": "teal",
+              "animate": [
+                {
+                  "prop": "width",
+                  "keys": [
+                    [2.8, 0],
+                    [3.4, 780, "out"]
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "unit",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.9 },
+              "children": [{ "id": "t", "type": "text", "text": "{{H | noun:\"hour\"}}", "x": 380, "y": 715, "size": 116, "font": "d", "color": "walnut" }]
+            },
+            {
+              "id": "counts",
+              "type": "group",
+              "in": { "preset": "up", "at": 3.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{server.totals.plays | number}} {{server.totals.plays | noun:\"play\"}} · {{server.totals.viewers | number}} {{server.totals.viewers | noun:\"viewer\"}} · {{server.totals.titles | number}} {{server.totals.titles | noun:\"title\"}}",
+                  "x": 380,
+                  "y": 860,
+                  "size": 64,
+                  "font": "b",
+                  "color": "walnut",
+                  "fit": "line",
+                  "maxWidth": 1460
+                }
+              ]
+            }
+          ]
+        },
+        "growth": {
+          "background": "cream",
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "stripes",
+              "type": "repeat",
+              "items": [
+                { "y": 992, "c": "mustard" },
+                { "y": 1024, "c": "rust" },
+                { "y": 1056, "c": "teal" }
+              ],
+              "vars": { "at": "{{index | mul:0.15 | add:0.2}}" },
+              "template": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": -340,
+                  "y": "{{item.y}}",
+                  "width": 0,
+                  "height": 24,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 2600, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.2 },
+              "children": [{ "id": "t", "type": "text", "text": "New this year:", "x": 960, "y": 210, "size": 96, "font": "d", "color": "rust", "align": "center" }]
+            },
+            {
+              "id": "tvs",
+              "type": "repeat",
+              "x": 960,
+              "y": 0,
+              "layout": "row",
+              "pitch": 580,
+              "items": [
+                { "v": "{{server.growth.movies}}", "w": "movie" },
+                { "v": "{{server.growth.episodes}}", "w": "episode" },
+                { "v": "{{server.growth.albums}}", "w": "album" }
+              ],
+              "where": "item.v > 0",
+              "vars": { "at": "{{index | mul:0.5 | add:0.6}}", "end": "(index < count | sub:1) | then:\",\",\".\"" },
+              "template": [
+                {
+                  "id": "tv",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{at}}", "args": { "dur": 0.9, "dist": 90 } },
+                  "children": [
+                    { "id": "tv-medium-legs", "type": "image", "src": "img/tv-medium-legs.svg", "x": -171, "y": 699, "width": 342, "height": 62, "fit": "fill" },
+                    { "id": "cabinet", "type": "effect", "effect": "wood", "x": -235, "y": 330, "width": 470, "height": 390, "radius": 60 },
+                    { "id": "tv-medium-front", "type": "image", "src": "img/tv-medium-front.svg", "x": -206, "y": 359, "width": 412, "height": 335, "fit": "fill" },
+                    {
+                      "id": "n",
+                      "type": "text",
+                      "value": "{{item.v}}",
+                      "text": "{{value | number}}",
+                      "x": 0,
+                      "y": 545,
+                      "size": 130,
+                      "font": "d",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 360,
+                      "animate": [
+                        {
+                          "prop": "count",
+                          "keys": [
+                            ["{{at}}", 0],
+                            ["{{at | add:1.8}}", 1, "out"]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "w",
+                      "type": "text",
+                      "text": "{{item.v | noun:item.w}}{{end}}",
+                      "x": 0,
+                      "y": 880,
+                      "size": 84,
+                      "font": "d",
+                      "color": "walnut",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 520
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "kids-vs-grownups": {
+          "background": "teal",
+          "vars": {
+            "hk0": "groups.kids.hoursPerPerson",
+            "hg0": "groups.grownups.hoursPerPerson",
+            "hkR": "hk0 | round",
+            "hkR1": "hk0 | round:1 | atLeast:0.1",
+            "hgR": "hg0 | round",
+            "hgR1": "hg0 | round:1 | atLeast:0.1",
+            "hK": "(hk0 >= 10) | then:hkR,hkR1",
+            "hG": "(hg0 >= 10) | then:hgR,hgR1",
+            "h1": "kidsWin | then:hK,hG",
+            "h2": "kidsWin | then:hG,hK",
+            "d1": "(h1 < 10) | then:1,0",
+            "d2": "(h2 < 10) | then:1,0",
+            "mx0": "h1 | atLeast:h2",
+            "mx": "(mx0 > 0) | then:mx0,1",
+            "winCap": "kidsWin | then:kSubjCap,gSubjCap",
+            "loseSubj": "kidsWin | then:gSubj,kSubj",
+            "winAvg": "kidsWin | then:kAvg,gAvg",
+            "loseAvg": "kidsWin | then:gAvg,kAvg",
+            "eK": "groups.kids.episodes | div:groups.kids.count",
+            "eG": "groups.grownups.episodes | div:groups.grownups.count",
+            "eKidsWon": "groups.moreEpisodes == \"kids\"",
+            "eTop": "eKidsWon | then:eK,eG",
+            "eWin": "kidsWin | then:eK,eG",
+            "xr": "eTop | div:eWin | round:1",
+            "xsn": "{{xr}} times",
+            "xs4": "(xr == 4) | then:\"four times\",xsn",
+            "xs3": "(xr == 3) | then:\"three times\",xs4",
+            "xs": "(xr == 2) | then:\"twice\",xs3",
+            "gAvgOf": "eKidsWon | then:kAvg,gAvg",
+            "epA": "{{kName}}: {{eK | round | number}} episodes. {{gAvgCap}}: {{eG | round | number}}.",
+            "epB": "But {{gAvgOf}} watched {{xs}} as many episodes ({{eTop | round | number}} vs {{eWin | round | number}}).",
+            "epLine": "kOne | then:epA,epB"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "head",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.2 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{winCap}} out-watched {{loseSubj}}:",
+                  "x": 160,
+                  "y": 190,
+                  "size": 72,
+                  "font": "b",
+                  "color": "cream",
+                  "fit": "line",
+                  "maxWidth": 1600
+                }
+              ]
+            },
+            {
+              "id": "sides",
+              "type": "repeat",
+              "items": [
+                { "h": "{{h1}}", "d": "{{d1}}", "who": "{{winAvg}}", "c": "mustard", "at": 0.6 },
+                { "h": "{{h2}}", "d": "{{d2}}", "who": "{{loseAvg}}", "c": "rust", "at": 1.2 }
+              ],
+              "vars": { "y": "{{index | mul:290 | add:320}}", "len": "{{item.h | mul:1250 | div:mx | atLeast:60}}", "te": "{{item.at | add:1.4}}" },
+              "template": [
+                {
+                  "id": "bar",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": 0,
+                  "y": "{{y}}",
+                  "width": 0,
+                  "height": 150,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{item.at}}", 0],
+                        ["{{te}}", "{{len}}", "out"]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "num",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{item.at | add:0.3}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "value": "{{item.h}}",
+                      "text": "{{value | number:item.d}} h",
+                      "x": 40,
+                      "y": "{{y | add:118}}",
+                      "size": 120,
+                      "font": "d",
+                      "color": "cream",
+                      "animate": [
+                        {
+                          "prop": "count",
+                          "keys": [
+                            ["{{item.at}}", 0],
+                            ["{{te}}", 1, "out"]
+                          ]
+                        },
+                        {
+                          "prop": "x",
+                          "keys": [
+                            ["{{item.at}}", 40],
+                            ["{{te}}", "{{len | add:40}}", "out"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "who",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{item.at | add:0.6}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.who}}",
+                      "x": 160,
+                      "y": "{{y | add:215}}",
+                      "size": 52,
+                      "font": "b",
+                      "color": "cream",
+                      "fit": "line",
+                      "maxWidth": 1600
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "eps",
+              "type": "group",
+              "when": "twist && eWin > 0",
+              "in": { "preset": "up", "at": 3.2 },
+              "children": [{ "id": "t", "type": "text", "text": "{{epLine}}", "x": 160, "y": 935, "size": 52, "font": "b", "color": "mustard", "fit": "line", "maxWidth": 1600 }]
+            }
+          ]
+        },
+        "busiest": {
+          "vars": {
+            "d0": "server.busiest.day",
+            "inMonth": "true"
+          },
+          "elements": [
+            { "id": "calendar", "children": [{ "id": "month", "text": "{{d0 | month}}" }] },
+            { "id": "cap1", "children": [{ "id": "t", "text": "Busiest day:" }] },
+            { "id": "month", "children": [{ "id": "t", "text": "{{d0 | date:\"dddd, MMMM d\"}}", "size": 104 }] },
+            { "id": "hm", "in": { "preset": "up", "at": 1.0 }, "children": [{ "id": "t", "text": "({{server.busiest.dayHours | hours:\"number\"}} h).", "y": 530, "size": 80 }] },
+            { "id": "cap2", "in": { "preset": "up", "at": 1.3 }, "children": [{ "id": "t", "text": "Busiest hour:", "y": 680 }] },
+            { "id": "day", "in": { "preset": "up", "at": 1.6 }, "children": [{ "id": "t", "text": "{{server.busiest.hour | hour}}.", "y": 810, "size": 120, "color": "rust" }] }
+          ]
+        },
+        "who-owns-when": {
+          "vars": { "mx0": "server.whoOwnsWhen | max:\"shareOfMinutes\"", "mx": "(mx0 > 0) | then:mx0,1" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 1920, "height": 1080, "radius": 0, "planks": 240 },
+            {
+              "id": "guide",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.2, "args": { "dur": 0.8, "dist": 60 } },
+              "children": [
+                { "id": "guide-board", "type": "image", "src": "img/guide-board.svg", "x": 329, "y": 89, "width": 1262, "height": 662, "fit": "fill" },
+                {
+                  "id": "days",
+                  "type": "repeat",
+                  "count": 7,
+                  "template": [
+                    {
+                      "id": "d",
+                      "type": "text",
+                      "text": "{{index | pick:\"M\",\"T\",\"W\",\"T\",\"F\",\"S\",\"S\"}}",
+                      "x": "{{index | mul:120 | add:745}}",
+                      "y": 164,
+                      "size": 44,
+                      "font": "b",
+                      "color": "cream",
+                      "align": "center"
+                    }
+                  ]
+                },
+                {
+                  "id": "parts",
+                  "type": "repeat",
+                  "items": [{ "p": "Mornings" }, { "p": "Afternoons" }, { "p": "Evenings" }, { "p": "Nights" }],
+                  "template": [
+                    {
+                      "id": "p",
+                      "type": "text",
+                      "text": "{{item.p}}",
+                      "x": 670,
+                      "y": "{{index | mul:112 | add:268}}",
+                      "size": 40,
+                      "font": "b",
+                      "color": "walnut",
+                      "align": "right"
+                    }
+                  ]
+                },
+                {
+                  "id": "grid",
+                  "type": "repeat",
+                  "items": "{{server.whoOwnsWhen | take:28}}",
+                  "vars": {
+                    "k": "item.kidsShare",
+                    "c1": "(k <= 0.4) | then:\"teal\",\"#E6D7BE\"",
+                    "c": "(k >= 0.6) | then:\"mustard\",c1",
+                    "s": "{{item.shareOfMinutes | div:mx | mul:0.55 | add:0.45 | atMost:1}}",
+                    "cx": "{{index | div:4 | floor | mul:120 | add:745}}",
+                    "cy": "{{index | mod:4 | mul:112 | add:254}}",
+                    "at": "{{index | div:4 | floor | mul:0.12 | add:0.7}}",
+                    "hi": "(item.weekday == kidSlot.weekday && item.part == kidSlot.part) || (item.weekday == grownSlot.weekday && item.part == grownSlot.part)"
+                  },
+                  "template": [
+                    {
+                      "id": "cell",
+                      "type": "group",
+                      "x": "{{cx}}",
+                      "y": "{{cy}}",
+                      "scale": "{{s}}",
+                      "in": { "preset": "tick", "at": "{{at}}" },
+                      "children": [{ "id": "sq", "type": "shape", "shape": "roundRect", "x": -46, "y": -46, "width": 92, "height": 92, "radius": 14, "fill": "{{c}}" }]
+                    },
+                    {
+                      "id": "ring",
+                      "type": "shape",
+                      "shape": "roundRect",
+                      "when": "hi",
+                      "x": "{{cx | sub:56}}",
+                      "y": "{{cy | sub:56}}",
+                      "width": 112,
+                      "height": 112,
+                      "radius": 20,
+                      "stroke": "rust",
+                      "strokeWidth": 8,
+                      "start": 2.4001,
+                      "trim": 0,
+                      "animate": [
+                        {
+                          "prop": "trim",
+                          "keys": [
+                            [2.4, 0],
+                            [3.0, 1, "out"]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "legend",
+                  "type": "repeat",
+                  "x": 1010,
+                  "y": 0,
+                  "layout": "row",
+                  "pitch": 360,
+                  "items": [
+                    { "t": "{{kCap}}", "c": "mustard" },
+                    { "t": "Grown-ups", "c": "teal" }
+                  ],
+                  "template": [
+                    { "id": "sq", "type": "shape", "shape": "roundRect", "x": -150, "y": 680, "width": 44, "height": 44, "radius": 10, "fill": "{{item.c}}" },
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": -90,
+                      "y": 717,
+                      "size": 40,
+                      "font": "b",
+                      "color": "walnut",
+                      "align": "left",
+                      "fit": "line",
+                      "maxWidth": 230
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "lines",
+              "type": "repeat",
+              "x": 960,
+              "y": 885,
+              "layout": "column",
+              "pitch": 125,
+              "items": [
+                { "t": "{{kidSlot.weekday}} {{kidSlot.part}}s belong to {{kSubj}} ({{kidSlot.kidsShare | percent}}).", "c": "rust", "has": "{{kidSlot != null}}" },
+                {
+                  "t": "{{grownSlot.weekday}} {{grownSlot.part}}s belong to the grown-ups ({{grownSlot.kidsShare | sub:1 | mul:-1 | percent}}).",
+                  "c": "teal",
+                  "has": "{{grownSlot != null}}"
+                }
+              ],
+              "where": "item.has",
+              "vars": { "at": "{{index | mul:0.5 | add:2.8}}" },
+              "template": [
+                {
+                  "id": "l",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{at}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": 0,
+                      "y": 0,
+                      "size": 56,
+                      "font": "d",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 1640,
+                      "box": { "padX": 40, "height": 100, "radius": 20, "fill": "{{item.c}}", "shift": 0.33 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "top-genre": {
+          "vars": {
+            "gk": "groups.kids.topGenre.name",
+            "gg": "groups.grownups.topGenre.name"
+          },
+          "elements": [
+            {
+              "id": "dial",
+              "children": [
+                { "id": "g1", "text": "{{server.topGenres[0].name}}" },
+                { "id": "g2", "when": "server.topGenres | count > 1", "text": "{{server.topGenres[1].name}}" },
+                { "id": "g3", "when": "server.topGenres | count > 2", "text": "{{server.topGenres[2].name}}" }
+              ]
+            },
+            { "id": "head", "children": [{ "id": "t", "text": "Top genres:" }] },
+            { "id": "genre", "children": [{ "id": "t", "text": "{{server.topGenres[0].name}}" }] },
+            { "id": "share", "when": "server.topGenres[0].share != null", "children": [{ "id": "t", "text": "{{server.topGenres[0].share | percent}}" }] },
+            {
+              "id": "then",
+              "when": "server.topGenres | count > 1",
+              "children": [{ "id": "t", "text": "Then {{server.topGenres | skip:1 | take:2 | pluck:\"name\" | join:\", \",\" and \"}}." }]
+            },
+            {
+              "id": "kid-genre",
+              "type": "group",
+              "when": "groups.hasSplit && gk != null",
+              "in": { "preset": "up", "at": 3.1 },
+              "children": [
+                { "id": "t", "type": "text", "text": "{{kCap}}: {{gk}}", "x": 1020, "y": 892, "size": 44, "font": "b", "color": "mustard", "fit": "line", "maxWidth": 860 }
+              ]
+            },
+            {
+              "id": "grown-genre",
+              "type": "group",
+              "when": "groups.hasSplit && gg != null",
+              "in": { "preset": "up", "at": 3.3 },
+              "children": [
+                { "id": "t", "type": "text", "text": "Grown-ups: {{gg}}", "x": 1020, "y": 946, "size": 44, "font": "b", "color": "mustard", "fit": "line", "maxWidth": 860 }
+              ]
+            }
+          ]
+        },
+        "top-series": {
+          "vars": { "n": "(server.topSeries | count >= 5) | then:5,3" },
+          "elements": [
+            { "id": "head", "children": [{ "id": "t", "text": "Top shows" }] },
+            {
+              "id": "rows",
+              "items": "{{server.topSeries | take:n}}",
+              "template": [
+                {
+                  "id": "row",
+                  "children": [
+                    { "id": "title", "maxWidth": 900 },
+                    { "id": "hours", "text": "{{item.hours | default:0 | hours:\"number\"}} h · {{item.viewers}} of you" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "top-movies": {
+          "vars": { "n": "(server.topMovies | count >= 5) | then:5,3" },
+          "elements": [
+            { "id": "head", "children": [{ "id": "t", "text": "Top movies" }] },
+            { "id": "rest", "items": "{{server.topMovies | skip:1 | take:nm1}}" },
+            { "id": "top", "children": [{ "id": "poster", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" }] },
+            { "id": "top-title", "children": [{ "id": "t", "text": "{{server.topMovies[0].title}}" }] }
+          ]
+        },
+        "kids-1-vs-grownups-1": {
+          "vars": { "same": "groups.kids.top.id == groups.grownups.top.id" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            { "id": "wood", "type": "effect", "effect": "wood", "x": 0, "y": 0, "width": 1920, "height": 1080, "radius": 0, "planks": 240 },
+            {
+              "id": "picks",
+              "type": "repeat",
+              "items": [
+                { "cap": "{{kOwn}} #1:", "t": "{{groups.kids.top.title}}", "p": "{{groups.kids.top.poster}}", "x": 520, "at": 0.3, "show": "{{!same}}" },
+                { "cap": "Grown-ups' #1:", "t": "{{groups.grownups.top.title}}", "p": "{{groups.grownups.top.poster}}", "x": 1400, "at": 1.3, "show": "{{!same}}" },
+                { "cap": "Everyone's #1:", "t": "{{groups.kids.top.title}}", "p": "{{groups.kids.top.poster}}", "x": 960, "at": 0.3, "show": "{{same}}" }
+              ],
+              "where": "item.show",
+              "template": [
+                {
+                  "id": "cap",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{item.at}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.cap}}",
+                      "x": "{{item.x}}",
+                      "y": 165,
+                      "size": 60,
+                      "font": "b",
+                      "color": "mustard",
+                      "align": "center",
+                      "fit": "line",
+                      "maxWidth": 760
+                    }
+                  ]
+                },
+                {
+                  "id": "pic",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{item.at | add:0.3}}", "args": { "dur": 0.9, "dist": 120 } },
+                  "children": [
+                    { "id": "frame", "type": "shape", "shape": "roundRect", "x": "{{item.x | sub:200}}", "y": 220, "width": 400, "height": 580, "radius": 18, "fill": "cream" },
+                    {
+                      "id": "poster",
+                      "type": "image",
+                      "src": "{{item.p}}",
+                      "title": "{{item.t}}",
+                      "x": "{{item.x | sub:170}}",
+                      "y": 250,
+                      "width": 340,
+                      "height": 510,
+                      "radius": 8,
+                      "fallback": "poster"
+                    },
+                    { "id": "tag", "type": "shape", "shape": "roundRect", "x": "{{item.x | sub:220}}", "y": 200, "width": 120, "height": 90, "radius": 16, "fill": "mustard" },
+                    { "id": "rank", "type": "text", "text": "#1", "x": "{{item.x | sub:160}}", "y": 266, "size": 56, "font": "b", "color": "walnut", "align": "center" }
+                  ]
+                },
+                {
+                  "id": "title",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{item.at | add:0.7}}" },
+                  "children": [
+                    {
+                      "id": "t",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": "{{item.x}}",
+                      "y": 905,
+                      "y2": 940,
+                      "size": 76,
+                      "size2": 54,
+                      "maxWidth": 780,
+                      "fit": "title",
+                      "font": "d",
+                      "color": "cream",
+                      "align": "center"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "vs",
+              "type": "group",
+              "when": "!same",
+              "in": { "preset": "up", "at": 1.0 },
+              "children": [{ "id": "t", "type": "text", "text": "vs", "x": 960, "y": 545, "size": 130, "font": "d", "color": "mustard", "align": "center" }]
+            }
+          ]
+        },
+        "common-ground": {
+          "background": "rust",
+          "vars": {
+            "cg": "server.commonGround | default:server.mostShared",
+            "split": "server.commonGround != null",
+            "kh": "server.commonGroundKidsHours | hours",
+            "gh": "server.commonGroundGrownupsHours | hours"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "stripes",
+              "type": "repeat",
+              "items": [{ "c": "mustard" }, { "c": "cream" }, { "c": "teal" }],
+              "x": 0,
+              "y": 535,
+              "layout": "column",
+              "pitch": 150,
+              "vars": { "at": "{{index | mul:0.3 | add:0.6}}" },
+              "template": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": 0,
+                  "y": -55,
+                  "width": 0,
+                  "height": 110,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 980, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "poster",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.3, "args": { "dur": 0.9, "dist": 90 } },
+              "children": [
+                { "id": "frame", "type": "shape", "shape": "roundRect", "x": 300, "y": 240, "width": 420, "height": 600, "radius": 18, "fill": "cream" },
+                { "id": "p", "type": "image", "src": "{{cg.poster}}", "title": "{{cg.title}}", "x": 330, "y": 270, "width": 360, "height": 540, "radius": 8, "fallback": "poster" }
+              ]
+            },
+            {
+              "id": "head",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.5 },
+              "children": [
+                { "id": "t", "type": "text", "text": "The one everyone agrees on:", "x": 1010, "y": 300, "size": 60, "font": "b", "color": "cream", "fit": "line", "maxWidth": 860 }
+              ]
+            },
+            {
+              "id": "title",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.9 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{cg.title}}{{split | then:\" —\",\".\"}}",
+                  "x": 1010,
+                  "y": 540,
+                  "y2": 540,
+                  "size": 130,
+                  "size2": 84,
+                  "min2": 50,
+                  "shrink": 2,
+                  "balance": false,
+                  "lineHeight": 1.1,
+                  "roundLineHeight": false,
+                  "maxWidth": 860,
+                  "fit": "title",
+                  "single": { "y": 490 },
+                  "font": "d",
+                  "color": "cream"
+                }
+              ]
+            },
+            {
+              "id": "kids",
+              "type": "group",
+              "when": "split",
+              "in": { "preset": "up", "at": 2.0 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{kh}} from {{kSubj}},",
+                  "x": 1050,
+                  "y": 685,
+                  "size": 58,
+                  "font": "d",
+                  "color": "mustard",
+                  "fit": "line",
+                  "maxWidth": 820,
+                  "box": { "padX": 40, "height": 108, "radius": 24, "fill": "walnut", "shift": 0.35 }
+                }
+              ]
+            },
+            {
+              "id": "grown",
+              "type": "group",
+              "when": "split",
+              "in": { "preset": "up", "at": 2.5 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{gh}} from the grown-ups.",
+                  "x": 1050,
+                  "y": 815,
+                  "size": 58,
+                  "font": "d",
+                  "color": "mustard",
+                  "fit": "line",
+                  "maxWidth": 820,
+                  "box": { "padX": 40, "height": 108, "radius": 24, "fill": "walnut", "shift": 0.35 }
+                }
+              ]
+            },
+            {
+              "id": "viewers",
+              "type": "group",
+              "when": "!split && cg.viewers > 1",
+              "in": { "preset": "up", "at": 2.0 },
+              "children": [
+                {
+                  "id": "t",
+                  "type": "text",
+                  "text": "{{cg.viewers}} of you",
+                  "x": 1050,
+                  "y": 685,
+                  "size": 80,
+                  "font": "d",
+                  "color": "mustard",
+                  "box": { "padX": 44, "height": 130, "radius": 26, "fill": "walnut", "shift": 0.35 }
+                }
+              ]
+            }
+          ]
+        },
+        "leaderboard": {
+          "background": "cream",
+          "vars": { "rows": "server.leaderboard | take:5", "n": "rows | count", "mx0": "rows | max:\"hours\"", "mx": "(mx0 > 0) | then:mx0,1", "y0": "{{n | mul:-82 | add:610}}" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "head",
+              "type": "group",
+              "in": { "preset": "up", "at": 0.2 },
+              "children": [{ "id": "t", "type": "text", "text": "Leaderboard", "x": 96, "y": 150, "size": 88, "font": "d", "color": "rust" }]
+            },
+            {
+              "id": "marks",
+              "type": "repeat",
+              "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "teal" }],
+              "vars": { "at": "{{index | mul:0.15 | add:0.3}}" },
+              "template": [
+                {
+                  "id": "m",
+                  "type": "shape",
+                  "shape": "roundRect",
+                  "x": "{{index | mul:80 | add:1594}}",
+                  "y": 112,
+                  "width": 0,
+                  "height": 14,
+                  "radius": 7,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "width",
+                      "keys": [
+                        ["{{at}}", 0],
+                        ["{{at | add:0.9}}", 70, "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "rows",
+              "type": "repeat",
+              "items": "{{rows}}",
+              "x": 0,
+              "y": "{{y0}}",
+              "layout": "column",
+              "pitch": 164,
+              "align": "start",
+              "vars": {
+                "first": "index == 0",
+                "at": "{{count | sub:1 | sub:index | mul:0.6 | add:0.8}}",
+                "full": "{{item.hours | mul:1728 | div:mx}}",
+                "fc": "first | then:\"mustard\",\"mustard@0.4\""
+              },
+              "template": [
+                {
+                  "id": "row",
+                  "type": "group",
+                  "pivot": [0, 70],
+                  "in": { "preset": "tick", "at": "{{at}}" },
+                  "children": [
+                    { "id": "card", "type": "shape", "shape": "roundRect", "x": 96, "y": 0, "width": 1728, "height": 140, "radius": 22, "fill": "paper" },
+                    {
+                      "id": "hl",
+                      "type": "group",
+                      "clip": { "shape": "roundRect", "x": 96, "y": 0, "width": 1728, "height": 140, "radius": 22 },
+                      "children": [
+                        {
+                          "id": "f",
+                          "type": "shape",
+                          "shape": "rect",
+                          "x": 96,
+                          "y": 0,
+                          "width": 0,
+                          "height": 140,
+                          "fill": "{{fc}}",
+                          "animate": [
+                            {
+                              "prop": "width",
+                              "keys": [
+                                ["{{at | add:0.2}}", 0],
+                                ["{{at | add:0.9}}", "{{full}}", "out"]
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    { "id": "rank", "type": "text", "text": "{{item.rank}}.", "x": 136, "y": 92, "size": 60, "font": "b", "color": "walnut" },
+                    {
+                      "id": "img",
+                      "type": "image",
+                      "src": "{{item.user.avatar}}",
+                      "title": "{{item.user.name}}",
+                      "x": 250,
+                      "y": 16,
+                      "width": 108,
+                      "height": 108,
+                      "clip": { "shape": "circle", "x": 304, "y": 70, "radius": 54 },
+                      "fallback": "avatar"
+                    },
+                    {
+                      "id": "name",
+                      "type": "text",
+                      "text": "{{item.user.name}}",
+                      "x": 395,
+                      "y": 94,
+                      "size": 60,
+                      "font": "d",
+                      "color": "walnut",
+                      "fit": "step",
+                      "minSize": 40,
+                      "maxWidth": 1100
+                    },
+                    {
+                      "id": "hours",
+                      "type": "text",
+                      "text": "{{item.hours | hours:\"number\"}} h",
+                      "x": 1784,
+                      "y": 92,
+                      "size": 56,
+                      "font": "b",
+                      "color": "walnut",
+                      "align": "right"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "superlatives": {
+          "background": "teal",
+          "vars": { "sp": "server.superlatives" },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "edges",
+              "type": "repeat",
+              "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "cream" }],
+              "vars": { "at": "{{index | mul:0.15 | add:0.1}}" },
+              "template": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": "{{index | mul:40}}",
+                  "y": 0,
+                  "width": 40,
+                  "height": 1080,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        ["{{at}}", "-120"],
+                        ["{{at | add:0.8}}", "+0", "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "cards",
+              "type": "repeat",
+              "x": 1020,
+              "y": 545,
+              "layout": "grid",
+              "columns": 2,
+              "pitch": [820, 430],
+              "items": [
+                { "label": "Most movies:", "u": "{{sp.mostMovies.user.name}}", "v": "{{sp.mostMovies.value}}", "t": "({{sp.mostMovies.value | number}})" },
+                { "label": "Most episodes:", "u": "{{sp.mostEpisodes.user.name}}", "v": "{{sp.mostEpisodes.value}}", "t": "({{sp.mostEpisodes.value | number}})" },
+                { "label": "Most rewatches:", "u": "{{sp.mostRewatches.user.name}}", "v": "{{sp.mostRewatches.value}}", "t": "({{sp.mostRewatches.value | number}})" },
+                { "label": "Most music:", "u": "{{sp.mostMusic.user.name}}", "v": "{{sp.mostMusic.value}}", "t": "({{sp.mostMusic.value | hours}})" }
+              ],
+              "where": "item.v > 0",
+              "vars": { "at": "{{index | mul:0.8 | add:0.5}}" },
+              "template": [
+                {
+                  "id": "card",
+                  "type": "group",
+                  "in": { "preset": "up", "at": "{{at}}", "args": { "dur": 0.8, "dist": 70 } },
+                  "children": [
+                    { "id": "wood", "type": "effect", "effect": "wood", "x": -380, "y": -190, "width": 760, "height": 380, "radius": 30 },
+                    { "id": "label", "type": "text", "text": "{{item.label}}", "x": 0, "y": -88, "size": 52, "font": "b", "color": "mustard", "align": "center" },
+                    {
+                      "id": "who",
+                      "type": "text",
+                      "text": "{{item.u}}",
+                      "x": 0,
+                      "y": 50,
+                      "size": 110,
+                      "font": "d",
+                      "color": "cream",
+                      "align": "center",
+                      "fit": "step",
+                      "minSize": 56,
+                      "maxWidth": 660
+                    },
+                    {
+                      "id": "v",
+                      "type": "text",
+                      "text": "{{item.t}}",
+                      "x": 0,
+                      "y": 128,
+                      "size": 50,
+                      "font": "b",
+                      "color": "walnut",
+                      "align": "center",
+                      "box": { "padX": 34, "height": 76, "radius": 38, "fill": "mustard", "shift": 0.34 }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "music": {
+          "vars": { "songs": "server.music.topSongs | take:3" },
+          "elements": [
+            { "id": "hours", "children": [{ "id": "t", "value": "{{server.music.hours | default:0}}" }] },
+            { "id": "artist", "children": [{ "id": "t", "text": "Top artist: {{server.music.topArtist.name}}." }] }
+          ]
+        },
+        "lineup": {
+          "background": "teal",
+          "vars": {
+            "all": "server.lineup",
+            "grown": "all | where:\"isKid\",false",
+            "kids": "all | where:\"isKid\",true",
+            "gN": "grown | count",
+            "kN": "kids | count",
+            "gp": "gN | div:6 | ceil",
+            "kp": "kN | div:6 | ceil",
+            "pages": "gp | atLeast:kp | atLeast:1",
+            "gper": "gN | div:pages | ceil",
+            "kper": "kN | div:pages | ceil",
+            "pgd": "slide.duration | div:pages"
+          },
+          "elements": [
+            { "id": "base-headline", "remove": true },
+            {
+              "id": "edges",
+              "type": "repeat",
+              "items": [{ "c": "mustard" }, { "c": "rust" }, { "c": "cream" }],
+              "vars": { "at": "{{index | mul:0.15 | add:0.1}}" },
+              "template": [
+                {
+                  "id": "r",
+                  "type": "shape",
+                  "shape": "rect",
+                  "x": "{{index | mul:40}}",
+                  "y": 0,
+                  "width": 40,
+                  "height": 1080,
+                  "fill": "{{item.c}}",
+                  "animate": [
+                    {
+                      "prop": "x",
+                      "keys": [
+                        ["{{at}}", "-120"],
+                        ["{{at | add:0.8}}", "+0", "out"]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "pages",
+              "type": "repeat",
+              "count": "{{pages}}",
+              "vars": {
+                "glo": "{{index | mul:gper}}",
+                "klo": "{{index | mul:kper}}",
+                "gs": "grown | skip:glo | take:gper",
+                "ks": "kids | skip:klo | take:kper",
+                "gc": "gs | count",
+                "kc": "ks | count",
+                "both": "gc > 0 && kc > 0",
+                "yG": "{{both | then:300,520}}",
+                "yK": "{{both | then:760,520}}",
+                "rowN": "gc | atLeast:kc",
+                "pitch": "{{1740 | div:rowN | atMost:360}}",
+                "ps": "{{index | mul:pgd}}",
+                "gAt": "{{ps | add:0.3}}",
+                "kAt": "{{gc | mul:0.3 | add:gAt | add:0.3}}",
+                "last": "index | add:1 >= pages",
+                "pe": "{{index | add:1 | mul:pgd}}",
+                "pend": "{{last | then:100000,pe}}"
+              },
+              "template": [
+                {
+                  "id": "page",
+                  "type": "group",
+                  "end": "{{pend}}",
+                  "children": [
+                    {
+                      "id": "gHead",
+                      "type": "group",
+                      "when": "gc > 0",
+                      "in": { "preset": "up", "at": "{{gAt}}" },
+                      "children": [
+                        {
+                          "id": "t",
+                          "type": "text",
+                          "text": "Grown-ups",
+                          "x": 1020,
+                          "y": "{{yG | sub:160}}",
+                          "size": 44,
+                          "font": "b",
+                          "color": "walnut",
+                          "align": "center",
+                          "box": { "padX": 32, "height": 70, "radius": 35, "fill": "mustard", "shift": 0.34 }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "gRow",
+                      "type": "repeat",
+                      "items": "{{gs}}",
+                      "x": 1020,
+                      "y": "{{yG}}",
+                      "layout": "row",
+                      "pitch": "{{pitch}}",
+                      "vars": { "at": "{{index | mul:0.3 | add:gAt | add:0.3}}" },
+                      "template": [
+                        {
+                          "id": "who",
+                          "type": "group",
+                          "in": { "preset": "up", "at": "{{at}}", "args": { "dist": 60 } },
+                          "children": [
+                            {
+                              "id": "portrait-frame-small",
+                              "type": "image",
+                              "src": "img/portrait-frame-small.svg",
+                              "x": -87,
+                              "y": -107,
+                              "width": 174,
+                              "height": 214,
+                              "fit": "fill"
+                            },
+                            {
+                              "id": "img",
+                              "type": "image",
+                              "src": "{{item.avatar}}",
+                              "title": "{{item.name}}",
+                              "x": -72,
+                              "y": -92,
+                              "width": 144,
+                              "height": 184,
+                              "clip": { "shape": "ellipse", "x": 0, "y": 0, "rx": 72, "ry": 92 },
+                              "fallback": "avatar"
+                            },
+                            {
+                              "id": "name",
+                              "type": "text",
+                              "text": "{{item.name}}",
+                              "x": 0,
+                              "y": 168,
+                              "size": 46,
+                              "font": "d",
+                              "color": "cream",
+                              "align": "center",
+                              "fit": "step",
+                              "minSize": 30,
+                              "maxWidth": "{{pitch | sub:40}}"
+                            },
+                            {
+                              "id": "role",
+                              "type": "text",
+                              "text": "{{item.persona.name}}",
+                              "x": 0,
+                              "y": 214,
+                              "size": 34,
+                              "font": "b",
+                              "color": "cream",
+                              "align": "center",
+                              "fit": "wraplines",
+                              "lines": 2,
+                              "maxWidth": "{{pitch | sub:30}}",
+                              "lineHeight": 1.1
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "kHead",
+                      "type": "group",
+                      "when": "kc > 0",
+                      "in": { "preset": "up", "at": "{{kAt}}" },
+                      "children": [
+                        {
+                          "id": "t",
+                          "type": "text",
+                          "text": "Kids",
+                          "x": 1020,
+                          "y": "{{yK | sub:160}}",
+                          "size": 44,
+                          "font": "b",
+                          "color": "cream",
+                          "align": "center",
+                          "box": { "padX": 32, "height": 70, "radius": 35, "fill": "rust", "shift": 0.34 }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "kRow",
+                      "type": "repeat",
+                      "items": "{{ks}}",
+                      "x": 1020,
+                      "y": "{{yK}}",
+                      "layout": "row",
+                      "pitch": "{{pitch}}",
+                      "vars": { "at": "{{index | mul:0.3 | add:kAt | add:0.3}}" },
+                      "template": [
+                        {
+                          "id": "who",
+                          "type": "group",
+                          "in": { "preset": "up", "at": "{{at}}", "args": { "dist": 60 } },
+                          "children": [
+                            {
+                              "id": "portrait-frame-small",
+                              "type": "image",
+                              "src": "img/portrait-frame-small.svg",
+                              "x": -87,
+                              "y": -107,
+                              "width": 174,
+                              "height": 214,
+                              "fit": "fill"
+                            },
+                            {
+                              "id": "img",
+                              "type": "image",
+                              "src": "{{item.avatar}}",
+                              "title": "{{item.name}}",
+                              "x": -72,
+                              "y": -92,
+                              "width": 144,
+                              "height": 184,
+                              "clip": { "shape": "ellipse", "x": 0, "y": 0, "rx": 72, "ry": 92 },
+                              "fallback": "avatar"
+                            },
+                            {
+                              "id": "name",
+                              "type": "text",
+                              "text": "{{item.name}}",
+                              "x": 0,
+                              "y": 168,
+                              "size": 46,
+                              "font": "d",
+                              "color": "mustard",
+                              "align": "center",
+                              "fit": "step",
+                              "minSize": 30,
+                              "maxWidth": "{{pitch | sub:40}}"
+                            },
+                            {
+                              "id": "role",
+                              "type": "text",
+                              "text": "{{item.persona.name}}",
+                              "x": 0,
+                              "y": 214,
+                              "size": 34,
+                              "font": "b",
+                              "color": "cream",
+                              "align": "center",
+                              "fit": "wraplines",
+                              "lines": 2,
+                              "maxWidth": "{{pitch | sub:30}}",
+                              "lineHeight": 1.1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "summary": {
+          "vars": {
+            "hasGenre": "server.topGenres | count > 0",
+            "sayK": "kOne | then:kName,\"kids\"",
+            "sayW": "kidsWin | then:sayK,\"grown-ups\"",
+            "sayE": "(groups.moreEpisodes == \"kids\") | then:sayK,\"grown-ups\"",
+            "eKs": "groups.kids.episodes | div:groups.kids.count",
+            "eGs": "groups.grownups.episodes | div:groups.grownups.count",
+            "wTwist": "{{sayW}} by hours, {{sayE}} by episodes",
+            "wOut": "{{sayW}} out-watched",
+            "eWs": "kidsWin | then:eKs,eGs",
+            "tw": "twist && eWs > 0",
+            "wText": "tw | then:wTwist,wOut",
+            "winner": "groups.hasSplit | then:wText"
+          },
+          "elements": [
+            { "id": "initial", "children": [{ "id": "t", "text": "{{server.name | initials}}" }] },
+            { "id": "hours", "when": "server.totals.hours != null", "children": [{ "id": "t", "text": "{{server.totals.hours | hours:\"number\"}} h" }] },
+            {
+              "id": "show",
+              "when": "server.topSeries | count > 0",
+              "children": [
+                { "id": "p", "src": "{{server.topSeries[0].poster}}", "title": "{{server.topSeries[0].title}}" },
+                { "id": "t", "text": "{{server.topSeries[0].title}}" }
+              ]
+            },
+            {
+              "id": "movie",
+              "when": "server.topMovies | count > 0",
+              "children": [
+                { "id": "p", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" },
+                { "id": "t", "text": "{{server.topMovies[0].title}}" }
+              ]
+            },
+            {
+              "id": "mrow",
+              "children": [
+                { "id": "mg", "text": "{{server.topGenres[0].name}}" },
+                { "id": "mp", "when": "winner", "text": "{{winner}}" }
+              ]
+            },
+            { "id": "genre-chip", "children": [{ "id": "gt", "text": "{{server.topGenres[0].name}}" }] },
+            { "id": "persona-chip", "when": "winner", "children": [{ "id": "pt", "text": "{{winner}}" }] }
+          ]
+        },
+        "outro": {
+          "elements": [
+            {
+              "id": "picture",
+              "children": [{ "id": "that", "children": [{ "id": "t", "text": "That was {{server.possessiveInline}} {{year}}.", "fit": "title", "size2": 66, "y2": 440 }] }]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-73 -73 283 146">
+  <circle cx="0" cy="0" r="62" fill="#FFF6F2" fill-opacity="0.55" stroke="#FFF6F2" stroke-width="13" stroke-opacity="0.7"/>
+  <polyline points="68.2,-22.3 75.6,-18.4 83.1,-17.5 90.5,-20.2 98,-24.5 105.4,-27.2 112.8,-26.2 120.3,-22.2 127.7,-18.4 135.2,-17.5 142.6,-20.3 150,-24.6 157.5,-27.2 164.9,-26.1 172.4,-22.2 179.8,-18.3 187.2,-17.5 194.7,-20.4 202.1,-24.7" fill="none" stroke="#FFF6F2" stroke-width="13" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.2,0 75.6,3.9 83.1,4.8 90.5,2.1 98,-2.2 105.4,-4.8 112.8,-3.8 120.3,0.1 127.7,3.9 135.2,4.8 142.6,2 150,-2.3 157.5,-4.9 164.9,-3.8 172.4,0.2 179.8,4 187.2,4.8 194.7,2 202.1,-2.3" fill="none" stroke="#FFF6F2" stroke-width="13" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="68.2,22.3 75.6,26.2 83.1,27.2 90.5,24.4 98,20.1 105.4,17.5 112.8,18.5 120.3,22.4 127.7,26.3 135.2,27.1 142.6,24.4 150,20.1 157.5,17.5 164.9,18.5 172.4,22.5 179.8,26.3 187.2,27.1 194.7,24.3 202.1,20" fill="none" stroke="#FFF6F2" stroke-width="13" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="0" cy="0" r="62" fill="none" stroke="#2A1020" stroke-width="5"/>
+  <circle cx="0" cy="0" r="49.6" fill="none" stroke="#2A1020" stroke-width="5"/>
+  <polyline points="68.2,-22.3 75.6,-18.4 83.1,-17.5 90.5,-20.2 98,-24.5 105.4,-27.2 112.8,-26.2 120.3,-22.2 127.7,-18.4 135.2,-17.5 142.6,-20.3 150,-24.6 157.5,-27.2 164.9,-26.1 172.4,-22.2 179.8,-18.3 187.2,-17.5 194.7,-20.4 202.1,-24.7" fill="none" stroke="#2A1020" stroke-width="5" stroke-linejoin="round"/>
+  <polyline points="68.2,0 75.6,3.9 83.1,4.8 90.5,2.1 98,-2.2 105.4,-4.8 112.8,-3.8 120.3,0.1 127.7,3.9 135.2,4.8 142.6,2 150,-2.3 157.5,-4.9 164.9,-3.8 172.4,0.2 179.8,4 187.2,4.8 194.7,2 202.1,-2.3" fill="none" stroke="#2A1020" stroke-width="5" stroke-linejoin="round"/>
+  <polyline points="68.2,22.3 75.6,26.2 83.1,27.2 90.5,24.4 98,20.1 105.4,17.5 112.8,18.5 120.3,22.4 127.7,26.3 135.2,27.1 142.6,24.4 150,20.1 157.5,17.5 164.9,18.5 172.4,22.5 179.8,26.3 187.2,27.1 194.7,24.3 202.1,20" fill="none" stroke="#2A1020" stroke-width="5" stroke-linejoin="round"/>
+</svg>

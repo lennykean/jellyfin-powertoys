@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1125 265 630 630" width="630" height="630">
+  <circle id="ring" cx="1440" cy="580" r="300" fill="none" stroke="#2F3A86" stroke-width="4"/>
+  <line x1="1440" y1="292" x2="1440" y2="268" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1586.5" y1="332.04" x2="1598.71" y2="311.38" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1684.75" y1="428.2" x2="1705.14" y2="415.55" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1727.93" y1="573.8" x2="1751.93" y2="573.29" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1693.44" y1="716.79" x2="1714.56" y2="728.18" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1588.63" y1="826.69" x2="1601.01" y2="847.24" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1447.44" y1="867.9" x2="1448.06" y2="891.9" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1299.95" y1="831.66" x2="1288.28" y2="852.63" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1191.42" y1="725.43" x2="1170.7" y2="737.55" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1152.02" y1="583.72" x2="1128.03" y2="584.03" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1190.17" y1="436.72" x2="1169.35" y2="424.78" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+  <line x1="1293.5" y1="332.04" x2="1281.29" y2="311.38" fill="none" stroke="#EEF0FF99" stroke-width="3"/>
+</svg>

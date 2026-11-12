@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="179 219 682 682">
+  <circle cx="520" cy="560" r="330" fill="#FFF6F2"/>
+  <circle cx="520" cy="560" r="330" fill="none" stroke="#6B1E3A" stroke-width="14"/>
+  <rect x="516" y="254" width="8" height="44" fill="#2A1020"/>
+  <g transform="translate(520 560) rotate(30) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(60) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(90) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="44" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(120) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(150) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(180) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="44" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(210) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(240) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(270) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="44" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(300) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+  <g transform="translate(520 560) rotate(330) translate(-520 -560)">
+    <rect x="516" y="254" width="8" height="26" fill="#2A1020"/>
+  </g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-196 -189 392 378">
+  <circle cx="160" cy="0" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="129.44" cy="94.05" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="49.44" cy="152.17" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="-49.44" cy="152.17" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="-129.44" cy="94.05" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="-160" cy="0" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="-129.44" cy="-94.05" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="-49.44" cy="-152.17" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="49.44" cy="-152.17" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="129.44" cy="-94.05" r="34" fill='{{dusk | then:"#D6336C","#F28C28"}}'/>
+  <circle cx="0" cy="0" r="125" fill="#FFC233"/>
+</svg>

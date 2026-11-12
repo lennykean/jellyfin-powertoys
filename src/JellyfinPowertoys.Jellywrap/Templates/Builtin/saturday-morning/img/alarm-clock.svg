@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="232 258 616 667" width="616" height="667">
+  <line id="leg1" x1="370" y1="830" x2="310" y2="915" fill="none" stroke="#1E1B4B" stroke-width="18" stroke-linecap="round"/>
+  <line id="leg2" x1="710" y1="830" x2="770" y2="915" fill="none" stroke="#1E1B4B" stroke-width="18" stroke-linecap="round"/>
+  <circle id="bell1" cx="335" cy="350" r="85" fill="#FFD23F" stroke="#1E1B4B" stroke-width="12"/>
+  <circle id="bell2" cx="745" cy="350" r="85" fill="#FFD23F" stroke="#1E1B4B" stroke-width="12"/>
+  <circle id="rim" cx="540" cy="600" r="300" fill="#FF5A36" stroke="#1E1B4B" stroke-width="14"/>
+  <circle id="face" cx="540" cy="600" r="250" fill="#FFF8E7" stroke="#1E1B4B" stroke-width="10"/>
+  <path id="night" d="M540 600 L335.62 482 A236 236 0 0 1 658 395.62 A236 236 0 0 1 744.38 718 Z" fill="#BDE9FA" display='{{(late) | then:"inline","none"}}'/>
+  <line x1="540" y1="404" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="12" stroke-linecap="round"/>
+  <g transform="rotate(30 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(60 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(90 540 600)">
+    <line x1="540" y1="404" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(120 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(150 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(180 540 600)">
+    <line x1="540" y1="404" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(210 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(240 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(270 540 600)">
+    <line x1="540" y1="404" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(300 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(330 540 600)">
+    <line x1="540" y1="388" x2="540" y2="364" fill="none" stroke="#1E1B4B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

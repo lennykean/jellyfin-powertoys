@@ -1195,5 +1195,15 @@
         "timestamp": "2026-03-10T01:39:06Z"
       }
     ]
+  },
+  {
+    "category": "General",
+    "guid": "79f37cbb-74db-44cb-a2ac-e95a5e7fbd9f",
+    "name": "Jellywrap",
+    "description": "A Spotify Wrapped style video of Jellyfin's usage over the year.",
+    "owner": "lennykean",
+    "overview": "A Spotify Wrapped style video of Jellyfin's usage over the year.",
+    "imageUrl": "https://raw.githubusercontent.com/lennykean/jellyfin-powertoys/main/logo.png",
+    "versions": []
   }
 ]

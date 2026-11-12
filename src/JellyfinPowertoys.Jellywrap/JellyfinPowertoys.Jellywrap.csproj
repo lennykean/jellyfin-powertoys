@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jellyfin.Controller" />
+    <PackageReference Include="SkiaSharp" ExcludeAssets="runtime;native" />
+    <PackageReference Include="HarfBuzzSharp" ExcludeAssets="runtime;native" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\configPage.html" />
+    <EmbeddedResource Include="Templates\Builtin\**\*" LogicalName="Templates/Builtin/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Templates\Starter\**\*" LogicalName="Templates/Starter/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

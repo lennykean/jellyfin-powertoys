@@ -1,0 +1,257 @@
+{
+  "id": "kid",
+  "name": "Kid (base)",
+  "audience": "base",
+  "fonts": { "body": "pkg:adult/fonts/Manrope-700.ttf" },
+  "palette": { "bg": "#FFF4E6", "ink": "#3A2350", "accent": "#FF8FB1" },
+  "background": "#000000",
+  "transition": { "type": "crossfade", "duration": 0.8 },
+  "open": { "type": "fade", "duration": 0.5, "ease": "out" },
+  "close": { "type": "fade", "duration": 0.8, "ease": "in-out" },
+  "card": { "slide": "intro", "time": 5 },
+  "vars": {
+    "isEpisode": "me.mostReplayed.kind == \"episode\"",
+    "replayedMain": "{{isEpisode | then:\"'\"}}{{me.mostReplayed.title}}{{isEpisode | then:\"'\"}}",
+    "replayedSeries": "{{me.mostReplayed.seriesTitle | then:\"(\"}}{{me.mostReplayed.seriesTitle}}{{me.mostReplayed.seriesTitle | then:\")\"}}"
+  },
+  "slides": {
+    "intro": {
+      "duration": 6,
+      "audioGroup": 1,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 140,
+          "color": "ink",
+          "x": 960,
+          "y": 580,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "pop",
+          "text": "{{me.possessive}} {{year}}!"
+        }
+      ]
+    },
+    "total-time": {
+      "duration": 10,
+      "audioGroup": 1,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 56,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "pop",
+          "text": "About {{me.totals.hours | round}} hours, that's like {{me.totals.hours | div:1.5 | number}} movies!"
+        }
+      ]
+    },
+    "counts": {
+      "duration": 10,
+      "audioGroup": 1,
+      "background": "bg",
+      "when": "me.totals.episodes > 0 || me.totals.movies > 0",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 88,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "pop",
+          "text": "{{me.totals.episodes | number}} episodes and {{me.totals.movies | number}} movies!"
+        }
+      ]
+    },
+    "fav-shows": {
+      "duration": 12,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topSeries | count > 0",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 100, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "pop", "text": "Your favorite shows" }
+      ]
+    },
+    "fav-movies": {
+      "duration": 12,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.topMovies | count > 0",
+      "elements": [
+        { "id": "base-headline", "type": "text", "font": "body", "size": 100, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "pop", "text": "Your favorite movies" }
+      ]
+    },
+    "story": {
+      "duration": 9,
+      "audioGroup": 2,
+      "background": "bg",
+      "when": "me.storyGenre != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 88,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "title",
+          "size2": 64,
+          "maxWidth": 1600,
+          "y2": 600,
+          "in": "pop",
+          "text": "Your favorite kind of story: {{me.storyGenre.name}}!"
+        }
+      ]
+    },
+    "again": {
+      "duration": 10,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "me.mostReplayed.completions >= 2",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 56,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "pop",
+          "text": "You watched {{replayedMain}} {{me.mostReplayed.completions}} times!"
+        }
+      ]
+    },
+    "fav-time": {
+      "duration": 9,
+      "audioGroup": 3,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 120,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "in": "pop",
+          "text": "{{me.clock.favoritePart | title}}s are your time!"
+        }
+      ]
+    },
+    "music": {
+      "duration": 10,
+      "audioGroup": 3,
+      "background": "bg",
+      "when": "me.music != null",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 80,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 56,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "pop",
+          "text": "Your song: {{me.music.topSongs[0].title | default:me.music.topArtist.name}} by {{me.music.topSongs[0].seriesTitle | default:me.music.topArtist.name}}!"
+        }
+      ]
+    },
+    "persona": {
+      "duration": 14,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 120,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "fit": "line",
+          "maxWidth": 1600,
+          "in": "pop",
+          "text": "You're {{me.persona.name}}!"
+        }
+      ]
+    },
+    "summary": {
+      "duration": 12,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 64,
+          "color": "ink",
+          "x": 960,
+          "y": 540,
+          "align": "center",
+          "fit": "title",
+          "size2": 48,
+          "maxWidth": 1600,
+          "y2": 580,
+          "in": "pop",
+          "text": "{{me.totals.hours | round}} hours · {{me.topSeries[0].title | default:me.topMovies[0].title}} · {{me.persona.name}}"
+        }
+      ]
+    },
+    "outro": {
+      "duration": 5,
+      "audioGroup": 4,
+      "background": "bg",
+      "elements": [
+        {
+          "id": "base-headline",
+          "type": "text",
+          "font": "body",
+          "size": 96,
+          "color": "ink",
+          "x": 960,
+          "y": 560,
+          "align": "center",
+          "in": "pop",
+          "text": "What a year, {{me.name}}! See you next year!"
+        }
+      ]
+    }
+  }
+}

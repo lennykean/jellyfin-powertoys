@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="304 384 432 432" width="432" height="432">
+  <circle id="face" cx="520" cy="600" r="215" fill="#F6EBD9"/>
+  <g transform="rotate(-60 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(-50 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(-40 520 600)">
+    <line x1="520" y1="420" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="7"/>
+  </g>
+  <g transform="rotate(-30 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(-20 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(-10 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <line x1="520" y1="420" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="7"/>
+  <g transform="rotate(10 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(20 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(30 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(40 520 600)">
+    <line x1="520" y1="420" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="7"/>
+  </g>
+  <g transform="rotate(50 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+  <g transform="rotate(60 520 600)">
+    <line x1="520" y1="404" x2="520" y2="390" fill="none" stroke="#3A2A1F" stroke-width="4"/>
+  </g>
+</svg>

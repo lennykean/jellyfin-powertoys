@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1568 644 244 293" width="244" height="293">
+  <polygon id="ear1" points="1595,740 1612,650 1665,700" fill="#2A2670" stroke="#1E1B4B" stroke-width="10" stroke-linejoin="round"/>
+  <polygon id="ear2" points="1785,740 1768,650 1715,700" fill="#2A2670" stroke="#1E1B4B" stroke-width="10" stroke-linejoin="round"/>
+  <ellipse id="body" cx="1690" cy="800" rx="115" ry="130" fill="#2A2670" stroke="#1E1B4B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse id="belly" cx="1690" cy="852" rx="70" ry="64" fill="#FFF8E7" stroke="#1E1B4B" stroke-width="8" stroke-linejoin="round"/>
+  <circle id="eye1" cx="1644" cy="762" r="42" fill="#FFFFFF" stroke="#1E1B4B" stroke-width="9"/>
+  <circle id="eye2" cx="1736" cy="762" r="42" fill="#FFFFFF" stroke="#1E1B4B" stroke-width="9"/>
+  <polygon id="beak" points="1672,794 1708,794 1690,822" fill="#FFD23F" stroke="#1E1B4B" stroke-width="7" stroke-linejoin="round"/>
+</svg>
