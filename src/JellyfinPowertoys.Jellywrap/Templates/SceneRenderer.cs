@@ -14,13 +14,13 @@ internal static class SceneRenderer
 
     private const int TitleCardJpegQuality = 90;
 
-    private static readonly SKImageInfo _frameInfo = new(Scene.Width, Scene.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+    private static readonly SKImageInfo _frameInfo = new SKImageInfo(Scene.Width, Scene.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
     public static async Task<bool> WriteFramesAsync(Scene scene, Stream output, CancellationToken cancellationToken)
     {
-        var frameCount = (int)Rounding.HalfUp(scene.Duration * FramesPerSecond);
+        var frameCount = (int)(scene.Duration * FramesPerSecond).RoundHalfUp();
         var pixels = GC.AllocateArray<byte>(_frameInfo.BytesSize, pinned: true);
         using var surface = SKSurface.Create(_frameInfo, Marshal.UnsafeAddrOfPinnedArrayElement(pixels, 0), _frameInfo.RowBytes);
-        using var painter = new Painter(surface.Canvas, scene.Fonts, scene.Images);
+        using var painter = new Painter(surface.Canvas, scene.Shaper);
         for (var frame = 0; frame < frameCount; frame++)
         {
             scene.Draw(painter, (double)frame / FramesPerSecond);
@@ -41,7 +41,7 @@ internal static class SceneRenderer
     public static void RenderTitleCard(Scene scene, string outputJpg)
     {
         using var surface = SKSurface.Create(_frameInfo);
-        using var painter = new Painter(surface.Canvas, scene.Fonts, scene.Images);
+        using var painter = new Painter(surface.Canvas, scene.Shaper);
         scene.Draw(painter, scene.CardAt);
         using var image = surface.Snapshot();
         using var jpeg = image.Encode(SKEncodedImageFormat.Jpeg, TitleCardJpegQuality);

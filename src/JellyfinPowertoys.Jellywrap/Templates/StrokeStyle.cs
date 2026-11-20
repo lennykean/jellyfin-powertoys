@@ -26,6 +26,11 @@ internal static class StrokeStyle
 
     public static SKPathEffect? Dash(float[] intervals, float offset)
     {
-        return intervals.Length == 0 ? null : SKPathEffect.CreateDash(intervals.Length % 2 == 0 ? intervals : [.. intervals, .. intervals], offset);
+        if (intervals.Length == 0)
+        {
+            return null;
+        }
+
+        return SKPathEffect.CreateDash(intervals.Length % 2 == 0 ? intervals : [.. intervals, .. intervals], offset);
     }
 }

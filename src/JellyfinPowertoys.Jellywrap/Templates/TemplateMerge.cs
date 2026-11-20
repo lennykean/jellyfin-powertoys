@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
@@ -72,7 +73,7 @@ internal static class TemplateMerge
         foreach (var item in overlay.OfType<JsonObject>())
         {
             var index = IndexOf(item["id"]!.GetValue<string>());
-            if (item["remove"]?.GetValue<bool>() == true)
+            if (item["remove"] is JsonValue remove && remove.GetValueKind() == JsonValueKind.True)
             {
                 if (index >= 0)
                 {
@@ -88,8 +89,8 @@ internal static class TemplateMerge
                 continue;
             }
 
-            var neighbor = item["before"]?.GetValue<string>() ?? item["after"]?.GetValue<string>();
-            var neighborIndex = neighbor is null ? -1 : IndexOf(neighbor);
+            var hasNeighbor = PropertyReader.IsString(item["before"] ?? item["after"], out var neighbor);
+            var neighborIndex = hasNeighbor ? IndexOf(neighbor) : -1;
             var added = item.DeepClone();
             if (neighborIndex < 0)
             {
@@ -106,6 +107,6 @@ internal static class TemplateMerge
 
     private static bool HasIds(JsonArray array)
     {
-        return array.Count > 0 && array.All(item => item is JsonObject element && element["id"] is JsonValue);
+        return array.Count > 0 && array.All(item => item is JsonObject element && PropertyReader.IsString(element["id"], out _));
     }
 }

@@ -4,21 +4,21 @@ using SkiaSharp;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
 
-internal sealed class Painter(SKCanvas canvas, FontStore fonts, ImageStore images) : IDisposable
+internal sealed class Painter(SKCanvas canvas, TextShaper shaper) : IDisposable
 {
     private const float MiterLimit = 10;
 
-    private static readonly SKSamplingOptions _smooth = new(SKCubicResampler.Mitchell);
+    private static readonly SKSamplingOptions _smooth = new SKSamplingOptions(SKCubicResampler.Mitchell);
 
-    private readonly SKPaint _skiaPaint = new();
+    private readonly SKPaint _skiaPaint = new SKPaint();
 
     public SKCanvas Canvas { get; } = canvas;
 
-    public FontStore Fonts { get; } = fonts;
-
-    public ImageStore Images { get; } = images;
+    public TextShaper Shaper { get; } = shaper;
 
     public double Alpha { get; set; } = 1;
+
+    public int BlurLayers { get; set; }
     public SKPaint Fill(Paint paint, double alpha = 1)
     {
         Reset(paint, alpha);

@@ -13,7 +13,8 @@ internal sealed class Palette(JsonObject colors)
 {
     private const char AlphaSeparator = '@';
     private const string NoPaint = "none";
-    private const int PointNumbers = 2;
+    public const int PointNumbers = 2;
+    public const int StopParts = 2;
     public SKColor Color(string name)
     {
         var alphas = new Stack<double>();
@@ -64,8 +65,16 @@ internal sealed class Palette(JsonObject colors)
                 {
                     var stops = (gradient["stops"] as JsonArray ?? [])
                         .OfType<JsonArray>()
-                        .Select(stop => ((float)(PropertyReader.ReadNumber(stop[0], scope) ?? 0), Paint(stop[1], scope)?.Color ?? SKColors.Transparent))
+                        .Select(stop => stop.Count >= StopParts
+                            ? ((float)(PropertyReader.ReadNumber(stop[0], scope) ?? 0), Paint(stop[1], scope)?.Color ?? SKColors.Transparent)
+                            : throw new FormatException("A gradient stop must be [offset, color]."))
                         .ToArray();
+                    var repeat = PropertyReader.ReadNumber(gradient["repeat"], scope) ?? 1;
+                    if (repeat > Gradient.MaxRepeat)
+                    {
+                        throw new FormatException($"A gradient's \"repeat\" must be at most {Gradient.MaxRepeat}, not {repeat}.");
+                    }
+
                     float[] Point(string property)
                     {
                         var point = (gradient[property] as JsonArray ?? []).Select(coordinate => (float)(PropertyReader.ReadNumber(coordinate, scope) ?? 0)).ToArray();
@@ -75,11 +84,11 @@ internal sealed class Palette(JsonObject colors)
                     return new Paint(
                         SKColors.Black,
                         new Gradient(
-                            gradient["type"]?.GetValue<string>() == "radial",
+                            PropertyReader.IsString(gradient["type"], out var type) && type == "radial",
                             Point("from"),
                             Point("to"),
                             stops,
-                            (int)(PropertyReader.ReadNumber(gradient["repeat"], scope) ?? 1),
+                            (int)repeat,
                             gradient["end"] is { } end ? Paint(end, scope)?.Color : null));
                 }
 

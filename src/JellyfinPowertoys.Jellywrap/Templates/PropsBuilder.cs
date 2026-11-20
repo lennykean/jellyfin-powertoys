@@ -8,8 +8,8 @@ internal sealed class PropsBuilder(Palette palette, TrackBuilder tracks)
     private static readonly HashSet<string> _structureKeys =
     [
         "id", "type", "when", "in", "out", "idle", "animate", "children", "template", "items", "vars", "clip", "fallback", "text",
-        "src", "title", "words", "lead", "single", "parts", "shape", "effect", "remove", "before", "after", "box", "border", "layout",
-        "where", "value", "pivot", "d", "points", "dash", "layer", "params",
+        "src", "title", "words", "lead", "single", "parts", "shape", "effect", "remove", "before", "after", "box", "border",
+        "where", "pivot", "d", "points", "dash", "layer", "params",
     ];
 
     private static readonly string[] _groupKeys = ["box", "border"];
@@ -26,7 +26,7 @@ internal sealed class PropsBuilder(Palette palette, TrackBuilder tracks)
         props.SlideStart = placement.Start;
         foreach (var (key, value) in definition)
         {
-            if (_structureKeys.Contains(key) && key is not ("layout" or "value"))
+            if (_structureKeys.Contains(key))
             {
                 continue;
             }
@@ -44,6 +44,11 @@ internal sealed class PropsBuilder(Palette palette, TrackBuilder tracks)
         {
             foreach (var (key, value) in definition[group] as JsonObject ?? [])
             {
+                if (key.Length == 0)
+                {
+                    continue;
+                }
+
                 var property = group + char.ToUpperInvariant(key[0]) + key[1..];
                 if (Props.IsPaint(property))
                 {

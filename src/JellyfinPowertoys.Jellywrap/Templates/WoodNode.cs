@@ -13,9 +13,10 @@ internal sealed class WoodNode(EffectParameters parameters) : Node
     private const double GrainSway = 7;
     private const double GrainStrokeWidth = 3;
     private const double SeamWidth = 6;
+    private const int MaxLines = 1000;
 
     private readonly SKColor _color = parameters.Color("color", "#3A2A1F");
-    private readonly Paint _grain = new(parameters.Color("grain", "#4A3628"));
+    private readonly Paint _grain = new Paint(parameters.Color("grain", "#4A3628"));
     private readonly SKColor _seam = parameters.Color("seam", "#2B1F16");
 
     protected override void DrawSelf(Painter painter, double slideTime, double x, double y)
@@ -32,11 +33,13 @@ internal sealed class WoodNode(EffectParameters parameters) : Node
         }
 
         painter.Rect(_color, x, y, width, height);
-        for (var grainX = x + (GrainSpacing / 2); grainX < x + width; grainX += GrainSpacing)
+        var grainX = x + (GrainSpacing / 2);
+        for (var grain = 0; grain < MaxLines && grainX < x + width; grain++, grainX += GrainSpacing)
         {
             using var line = new SKPath();
             line.MoveTo((float)grainX, (float)y);
-            for (var grainY = y; grainY <= y + height + GrainSegment; grainY += GrainSegment)
+            var grainY = y;
+            for (var segment = 0; segment < MaxLines && grainY <= y + height + GrainSegment; segment++, grainY += GrainSegment)
             {
                 line.LineTo((float)(grainX + (Math.Sin((grainY * GrainWaveAlong) + (grainX * GrainWaveAcross)) * GrainSway)), (float)grainY);
             }
@@ -46,7 +49,8 @@ internal sealed class WoodNode(EffectParameters parameters) : Node
 
         if (plankWidth > 0)
         {
-            for (var seamX = x + plankWidth; seamX < x + width; seamX += plankWidth)
+            var seamX = x + plankWidth;
+            for (var seam = 0; seam < MaxLines && seamX < x + width; seam++, seamX += plankWidth)
             {
                 painter.Rect(_seam, seamX - (SeamWidth / 2), y, SeamWidth, height);
             }

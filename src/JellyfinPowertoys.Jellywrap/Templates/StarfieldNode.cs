@@ -6,6 +6,8 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class StarfieldNode(EffectParameters parameters) : Node
 {
+    public const int MaxCount = 10000;
+
     private const double Seed = 2026;
     private const uint RandomMultiplier = 1664525;
     private const uint RandomIncrement = 1013904223;
@@ -21,8 +23,8 @@ internal sealed class StarfieldNode(EffectParameters parameters) : Node
     private const double MinAlpha = 0.2;
     private const double AlphaRange = 0.8;
 
-    private readonly Paint _cool = new(parameters.Color("color", "#EEF0FF"));
-    private readonly Paint _warm = new(parameters.Color("warm", "#FFC857"));
+    private readonly Paint _cool = new Paint(parameters.Color("color", "#EEF0FF"));
+    private readonly Paint _warm = new Paint(parameters.Color("warm", "#FFC857"));
 
     protected override void DrawSelf(Painter painter, double slideTime, double x, double y)
     {
@@ -37,7 +39,7 @@ internal sealed class StarfieldNode(EffectParameters parameters) : Node
         var height = Props.Number("height", slideTime, Scene.Height) * Props.Number("heightShare", slideTime, HeightShare);
         var warmShare = Props.Number("warmShare", slideTime, WarmShare);
         var videoTime = slideTime + Props.SlideStart;
-        var count = (int)Props.Number("count", slideTime, Count);
+        var count = (int)Math.Min(Props.Number("count", slideTime, Count), MaxCount);
         for (var i = 0; i < count; i++)
         {
             var starX = NextRandom() * width;

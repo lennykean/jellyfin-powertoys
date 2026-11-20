@@ -236,7 +236,7 @@
     },
     "total-time": {
       "background": "sun",
-      "vars": { "hasDays": "(me.totals.days | round) >= 1" },
+      "vars": { "hasDays": "me.totals.days >= 1" },
       "elements": [
         { "id": "base-headline", "remove": true },
         {
@@ -363,7 +363,7 @@
             {
               "id": "t",
               "type": "text",
-              "text": "that's {{me.totals.days | round}} days.",
+              "text": "that's {{me.totals.days | days}}.",
               "x": 960,
               "y": 925,
               "size": 76,
@@ -406,7 +406,7 @@
               "id": "t",
               "type": "text",
               "value": "{{me.rhythm.activeDays}}",
-              "text": "{{value | round}} days.",
+              "text": "{{value | days}}.",
               "x": 960,
               "y": 395,
               "size": 200,
@@ -677,9 +677,9 @@
               "color": "ink",
               "align": "center",
               "fit": "block",
-              "maxWidth": 640,
-              "maxHeight": 360,
-              "size2": 0,
+              "maxWidth": 460,
+              "maxHeight": 250,
+              "size2": 190,
               "lineHeight": 1.15,
               "shift": 0.35
             }
@@ -2390,8 +2390,12 @@
               "font": "d7",
               "color": "ink",
               "align": "center",
-              "fit": "line",
-              "maxWidth": 1600
+              "fit": "block",
+              "maxWidth": 820,
+              "maxHeight": 320,
+              "size2": 115,
+              "lineHeight": 1.15,
+              "shift": 0.35
             }
           ]
         },
@@ -2579,7 +2583,7 @@
             {
               "id": "t",
               "type": "text",
-              "text": "{{me.totals.hours | hours:\"number\"}} h",
+              "text": "{{me.totals.hours | hours}}",
               "x": 560,
               "y": 325,
               "size": 190,
@@ -2595,6 +2599,7 @@
           "id": "show",
           "type": "group",
           "when": "me.topSeries | count > 0",
+          "y": "{{(me.topMovies | count == 0) | then:98,0}}",
           "pivot": [360, 502],
           "in": { "preset": "pop", "at": 1.2 },
           "children": [
@@ -2634,6 +2639,7 @@
           "id": "movie",
           "type": "group",
           "when": "me.topMovies | count > 0",
+          "y": "{{(me.topSeries | count == 0) | then:-98,0}}",
           "pivot": [360, 697],
           "in": { "preset": "pop", "at": 1.6 },
           "children": [
@@ -2868,7 +2874,6 @@
         },
         "totals": {
           "background": "sun",
-          "vars": { "H": "server.totals.hours" },
           "elements": [
             { "id": "base-headline", "remove": true },
             {
@@ -2938,7 +2943,7 @@
                 {
                   "id": "num",
                   "type": "text",
-                  "value": "{{H}}",
+                  "value": "{{watchAmount}}",
                   "text": "{{value | number}}",
                   "x": 960,
                   "y": 497,
@@ -2965,7 +2970,7 @@
               "type": "group",
               "pivot": [960, 660],
               "in": { "preset": "pop", "at": 0.9 },
-              "children": [{ "id": "t", "type": "text", "text": "{{H | noun:\"hour\"}}", "x": 960, "y": 690, "size": 96, "font": "d7", "color": "ink", "align": "center" }]
+              "children": [{ "id": "t", "type": "text", "text": "{{watchAmount | round | noun:watchUnit}}", "x": 960, "y": 690, "size": 96, "font": "d7", "color": "ink", "align": "center" }]
             },
             {
               "id": "counts",
@@ -4485,10 +4490,11 @@
           },
           "elements": [
             { "id": "initial", "children": [{ "id": "t", "text": "{{server.name | initial}}" }] },
-            { "id": "hours", "children": [{ "id": "t", "text": "{{server.totals.hours | hours:\"number\"}} h" }] },
+            { "id": "hours", "children": [{ "id": "t", "text": "{{server.totals.hours | hours}}" }] },
             {
               "id": "show",
               "when": "server.topSeries | count > 0",
+              "y": "{{(server.topMovies | count == 0) | then:98,0}}",
               "children": [
                 { "id": "p", "src": "{{server.topSeries[0].poster}}", "title": "{{server.topSeries[0].title}}" },
                 { "id": "t", "text": "{{server.topSeries[0].title}}" }
@@ -4497,6 +4503,7 @@
             {
               "id": "movie",
               "when": "server.topMovies | count > 0",
+              "y": "{{(server.topSeries | count == 0) | then:-98,0}}",
               "children": [
                 { "id": "p", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" },
                 { "id": "t", "text": "{{server.topMovies[0].title}}" }

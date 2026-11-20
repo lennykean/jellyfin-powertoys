@@ -1,9 +1,7 @@
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -16,7 +14,8 @@ namespace JellyfinPowertoys.Jellywrap.Audio;
 
 public sealed class AudioProbe(IMediaEncoder mediaEncoder)
 {
-    private static readonly Regex _loudnessFrame = new(@"t:\s*([\d.]+)\s+TARGET:.*?M:\s*(-?[\d.]+)\s+S:\s*(-?[\d.]+)", RegexOptions.Compiled);
+    private static readonly Regex _loudnessFrame = new Regex(@"t:\s*([\d.]+)\s+TARGET:.*?M:\s*(-?[\d.]+)\s+S:\s*(-?[\d.]+)", RegexOptions.Compiled);
+    private static readonly TimeSpan _timeout = TimeSpan.FromMinutes(2);
 
     internal async Task<uint[]> FingerprintAsync(string path, double start, double length, CancellationToken cancellationToken)
     {
@@ -47,34 +46,8 @@ public sealed class AudioProbe(IMediaEncoder mediaEncoder)
         return value.ToString("R", CultureInfo.InvariantCulture);
     }
 
-    private async Task<(byte[] Output, string Log)> RunAsync(IEnumerable<string> arguments, CancellationToken cancellationToken)
+    private Task<(byte[] Output, string Log)> RunAsync(IEnumerable<string> arguments, CancellationToken cancellationToken)
     {
-        var startInfo = new ProcessStartInfo(mediaEncoder.EncoderPath)
-        {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-        };
-        foreach (var argument in new[] { "-hide_banner", "-nostats", "-threads", "1" }.Concat(arguments))
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        using var process = Process.Start(startInfo)!;
-        using var kill = cancellationToken.Register(() => process.Kill(entireProcessTree: true));
-        using var output = new MemoryStream();
-        var copy = process.StandardOutput.BaseStream.CopyToAsync(output, cancellationToken);
-        var log = process.StandardError.ReadToEndAsync(cancellationToken);
-        await Task.WhenAll(copy, log);
-        await process.WaitForExitAsync(cancellationToken);
-
-        // A killed ffmpeg exits with an error too; that is a cancellation, not a failure.
-        cancellationToken.ThrowIfCancellationRequested();
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException($"ffmpeg exited with {process.ExitCode}: {(await log).Trim()}");
-        }
-
-        return (output.ToArray(), await log);
+        return mediaEncoder.RunFfmpegAsync(new[] { "-hide_banner", "-nostats", "-threads", "1" }.Concat(arguments), _timeout, cancellationToken);
     }
 }

@@ -8,6 +8,7 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class OdometerNode : Node
 {
+    private const int MaxDecimals = 9;
     private const int DecimalBase = 10;
     private const string DecimalPoint = ".";
     private const double WindowMarginX = 20;
@@ -18,17 +19,17 @@ internal sealed class OdometerNode : Node
     public required string Font { get; init; }
 
     public double Value { get; init; }
-    public double Width(FontStore fonts)
+    public double Width(TextShaper shaper)
     {
-        return Widths(fonts, 0).Total;
+        return Widths(shaper, 0).Total;
     }
 
     protected override void DrawSelf(Painter painter, double slideTime, double x, double y)
     {
         var size = Props.Number("size", slideTime);
-        var decimals = (int)Props.Number("decimals", slideTime);
+        var decimals = Decimals(slideTime);
         var places = Digits(decimals).Length;
-        var (digitWidth, pointWidth, totalWidth) = Widths(painter.Fonts, slideTime);
+        var (digitWidth, pointWidth, totalWidth) = Widths(painter.Shaper, slideTime);
         var left = x - (Anchors.Align(Props.Text("align")) * totalWidth);
         var color = Props.Paint("color", slideTime) ?? new Paint(SKColors.Black);
         var canvas = painter.Canvas;
@@ -44,16 +45,22 @@ internal sealed class OdometerNode : Node
             (float)(totalWidth + (2 * WindowMarginX)),
             (float)(WindowHeight * size)));
         var pitch = RollPitch * size;
-        var finalValue = Rounding.HalfUp(Value * Math.Pow(DecimalBase, decimals));
+        var finalValue = (Value * Math.Pow(DecimalBase, decimals)).RoundHalfUp();
         var current = finalValue * Math.Clamp(Props.Number("count", slideTime, 1), 0, 1);
         var roll = 0.0;
         for (var place = 0; place < places; place++)
         {
             var shifted = current / Math.Pow(DecimalBase, place);
             var digit = (int)(Math.Floor(shifted) % DecimalBase);
-            roll = place == 0
-                ? shifted - Math.Floor(shifted)
-                : Math.Floor(current / Math.Pow(DecimalBase, place - 1)) % DecimalBase == DecimalBase - 1 ? roll : 0;
+            if (place == 0)
+            {
+                roll = shifted - Math.Floor(shifted);
+            }
+            else if (Math.Floor(current / Math.Pow(DecimalBase, place - 1)) % DecimalBase != DecimalBase - 1)
+            {
+                roll = 0;
+            }
+
             var centerX = left + totalWidth - (digitWidth * (place + 0.5)) - (place >= decimals ? pointWidth : 0);
             DrawGlyph(painter, $"{digit}", centerX, y - (roll * pitch), size, color, center: true);
             if (roll > 0)
@@ -65,23 +72,28 @@ internal sealed class OdometerNode : Node
         canvas.Restore();
     }
 
-    private string Digits(int decimals)
+    private int Decimals(double slideTime)
     {
-        return ((long)Rounding.HalfUp(Value * Math.Pow(DecimalBase, decimals))).ToString(CultureInfo.InvariantCulture).PadLeft(decimals + 1, '0');
+        return (int)Math.Clamp(Props.Number("decimals", slideTime), 0, MaxDecimals);
     }
 
-    private (float Digit, float Point, float Total) Widths(FontStore fonts, double slideTime)
+    private string Digits(int decimals)
+    {
+        return ((long)(Value * Math.Pow(DecimalBase, decimals)).RoundHalfUp()).ToString(CultureInfo.InvariantCulture).PadLeft(decimals + 1, '0');
+    }
+
+    private (float Digit, float Point, float Total) Widths(TextShaper shaper, double slideTime)
     {
         var size = Props.Number("size", slideTime);
-        var decimals = (int)Props.Number("decimals", slideTime);
-        var digitWidth = Enumerable.Range(0, DecimalBase).Max(digit => fonts.Shape(Font, size, 0, $"{digit}").Width);
-        var pointWidth = decimals > 0 ? fonts.Shape(Font, size, 0, DecimalPoint).Width : 0;
+        var decimals = Decimals(slideTime);
+        var digitWidth = Enumerable.Range(0, DecimalBase).Max(digit => shaper.Shape(Font, size, 0, $"{digit}").Width);
+        var pointWidth = decimals > 0 ? shaper.Shape(Font, size, 0, DecimalPoint).Width : 0;
         return (digitWidth, pointWidth, (digitWidth * Digits(decimals).Length) + pointWidth);
     }
 
     private void DrawGlyph(Painter painter, string glyph, double x, double y, double size, Paint color, bool center)
     {
-        var shaped = painter.Fonts.Shape(Font, size, 0, glyph);
+        var shaped = painter.Shaper.Shape(Font, size, 0, glyph);
         if (shaped.Blob is not null)
         {
             painter.Canvas.DrawText(shaped.Blob, (float)(center ? x - (shaped.Width / 2) : x), (float)y, painter.Fill(color));

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Security;
 using System.Text.Json.Nodes;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
@@ -21,26 +21,21 @@ public sealed class TemplateCatalog
     public static TemplateCatalog Load(string? dropInFolder)
     {
         var packages = LoadBuiltin();
-        var unreadable = new List<Template>();
+        var builtin = packages.Values.ToHashSet();
+        var rejected = new List<Template>();
         if (dropInFolder is not null && Directory.Exists(dropInFolder))
         {
-            foreach (var folder in Directory.GetDirectories(dropInFolder))
+            try
             {
-                var root = Path.GetFullPath(folder);
-                var package = new TemplatePackage(path => ReadFile(root, path));
-                package.Load();
-                if (package.Id is null)
-                {
-                    unreadable.Add(Unreadable(Path.GetFileName(folder), package));
-                }
-                else
-                {
-                    packages[package.Id] = package;
-                }
+                AddCustom(dropInFolder, packages, builtin, rejected);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or SecurityException)
+            {
+                rejected.Add(Rejected(dropInFolder, [$"The custom template folder cannot be read: {exception.Message}"]));
             }
         }
 
-        var templates = packages.Select(package => BuildTemplate(package.Key, package.Value, packages)).Concat(unreadable);
+        var templates = packages.Select(package => BuildTemplate(package.Key, package.Value, packages, builtin)).Concat(rejected);
         return new TemplateCatalog([.. templates.OrderBy(template => template.Id, StringComparer.Ordinal)]);
     }
 
@@ -60,6 +55,44 @@ public sealed class TemplateCatalog
     private IEnumerable<Template> Pool(string kind, string audience)
     {
         return All.Where(template => template.IsValid && template.Audience == audience && template.Bases.ContainsKey(kind));
+    }
+
+    private static void AddCustom(
+        string dropInFolder,
+        Dictionary<string, TemplatePackage> packages,
+        HashSet<TemplatePackage> builtin,
+        List<Template> rejected)
+    {
+        var folderOfId = new Dictionary<string, string>();
+        foreach (var folder in Directory.GetDirectories(dropInFolder).Order(StringComparer.Ordinal))
+        {
+            var root = Path.GetFullPath(folder);
+            if (!File.Exists(Path.Combine(root, TemplatePackage.TemplateFile)))
+            {
+                continue;
+            }
+
+            var name = Path.GetFileName(folder);
+            var package = new TemplatePackage(path => ReadFile(root, path));
+            package.Load();
+            if (package.Id is null)
+            {
+                rejected.Add(Rejected(name, package.Errors));
+            }
+            else if (packages.TryGetValue(package.Id, out var existing) && builtin.Contains(existing))
+            {
+                rejected.Add(Rejected(name, [$"The id \"{package.Id}\" is the id of a built-in template; give the template another id."]));
+            }
+            else if (folderOfId.TryGetValue(package.Id, out var first))
+            {
+                rejected.Add(Rejected(name, [$"The id \"{package.Id}\" is also the id of the template in the folder \"{first}\"; only that template is used."]));
+            }
+            else
+            {
+                packages[package.Id] = package;
+                folderOfId[package.Id] = name;
+            }
+        }
     }
 
     private static Dictionary<string, TemplatePackage> LoadBuiltin()
@@ -93,24 +126,29 @@ public sealed class TemplateCatalog
     {
         var fullPath = Path.GetFullPath(Path.Combine(root, path));
         var rootPrefix = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root)) + Path.DirectorySeparatorChar;
-        return fullPath.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase) && File.Exists(fullPath) ? File.ReadAllBytes(fullPath) : null;
+        return fullPath.StartsWith(rootPrefix, StringComparison.Ordinal) && File.Exists(fullPath) ? TemplatePackage.ReadAllBytes(fullPath) : null;
     }
 
-    private static Template Unreadable(string id, TemplatePackage package)
+    private static Template Rejected(string id, IReadOnlyList<string> errors)
     {
-        return new Template(id, id, string.Empty, new Dictionary<string, JsonObject>(), new Dictionary<string, string>(), package.Errors, _ => null);
+        return new Template(id, id, string.Empty, new Dictionary<string, JsonObject>(), new Dictionary<string, string>(), errors, _ => null);
     }
 
-    private static Template BuildTemplate(string id, TemplatePackage package, Dictionary<string, TemplatePackage> packages)
+    private static Template BuildTemplate(
+        string id,
+        TemplatePackage package,
+        Dictionary<string, TemplatePackage> packages,
+        HashSet<TemplatePackage> builtin)
     {
         if (package.Json is not { } json)
         {
-            return Unreadable(id, package);
+            return Rejected(id, package.Errors);
         }
 
         var errors = new List<string>();
         var merged = new Dictionary<string, JsonObject>();
         var bases = new Dictionary<string, string>();
+        var readable = new HashSet<TemplatePackage>(builtin) { package };
         string? Text(string property)
         {
             if (json[property] is { } node && !PropertyReader.IsString(node, out _))
@@ -126,6 +164,7 @@ public sealed class TemplateCatalog
         try
         {
             var chain = ExtendsChain(id, package, packages);
+            readable.UnionWith(chain);
             foreach (var (kind, baseName) in chain[^1].Json!["extends"] as JsonObject ?? [])
             {
                 if (kind is not (Template.IndividualKind or Template.ServerKind))
@@ -135,12 +174,16 @@ public sealed class TemplateCatalog
                 }
 
                 var baseId = PropertyReader.IsString(baseName, out var written) ? written : throw new InvalidDataException($"\"extends\" must name the base of the {kind} video.");
-                var baseTemplate = packages.GetValueOrDefault(baseId)?.Json ?? throw new InvalidDataException($"The base \"{baseId}\" does not exist.");
+                var basePackage = packages.GetValueOrDefault(baseId);
+                var baseTemplate = basePackage?.Json ?? throw new InvalidDataException($"The base \"{baseId}\" does not exist.");
+                readable.Add(basePackage);
                 var result = TemplateMerge.OntoBase(baseTemplate, baseId, chain);
                 merged[kind] = result;
                 bases[kind] = baseId;
-                errors.AddRange(TemplateValidator.Validate(result, key => ReadPackageFile(key, packages)).Select(error => $"{kind}: {error}"));
+                errors.AddRange(TemplateValidator.Validate(result, key => ReadPackageFile(key, packages, readable)).Select(error => $"{kind}: {error}"));
             }
+
+            errors.AddRange(UnknownSlides(chain, bases, packages));
         }
         catch (Exception exception)
         {
@@ -164,7 +207,49 @@ public sealed class TemplateCatalog
             merged,
             bases,
             [.. errors.Distinct()],
-            key => ReadPackageFile(key, packages));
+            key => ReadPackageFile(key, packages, readable));
+    }
+
+    private static IEnumerable<string> UnknownSlides(
+        List<TemplatePackage> chain,
+        Dictionary<string, string> bases,
+        Dictionary<string, TemplatePackage> packages)
+    {
+        if (bases.Count == 0)
+        {
+            yield break;
+        }
+
+        var slidesOfBase = bases.Values.Distinct().ToDictionary(
+            baseId => baseId,
+            baseId => (packages[baseId].Json!["slides"] as JsonObject ?? []).Select(slide => slide.Key).ToList());
+        var slidesOfAnyBase = slidesOfBase.Values.SelectMany(slides => slides).Distinct().ToList();
+        foreach (var layer in chain.Select(package => package.Json!))
+        {
+            foreach (var (slide, _) in layer["slides"] as JsonObject ?? [])
+            {
+                if (!slidesOfAnyBase.Contains(slide))
+                {
+                    yield return $"\"slides\" names an unknown slide \"{slide}\"; the slides are {string.Join(", ", slidesOfAnyBase)}";
+                }
+            }
+
+            foreach (var (baseId, overrides) in layer["byBase"] as JsonObject ?? [])
+            {
+                if (!slidesOfBase.TryGetValue(baseId, out var slides))
+                {
+                    continue;
+                }
+
+                foreach (var (slide, _) in (overrides as JsonObject)?["slides"] as JsonObject ?? [])
+                {
+                    if (!slides.Contains(slide))
+                    {
+                        yield return $"\"byBase.{baseId}.slides\" names an unknown slide \"{slide}\"; the slides are {string.Join(", ", slides)}";
+                    }
+                }
+            }
+        }
     }
 
     private static List<TemplatePackage> ExtendsChain(string id, TemplatePackage package, Dictionary<string, TemplatePackage> packages)
@@ -184,7 +269,7 @@ public sealed class TemplateCatalog
         return chain;
     }
 
-    private static byte[]? ReadPackageFile(string key, Dictionary<string, TemplatePackage> packages)
+    private static byte[]? ReadPackageFile(string key, Dictionary<string, TemplatePackage> packages, HashSet<TemplatePackage> readable)
     {
         if (!key.StartsWith(Template.PackagePrefix, StringComparison.Ordinal))
         {
@@ -192,6 +277,7 @@ public sealed class TemplateCatalog
         }
 
         var slash = key.IndexOf('/', StringComparison.Ordinal);
-        return slash < 0 ? null : packages.GetValueOrDefault(key[Template.PackagePrefix.Length..slash])?.ReadFile(key[(slash + 1)..]);
+        var package = slash < 0 ? null : packages.GetValueOrDefault(key[Template.PackagePrefix.Length..slash]);
+        return package is not null && readable.Contains(package) ? package.ReadFile(key[(slash + 1)..]) : null;
     }
 }

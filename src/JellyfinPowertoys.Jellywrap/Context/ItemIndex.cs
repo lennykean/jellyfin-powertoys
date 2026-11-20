@@ -14,8 +14,8 @@ internal sealed class ItemIndex
     {
         _items = items.ToDictionary(i => i.Id);
         _copies = items
-            .Where(i => i is { Kind: ItemKind.Series or ItemKind.Movie, ProviderKey: not null })
-            .GroupBy(i => (i.Kind, i.ProviderKey))
+            .Where(i => i.CopyKeys.Count > 0)
+            .GroupBySharedKey(i => i.CopyKeys.Select(key => (i.Kind, key)))
             .Select(g => g.Select(i => i.Id).OrderBy(id => id.ToString("N"), StringComparer.Ordinal).ToList())
             .SelectMany(ids => ids.Select(id => (Id: id, Copies: ids)))
             .ToDictionary(copy => copy.Id, copy => (IReadOnlyList<Guid>)copy.Copies);

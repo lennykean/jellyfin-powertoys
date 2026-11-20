@@ -424,7 +424,7 @@
             "mv": "me.totals.hours | mul:60 | round | atLeast:1",
             "mu": "mv | noun:\"minute\"",
             "unit": "mins | then:mu,\"hours\"",
-            "hasDays": "(me.totals.days | round) >= 1"
+            "hasDays": "me.totals.days >= 1"
           },
           "elements": [
             { "id": "base-headline", "remove": true },
@@ -1105,7 +1105,20 @@
                       "layout": "row",
                       "maxWidth": 980,
                       "children": [
-                        { "id": "a", "type": "text", "text": "{{index | add:1}}. {{item.title}}", "x": 0, "y": "{{y}}", "size": "{{sz}}", "font": "serif", "color": "wine" },
+                        {
+                          "id": "a",
+                          "type": "text",
+                          "text": "{{index | add:1}}. {{item.title}}",
+                          "x": 0,
+                          "y": "{{y}}",
+                          "size": "{{sz}}",
+                          "font": "serif",
+                          "color": "wine",
+                          "fit": "title",
+                          "size2": 40,
+                          "maxWidth": "{{measure.b.width | sub:980 | mul:-1}}",
+                          "y2": "{{y | add:20}}"
+                        },
                         { "id": "b", "type": "text", "text": " — {{item.hours | hours:\"number\"}} h", "x": 0, "y": "{{y}}", "size": "{{sh}}", "font": "hand", "color": "drose" }
                       ]
                     }
@@ -1261,7 +1274,20 @@
                       "layout": "row",
                       "maxWidth": 980,
                       "children": [
-                        { "id": "a", "type": "text", "text": "{{index | add:1}}. {{item.title}}", "x": 0, "y": "{{y}}", "size": "{{sz}}", "font": "serif", "color": "wine" }
+                        {
+                          "id": "a",
+                          "type": "text",
+                          "text": "{{index | add:1}}. {{item.title}}",
+                          "x": 0,
+                          "y": "{{y}}",
+                          "size": "{{sz}}",
+                          "font": "serif",
+                          "color": "wine",
+                          "fit": "title",
+                          "size2": 40,
+                          "maxWidth": 980,
+                          "y2": "{{y | add:20}}"
+                        }
                       ]
                     }
                   ]
@@ -3427,7 +3453,6 @@
         },
         "totals": {
           "background": "paper",
-          "vars": { "H": "server.totals.hours" },
           "elements": [
             { "id": "base-headline", "remove": true },
             {
@@ -3446,7 +3471,7 @@
               "size": 300,
               "font": "serif",
               "color": "wine",
-              "value": "{{H}}",
+              "value": "{{watchAmount}}",
               "fitOn": "final",
               "animate": [
                 {
@@ -3485,7 +3510,7 @@
                 ]
               },
               "children": [
-                { "id": "hw", "type": "text", "text": "{{H | noun:\"hour\"}}", "x": "{{measure.hn.width | add:290}}", "y": 470, "size": 120, "font": "serif", "color": "wine" }
+                { "id": "hw", "type": "text", "text": "{{watchAmount | round | noun:watchUnit}}", "x": "{{measure.hn.width | add:290}}", "y": 470, "size": 120, "font": "serif", "color": "wine" }
               ]
             },
             {
@@ -4505,7 +4530,20 @@
                       "layout": "row",
                       "maxWidth": 980,
                       "children": [
-                        { "id": "a", "type": "text", "text": "{{index | add:1}}. {{item.title}}", "x": 0, "y": "{{y}}", "size": "{{sz}}", "font": "serif", "color": "wine" },
+                        {
+                          "id": "a",
+                          "type": "text",
+                          "text": "{{index | add:1}}. {{item.title}}",
+                          "x": 0,
+                          "y": "{{y}}",
+                          "size": "{{sz}}",
+                          "font": "serif",
+                          "color": "wine",
+                          "fit": "title",
+                          "size2": 40,
+                          "maxWidth": "{{measure.b.width | sub:980 | mul:-1}}",
+                          "y2": "{{y | add:20}}"
+                        },
                         {
                           "id": "b",
                           "type": "text",
@@ -4670,7 +4708,20 @@
                       "layout": "row",
                       "maxWidth": 980,
                       "children": [
-                        { "id": "a", "type": "text", "text": "{{index | add:1}}. {{item.title}}", "x": 0, "y": "{{y}}", "size": "{{sz}}", "font": "serif", "color": "wine" }
+                        {
+                          "id": "a",
+                          "type": "text",
+                          "text": "{{index | add:1}}. {{item.title}}",
+                          "x": 0,
+                          "y": "{{y}}",
+                          "size": "{{sz}}",
+                          "font": "serif",
+                          "color": "wine",
+                          "fit": "title",
+                          "size2": 40,
+                          "maxWidth": 980,
+                          "y2": "{{y | add:20}}"
+                        }
                       ]
                     }
                   ]
@@ -5751,6 +5802,8 @@
           "background": "blush",
           "vars": {
             "hrs": "server.totals.hours",
+            "mins": "hrs < 1",
+            "mv": "hrs | mul:60 | round | atLeast:1",
             "show": "server.topSeries[0]",
             "movie": "server.topMovies[0]",
             "eKs": "groups.kids.episodes | div:groups.kids.count",
@@ -5809,8 +5862,8 @@
                       "layout": "row",
                       "maxWidth": 600,
                       "children": [
-                        { "id": "n", "type": "text", "text": "{{hrs | number}}", "x": 0, "y": 80, "size": 300, "font": "serif", "color": "wine" },
-                        { "id": "u", "type": "text", "text": " h", "x": 0, "y": 80, "size": 150, "font": "serif", "color": "wine" }
+                        { "id": "n", "type": "text", "text": "{{mins | then:mv,hrs | number}}", "x": 0, "y": 80, "size": 300, "font": "serif", "color": "wine" },
+                        { "id": "u", "type": "text", "text": "{{mins | then:\" min\",\" h\"}}", "x": 0, "y": 80, "size": 150, "font": "serif", "color": "wine" }
                       ]
                     }
                   ]

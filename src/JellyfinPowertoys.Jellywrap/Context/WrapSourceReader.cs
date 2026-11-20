@@ -4,25 +4,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Jellyfin.Data;
 using Jellyfin.Data.Enums;
 using Jellyfin.Data.Queries;
 using Jellyfin.Database.Implementations.Entities;
-using Jellyfin.Database.Implementations.Enums;
 
 using JellyfinPowertoys.Jellywrap.Configuration;
 using JellyfinPowertoys.Jellywrap.Library;
 
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.Globalization;
 using MediaBrowser.Model.MediaInfo;
 
 using AudioItem = MediaBrowser.Controller.Entities.Audio.Audio;
+using MusicAlbum = MediaBrowser.Controller.Entities.Audio.MusicAlbum;
 
 namespace JellyfinPowertoys.Jellywrap.Context;
 
@@ -30,12 +29,13 @@ public sealed class WrapSourceReader(
     ILibraryManager libraryManager,
     IUserManager userManager,
     IActivityManager activityManager,
-    IServerApplicationHost host,
-    ILocalizationManager localization)
+    IServerApplicationHost host)
 {
     private const int PageSize = 1000;
 
     private static readonly BaseItemKind[] _libraryKinds = [BaseItemKind.Movie, BaseItemKind.Episode, BaseItemKind.Audio, BaseItemKind.AudioBook, BaseItemKind.Video];
+    private static readonly MetadataProvider[] _titleProviders = [MetadataProvider.Tvdb, MetadataProvider.Tmdb, MetadataProvider.Imdb];
+    private static readonly MetadataProvider[] _albumProviders = [MetadataProvider.MusicBrainzAlbum];
     internal async Task<IReadOnlyList<int>> ReadYearsWithPlaysAsync()
     {
         var years = new List<int>();
@@ -78,7 +78,13 @@ public sealed class WrapSourceReader(
             .Where(e => e.Type.Contains("Playback", StringComparison.Ordinal))
             .Select(e => (Entry: e, ItemId: Guid.TryParse(e.ItemId, out var id) ? id : Guid.Empty))
             .Where(e => e.ItemId != Guid.Empty)
-            .Select(e => new PlaybackRow(e.Entry.UserId, e.ItemId, !e.Entry.Type.EndsWith("Stopped", StringComparison.Ordinal), e.Entry.Date, e.Entry.Name))
+            .Select(e => new PlaybackRow(
+                e.Entry.UserId,
+                e.ItemId,
+                !e.Entry.Type.EndsWith("Stopped", StringComparison.Ordinal),
+                e.Entry.Type.StartsWith("Audio", StringComparison.Ordinal),
+                e.Entry.Date,
+                e.Entry.Name))
             .ToList();
 
         var items = libraryManager
@@ -114,6 +120,12 @@ public sealed class WrapSourceReader(
             .ToList();
         var fullItems = ToFullItems(playedWithSeries).ToDictionary(i => i.Id);
         var start = TimeZoneInfo.ConvertTimeToUtc(new DateTime(year, 1, 1), TimeZoneInfo.Local);
+        var end = TimeZoneInfo.ConvertTimeToUtc(new DateTime(year + 1, 1, 1), TimeZoneInfo.Local);
+        var periodEnd = now.UtcDateTime < end ? now.UtcDateTime : end;
+        var yearStarts = rows.Where(r => r.IsStart && r.Time >= start && r.Time < end).ToList();
+        var yearUsers = yearStarts.Select(r => r.UserId).ToHashSet();
+        var yearItems = yearStarts.Select(r => r.ItemId).Distinct().Where(items.ContainsKey).Select(id => items[id]).ToList();
+        var albums = libraryManager.GetItemList(new InternalItemsQuery { IncludeItemTypes = [BaseItemKind.MusicAlbum], MinDateCreated = start, Recursive = true });
         return new WrapSource
         {
             Year = year,
@@ -122,26 +134,53 @@ public sealed class WrapSourceReader(
             ServerName = host.FriendlyName,
             Users =
             [
-                .. accounts.Zip(users, (account, user) => user with
-                {
-                    Visible = IsRestricted(account, user.IsKidOverride)
-                        ? playedWithSeries.Where(i => i.IsVisibleStandalone(account)).Select(i => i.Id).ToHashSet()
-                        : null,
-                }),
+                .. accounts.Zip(
+                    users,
+                    (account, user) => user with
+                    {
+                        Visible = yearUsers.Contains(account.Id) ? VisibleTo(account, yearItems) : null,
+                    }),
             ],
             Activity = rows,
             Items = [.. basicItems.Select(i => fullItems.GetValueOrDefault(i.Id) ?? i).Concat(fullItems.Values.Where(i => !items.ContainsKey(i.Id)))],
-            Growth = new Growth(Added(BaseItemKind.Movie, start), Added(BaseItemKind.Episode, start), Added(BaseItemKind.MusicAlbum, start)),
+            Growth = new Growth(
+                NewTitles(items.Values.OfType<Movie>(), start, periodEnd),
+                NewTitles(items.Values.OfType<Episode>(), start, periodEnd),
+                NewTitles(albums, start, periodEnd)),
         };
     }
 
-    private static bool IsRestricted(User user, bool? isKidOverride)
+    private static HashSet<Guid>? VisibleTo(User user, IReadOnlyList<BaseItem> items)
     {
-        return isKidOverride == true
-            || user.MaxParentalRatingScore is not null
-            || user.GetPreferenceValues<string>(PreferenceKind.BlockedTags).Any(t => !JellywrapTags.IsJellywrapTag(t))
-            || user.GetPreferenceValues<string>(PreferenceKind.AllowedTags).Length > 0
-            || user.GetPreferenceValues<UnratedItem>(PreferenceKind.BlockUnratedItems).Length > 0;
+        var visible = items.Where(i => i.IsVisibleStandalone(user)).Select(i => i.Id).ToHashSet();
+        return visible.Count == items.Count ? null : visible;
+    }
+
+    private static int NewTitles(IEnumerable<BaseItem> items, DateTime fromUtc, DateTime beforeUtc)
+    {
+        return items
+            .Where(i => i.DateCreated >= fromUtc && i.DateCreated < beforeUtc)
+            .GroupBySharedKey(CopyKeys)
+            .Count;
+    }
+
+    private static string[] CopyKeys(BaseItem item)
+    {
+        return item switch
+        {
+            Movie or Series => [.. ProviderIds(item, _titleProviders)],
+            Episode { Series: { } series, ParentIndexNumber: { } season, IndexNumber: { } number }
+                => [.. ProviderIds(series, _titleProviders).Select(id => $"{id} S{season}E{number}")],
+            MusicAlbum => [.. ProviderIds(item, _albumProviders)],
+            _ => [],
+        };
+    }
+
+    private static IEnumerable<string> ProviderIds(BaseItem item, MetadataProvider[] providers)
+    {
+        return providers
+            .Select(p => item.GetProviderId(p) is { Length: > 0 } value ? $"{p}={value}" : null)
+            .OfType<string>();
     }
 
     private static ImageRef? Avatar(User user)
@@ -212,12 +251,7 @@ public sealed class WrapSourceReader(
             var parents = item.GetParents().ToList();
             yield return ToBasicItem(item) with
             {
-                ProviderKey = new[] { MetadataProvider.Tvdb, MetadataProvider.Tmdb, MetadataProvider.Imdb }
-                    .Select(p => item.GetProviderId(p) is { Length: > 0 } value ? $"{p}={value}" : null)
-                    .FirstOrDefault(k => k is not null),
-                RatingScore = string.IsNullOrEmpty(item.OfficialRatingForComparison)
-                    ? null
-                    : localization.GetRatingScore(item.OfficialRatingForComparison)?.Score,
+                CopyKeys = CopyKeys(item),
                 Genres = item.Genres,
                 Actors =
                 [
@@ -248,10 +282,5 @@ public sealed class WrapSourceReader(
     {
         var page = await activityManager.GetPagedResultAsync(new ActivityLogQuery { Type = "Playback", MinDate = fromUtc, MaxDate = beforeUtc, Limit = 1 });
         return page.Items.Count > 0;
-    }
-
-    private int Added(BaseItemKind kind, DateTime sinceUtc)
-    {
-        return libraryManager.GetCount(new InternalItemsQuery { IncludeItemTypes = [kind], MinDateCreated = sinceUtc, Recursive = true });
     }
 }

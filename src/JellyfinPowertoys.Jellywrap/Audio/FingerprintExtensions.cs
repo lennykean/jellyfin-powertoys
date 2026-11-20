@@ -5,13 +5,13 @@ using System.Numerics;
 
 namespace JellyfinPowertoys.Jellywrap.Audio;
 
-internal static class Chromaprint
+internal static class FingerprintExtensions
 {
     private const int MaxBitErrors = 8;
     private const double MaxGap = 2.0;
     private const int Alignments = 10;
     private const int MaxRepeats = 20;
-    public static List<(double Start, double End)> Runs(uint[] first, uint[] second, double step, double minSeconds)
+    public static List<(double Start, double End)> MatchingRuns(this uint[] first, uint[] second, double step, double minSeconds)
     {
         var secondPositions = second.Select((value, position) => (value, position)).ToLookup(item => item.value, item => item.position);
         var shifts = first
@@ -61,8 +61,8 @@ internal static class Chromaprint
         return runs;
     }
 
-    public static List<(double Start, double End)> Common(
-        IReadOnlyList<List<(double Start, double End)>> runsPerOther,
+    public static List<(double Start, double End)> CommonStretches(
+        this IReadOnlyList<List<(double Start, double End)>> runsPerOther,
         double minSeconds)
     {
         var common = runsPerOther[0];
@@ -73,6 +73,19 @@ internal static class Chromaprint
                 .Where(stretch => stretch.End - stretch.Start >= minSeconds)];
         }
 
-        return [.. common.Distinct().OrderBy(stretch => stretch.Start - stretch.End)];
+        var merged = new List<(double Start, double End)>();
+        foreach (var stretch in common.OrderBy(stretch => stretch.Start))
+        {
+            if (merged.Count > 0 && stretch.Start <= merged[^1].End)
+            {
+                merged[^1] = (merged[^1].Start, Math.Max(merged[^1].End, stretch.End));
+            }
+            else
+            {
+                merged.Add(stretch);
+            }
+        }
+
+        return [.. merged.OrderBy(stretch => stretch.Start - stretch.End)];
     }
 }

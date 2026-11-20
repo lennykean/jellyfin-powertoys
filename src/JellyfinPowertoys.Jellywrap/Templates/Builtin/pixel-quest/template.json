@@ -427,7 +427,8 @@
         "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
         "amount": "{{mins | then:m,me.totals.hours | round}}",
         "mw": "{{(m == 1) | then:\" minute!\",\" minutes!\"}}",
-        "unit": "{{mins | then:mw,\" hours —\"}}",
+        "hrw": "{{me.totals.hours | round | noun:\" hour —\",\" hours —\"}}",
+        "unit": "{{mins | then:mw,hrw}}",
         "movies": "{{me.totals.hours | div:1.5 | round}}"
       },
       "elements": [
@@ -686,7 +687,7 @@
                   "children": [
                     { "id": "a", "type": "text", "font": "word", "size": 88, "color": "{{c}}", "y": "{{o | add:812}}", "text": "that's like " },
                     { "id": "b", "type": "text", "font": "game", "size": 80, "color": "{{c2}}", "y": "{{o | add:812}}", "text": "{{movies}}" },
-                    { "id": "d", "type": "text", "font": "word", "size": 88, "color": "{{c}}", "y": "{{o | add:812}}", "text": " movies!" }
+                    { "id": "d", "type": "text", "font": "word", "size": 88, "color": "{{c}}", "y": "{{o | add:812}}", "text": "{{movies | noun:\" movie!\",\" movies!\"}}" }
                   ]
                 }
               ]
@@ -704,8 +705,9 @@
         "one": "{{eps | then:me.totals.episodes,me.totals.movies}}",
         "c1": "{{eps | then:\"gem\",\"coin\"}}",
         "f1": "{{eps | then:\"coin\",\"heart\"}}",
-        "lone": "{{eps | then:\"episodes!\",\"movies!\"}}",
-        "label": "{{both | then:\"episodes\",lone}}"
+        "epw": "{{me.totals.episodes | noun:\"episode\",\"episodes\"}}{{both | then:\"\",\"!\"}}",
+        "mvw": "{{me.totals.movies | noun:\"movie!\",\"movies!\"}}",
+        "label": "{{eps | then:epw,mvw}}"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -857,7 +859,7 @@
               "in": { "preset": "blink", "at": 1.3 },
               "vars": { "o": "{{(index == 0) | then:6,0}}", "c": "{{(index == 0) | then:\"shadow\",\"cream\"}}" },
               "template": [
-                { "id": "t", "type": "text", "text": "movies!", "font": "word", "size": 110, "color": "{{c}}", "x": "{{o | add:1404}}", "y": "{{o | add:744}}", "align": "center" }
+                { "id": "t", "type": "text", "text": "{{mvw}}", "font": "word", "size": 110, "color": "{{c}}", "x": "{{o | add:1404}}", "y": "{{o | add:744}}", "align": "center" }
               ]
             },
             {

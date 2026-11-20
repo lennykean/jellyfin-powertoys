@@ -15,13 +15,16 @@ namespace JellyfinPowertoys.Jellywrap.Configuration;
 [ApiController]
 [Authorize(Policy = Policies.RequiresElevation)]
 [Route("PowerToys/Jellywrap")]
-public class SettingsPageController(IApplicationPaths applicationPaths, WrapSourceReader sourceReader) : ControllerBase
+public class SettingsPageController(
+    IApplicationPaths applicationPaths,
+    PluginConfigurationStore configurationStore,
+    WrapSourceReader sourceReader) : ControllerBase
 {
     [HttpGet("Templates")]
     public ActionResult GetTemplates()
     {
         var catalog = TemplateCatalog.Load(
-            JellywrapPaths.Templates(applicationPaths, Plugin.Instance?.Configuration.CustomTemplateFolder));
+            applicationPaths.GetJellywrapTemplatesPath(configurationStore.Current?.CustomTemplateFolder));
 
         return Ok(catalog.All
             .Where(template => template.IsValid)
@@ -39,14 +42,14 @@ public class SettingsPageController(IApplicationPaths applicationPaths, WrapSour
     [HttpGet("StarterTemplate")]
     public ActionResult GetStarterTemplate()
     {
-        var folder = Plugin.Instance?.Configuration.CustomTemplateFolder;
+        var folder = configurationStore.Current?.CustomTemplateFolder;
         return Ok(new { CanAdd = !string.IsNullOrWhiteSpace(folder) && !StarterTemplate.IsIn(folder.Trim()) });
     }
 
     [HttpPost("StarterTemplate")]
     public ActionResult AddStarterTemplate()
     {
-        var folder = Plugin.Instance?.Configuration.CustomTemplateFolder;
+        var folder = configurationStore.Current?.CustomTemplateFolder;
         if (string.IsNullOrWhiteSpace(folder))
         {
             return BadRequest();

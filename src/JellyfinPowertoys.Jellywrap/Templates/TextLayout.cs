@@ -70,7 +70,7 @@ internal static class TextLayout
 
     private static double LinePitch(double size, TextFit fit)
     {
-        return fit.LinePitch ?? (fit.RoundLineHeight ? Rounding.HalfUp(size * fit.LineHeight) : size * fit.LineHeight);
+        return fit.LinePitch ?? (fit.RoundLineHeight ? (size * fit.LineHeight).RoundHalfUp() : size * fit.LineHeight);
     }
 
     private static (string Text, double Size) FitLine(
@@ -110,13 +110,13 @@ internal static class TextLayout
             return text;
         }
 
-        var kept = TextElements.Count(text);
-        while (kept > 1 && measure(TextElements.Take(text, kept).TrimEnd() + Ellipsis, size) > maxWidth)
+        var kept = text.TextElementCount();
+        while (kept > 1 && measure(text.TakeTextElements(kept).TrimEnd() + Ellipsis, size) > maxWidth)
         {
             kept--;
         }
 
-        return TextElements.Take(text, kept).TrimEnd() + Ellipsis;
+        return text.TakeTextElements(kept).TrimEnd() + Ellipsis;
     }
 
     private static List<string> WrapWords(string text, double size, double maxWidth, Func<string, double, double> measure)

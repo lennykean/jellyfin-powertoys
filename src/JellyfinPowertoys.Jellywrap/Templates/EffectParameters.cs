@@ -22,6 +22,13 @@ internal sealed class EffectParameters(JsonObject parameters, Palette palette)
         return [.. names.Select(palette.Color)];
     }
 
+    public EffectParameters AtMost(string key, double max)
+    {
+        return parameters[key] is JsonValue value && value.GetValueKind() == JsonValueKind.Number && value.GetValue<double>() > max
+            ? throw new FormatException($"\"{key}\" must be at most {max}, not {value.GetValue<double>()}.")
+            : this;
+    }
+
     public static double Number(JsonNode? node, string name)
     {
         return node is JsonValue value && value.GetValueKind() == JsonValueKind.Number

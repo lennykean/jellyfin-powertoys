@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,20 +39,15 @@ public class WrapProducer(
         PluginConfiguration configuration,
         CancellationToken cancellationToken)
     {
-        var workPath = JellywrapPaths.Work(applicationPaths);
-        if (Directory.Exists(workPath))
-        {
-            Directory.Delete(workPath, true);
-        }
-
-        Directory.CreateDirectory(workPath);
+        DeleteWorkFiles();
+        Directory.CreateDirectory(applicationPaths.GetJellywrapWorkPath());
         var source = await sourceReader.ReadAsync(
             year,
             DateTimeOffset.UtcNow,
             configuration.UserSettings,
             cancellationToken);
         var wrapYear = WrapYear.Build(source);
-        var catalog = TemplateCatalog.Load(JellywrapPaths.Templates(applicationPaths, configuration.CustomTemplateFolder));
+        var catalog = TemplateCatalog.Load(applicationPaths.GetJellywrapTemplatesPath(configuration.CustomTemplateFolder));
         foreach (var template in catalog.All.Where(t => t.Errors.Count > 0))
         {
             logger.LogWarning("The Jellywrap template {Id} is not used: {Errors}", template.Id, string.Join("; ", template.Errors));
@@ -71,6 +65,15 @@ public class WrapProducer(
             string.IsNullOrWhiteSpace(configuration.ServerTemplateId) ? null : configuration.ServerTemplateId);
     }
 
+    internal void DeleteWorkFiles()
+    {
+        var workPath = applicationPaths.GetJellywrapWorkPath();
+        if (Directory.Exists(workPath))
+        {
+            Directory.Delete(workPath, true);
+        }
+    }
+
     internal async Task<ProducedWrap?> ProduceAsync(WrapRun run, User? user, CancellationToken cancellationToken)
     {
         var context = user is null
@@ -82,45 +85,13 @@ public class WrapProducer(
         }
 
         var stopwatch = Stopwatch.StartNew();
-        context = await WithLocalActorImageAsync(context);
+        context = await WithLocalActorImageAsync(context, cancellationToken);
         var json = JsonSerializer.SerializeToNode(context, JsonSerializerOptions.Web)!.AsObject();
         var fileStem = user?.Id.ToString("N") ?? "server";
         var name = context.Me?.Name ?? context.Server.Name;
-        var (template, scene) = BuildScene(
-            run,
-            json,
-            user is null ? Template.ServerKind : Template.IndividualKind,
-            context.Me is { IsKid: true } ? Template.KidsAudience : Template.GeneralAudience,
-            user is null ? run.ServerTemplateId : run.TemplateChoices.GetValueOrDefault(user.Id),
-            name);
-        using (scene)
-        {
-            var timeline = scene.Slides.Select(slide => new TimelineSlide(slide.Id, slide.Start, slide.Duration, slide.Featured)).ToList();
-            var clips = await run.AudioPlanner.PlanAsync(context, timeline, cancellationToken);
-            var workPath = JellywrapPaths.Work(applicationPaths);
-            var videoPath = Path.Combine(workPath, $"{fileStem}.mp4");
-            var imagePath = Path.Combine(workPath, $"{fileStem}.jpg");
-            await videoEncoder.EncodeAsync(scene, clips, videoPath, cancellationToken);
-            SceneRenderer.RenderTitleCard(scene, imagePath);
-            logger.LogInformation(
-                "Rendered the Jellywrap {Year} video of {Name} in {Template} in {Seconds:F0} s with audio {Clips}",
-                run.Year,
-                name,
-                template.Name,
-                stopwatch.Elapsed.TotalSeconds,
-                clips.Count == 0 ? "no sound" : string.Join("; ", clips.Select(c => $"{c.Title} {c.Kind} {c.Duration:F1} s")));
-            return new ProducedWrap(videoPath, imagePath, Overview(template, context));
-        }
-    }
-
-    private (Template Template, Scene Scene) BuildScene(
-        WrapRun run,
-        JsonObject context,
-        string kind,
-        string audience,
-        string? chosenTemplateId,
-        string name)
-    {
+        var kind = user is null ? Template.ServerKind : Template.IndividualKind;
+        var audience = context.Me is { IsKid: true } ? Template.KidsAudience : Template.GeneralAudience;
+        var chosenTemplateId = user is null ? run.ServerTemplateId : run.TemplateChoices.GetValueOrDefault(user.Id);
         var chosen = run.TemplateCatalog.Find(chosenTemplateId, kind, audience);
         if (chosenTemplateId is not null && chosen is null)
         {
@@ -140,17 +111,37 @@ public class WrapProducer(
                 : run.TemplateCatalog.Pick(kind, audience, failed);
             try
             {
-                return (template, SceneBuilder.Build(template, kind, context));
+                using var scene = SceneBuilder.Build(template, kind, json, cancellationToken);
+                if (scene.Slides.Count == 0)
+                {
+                    throw new InvalidOperationException($"The template {template.Id} shows no slide.");
+                }
+
+                var timeline = scene.Slides.Select(slide => new TimelineSlide(slide.Start, slide.Duration, slide.Featured)).ToList();
+                var clips = await run.AudioPlanner.PlanAsync(context, timeline, cancellationToken);
+                var workPath = applicationPaths.GetJellywrapWorkPath();
+                var videoPath = Path.Combine(workPath, $"{fileStem}.mp4");
+                var imagePath = Path.Combine(workPath, $"{fileStem}.jpg");
+                var hasSound = await videoEncoder.EncodeAsync(scene, clips, videoPath, cancellationToken);
+                SceneRenderer.RenderTitleCard(scene, imagePath);
+                logger.LogInformation(
+                    "Rendered the Jellywrap {Year} video of {Name} in {Template} in {Seconds:F0} s with audio {Clips}",
+                    run.Year,
+                    name,
+                    template.Name,
+                    stopwatch.Elapsed.TotalSeconds,
+                    hasSound ? string.Join("; ", clips.Select(c => $"{c.Title} {c.Kind.ToName()} {c.Duration:F1} s")) : "no sound");
+                return new ProducedWrap(videoPath, imagePath, Overview(template, context));
             }
-            catch (Exception exception) when (exception is not OperationCanceledException)
+            catch (Exception exception) when (exception is not VideoEncodingException && (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested))
             {
-                logger.LogError(exception, "The Jellywrap template {Id} cannot be built for {Name}; picking another", template.Id, name);
+                logger.LogError(exception, "The Jellywrap template {Id} failed for {Name}; picking another", template.Id, name);
                 failed.Add(template);
             }
         }
     }
 
-    private async Task<WrapContext> WithLocalActorImageAsync(WrapContext context)
+    private async Task<WrapContext> WithLocalActorImageAsync(WrapContext context, CancellationToken cancellationToken)
     {
         if (context.Me is not { TopActors: [var actor, ..] } me
             || libraryManager.GetItemById(actor.Id) is not { } person
@@ -165,7 +156,8 @@ public class WrapProducer(
             var localActor = actor with { Image = new ImageRef(local.Path, local.Width, local.Height) };
             return context with { Me = me with { TopActors = [localActor, .. me.TopActors.Skip(1)] } };
         }
-        catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException)
+        catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException
+            || (exception is OperationCanceledException && !cancellationToken.IsCancellationRequested))
         {
             logger.LogWarning(exception, "The image of {Name} could not be downloaded", actor.Name);
             return context;

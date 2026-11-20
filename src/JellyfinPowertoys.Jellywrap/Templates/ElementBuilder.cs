@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 using SkiaSharp;
 
@@ -9,20 +11,24 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class ElementBuilder(
     JsonNode? fallbacks,
-    FontStore fonts,
+    TextShaper shaper,
     ImageStore images,
     Palette palette,
     PropsBuilder propsBuilder,
     TrackBuilder trackBuilder,
-    List<SKPath> shapePaths)
+    List<SKPath> shapePaths,
+    CancellationToken cancellationToken)
 {
+    public const int MaxElements = 100000;
+    public const int MaxDepth = 64;
+
     private const string DefaultType = "group";
     private const string DefaultFont = "body";
     private const double DefaultWordStagger = 0.1;
 
     private static readonly string[] _boxProperties = ["x", "y", "width", "height"];
 
-    private static readonly Dictionary<string, Func<ElementBuilder, JsonObject, Placement, string, Node>> _builders = new()
+    private static readonly Dictionary<string, Func<ElementBuilder, JsonObject, Placement, string, Node>> _builders = new Dictionary<string, Func<ElementBuilder, JsonObject, Placement, string, Node>>()
     {
         ["text"] = (builder, definition, placement, id) => builder.BuildText(definition, placement, id),
         ["image"] = (builder, definition, placement, id) => builder.BuildImage(definition, placement, id),
@@ -33,6 +39,10 @@ internal sealed class ElementBuilder(
         ["odometer"] = (builder, definition, placement, id) => builder.BuildOdometer(definition, placement, id),
         ["effect"] = (builder, definition, placement, id) => builder.BuildEffect(definition, placement, id),
     };
+
+    private long _built;
+    private int _depth;
+
     public static bool HasType(string type)
     {
         return _builders.ContainsKey(type);
@@ -41,7 +51,7 @@ internal sealed class ElementBuilder(
     public List<Node> Build(IEnumerable<JsonNode?> definitions, Placement placement)
     {
         var siblings = definitions.OfType<JsonObject>().ToList();
-        var measure = new SiblingMeasure(siblings, fonts, BuildElement);
+        var measure = new SiblingMeasure(siblings, shaper, BuildElement);
         var outerMeasure = placement.Scope.Get("measure") as Func<string, object?>;
         Scope scope = null!;
         object? MeasureById(string id)
@@ -56,16 +66,37 @@ internal sealed class ElementBuilder(
 
     private Node? BuildElement(JsonObject definition, Placement placement)
     {
-        if (!PropertyReader.ReadCondition(definition["when"], placement.Scope))
+        cancellationToken.ThrowIfCancellationRequested();
+        RuntimeHelpers.EnsureSufficientExecutionStack();
+
+        // An element builds the elements inside it, its fallback and the elements that it or its condition measures.
+        if (++_depth > MaxDepth)
         {
-            return null;
+            throw new InvalidOperationException($"The template nests elements, or measures them, deeper than {MaxDepth} levels.");
         }
 
+        var node = PropertyReader.ReadCondition(definition["when"], placement.Scope) ? BuildNode(definition, placement) : null;
+        _depth--;
+        return node;
+    }
+
+    private Node BuildNode(JsonObject definition, Placement placement)
+    {
+        CountBuilt(1);
         var type = definition["type"]?.GetValue<string>() ?? DefaultType;
         var id = definition["id"]?.GetValue<string>() ?? string.Empty;
         return _builders.TryGetValue(type, out var build)
             ? build(this, definition, placement, id)
             : throw new InvalidOperationException($"There is no element type \"{type}\".");
+    }
+
+    private void CountBuilt(int elements)
+    {
+        _built += elements;
+        if (_built > MaxElements)
+        {
+            throw new InvalidOperationException($"The template builds more than {MaxElements} elements.");
+        }
     }
 
     private GroupNode BuildGroup(JsonObject definition, Placement placement, string id)
@@ -75,7 +106,7 @@ internal sealed class ElementBuilder(
         group.Clip = BuildClip(definition["clip"], placement, null);
         if (group.Props.Text("layout") is "row")
         {
-            RowLayout.Place(group, fonts);
+            RowLayout.Place(group, shaper);
         }
 
         return group;
@@ -144,7 +175,7 @@ internal sealed class ElementBuilder(
         var template = TextTemplate.HasHoles(written) ? TextTemplate.Parse(written) : null;
         var value = PropertyReader.ReadNumber(definition["value"], scope) ?? 0;
         var caseMode = definition["case"]?.GetValue<string>();
-        var shown = TextCase.Apply(template?.Render(scope.With("value", value)) ?? written, caseMode ?? string.Empty);
+        var shown = (template?.Render(scope.With("value", value)) ?? written).ApplyCase(caseMode ?? string.Empty);
         var props = propsBuilder.Build(definition, placement);
         var originY = props.Numbers.TryGetValue("y", out var y) && !double.IsNaN(y) ? y : 0;
         var text = new TextNode
@@ -161,7 +192,7 @@ internal sealed class ElementBuilder(
             Lead = definition["lead"] is JsonObject lead && palette.Paint(lead["color"], scope) is { } leadPaint ? (lead["text"]!.GetValue<string>(), leadPaint) : null,
             Fit = TextFit.FromProps(props, definition["single"] as JsonObject, scope, originY),
         };
-        text.LaidOut = text.Layout(fonts, text.Text);
+        text.LaidOut = text.Layout(shaper, text.Text);
         if (definition["words"] is JsonObject words)
         {
             text.Words = BuildWords(text, words, placement);
@@ -173,15 +204,16 @@ internal sealed class ElementBuilder(
     private string FontName(JsonNode font, Scope scope)
     {
         var name = PropertyReader.ReadText(font, scope);
-        return fonts.Has(name) ? name : throw new InvalidOperationException($"There is no font \"{name}\".");
+        return shaper.Has(name) ? name : throw new InvalidOperationException($"There is no font \"{name}\".");
     }
 
     private List<Props> BuildWords(TextNode text, JsonObject definition, Placement placement)
     {
         var stagger = PropertyReader.ReadNumber(definition["stagger"], placement.Scope) ?? DefaultWordStagger;
         var start = placement.Shift + text.Props.Number("delay", 0);
-        var count = text.LaidOut!.Lines.Sum(line => line.Words?.Count ?? line.Text.Split(' ').Length);
-        var words = new List<Props>();
+        var count = text.LaidOut!.Lines.Sum(line => line.Words?.Count ?? line.Text.Count(character => character == ' ') + 1);
+        CountBuilt(count);
+        var words = new List<Props>(count);
         for (var i = 0; i < count; i++)
         {
             var word = new Props { SlideStart = placement.Start };
@@ -202,13 +234,18 @@ internal sealed class ElementBuilder(
         var scope = placement.Scope;
         var key = PropertyReader.ReadValue(definition["src"], scope) switch
         {
-            JsonObject image => image["path"]?.GetValue<string>(),
+            JsonObject image => PropertyReader.IsString(image["path"], out var imagePath) ? imagePath : null,
             string path => path,
             _ => null,
         };
         var isSvg = key is not null && key.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
         var decoded = isSvg ? null : images.Get(key);
-        var art = isSvg ? images.Svg(key!, svg => TextTemplate.HasHoles(svg) ? TextTemplate.Parse(svg).Render(scope) : svg) : null;
+        string Filled(string svg)
+        {
+            return TextTemplate.HasHoles(svg) ? TextTemplate.Parse(svg).Render(scope) : svg;
+        }
+
+        var art = isSvg ? images.Svg(key!, Filled) : null;
         var props = propsBuilder.Build(definition, placement);
         var box = new JsonObject { ["width"] = props.Number("width", 0), ["height"] = props.Number("height", 0) };
         GroupNode? fallback = null;
@@ -258,18 +295,13 @@ internal sealed class ElementBuilder(
     {
         var props = propsBuilder.Build(definition, placement);
         var items = RepeatItems(definition, props, placement.Scope);
+        CountBuilt(items.Count);
         var group = new GroupNode { Id = id, Props = props };
         var slots = RepeatLayout.Place(props, items.Count);
         for (var i = 0; i < items.Count; i++)
         {
             var scope = placement.Scope.With("item", items[i]).With("index", (double)i).With("count", (double)items.Count);
-            var variables = new Dictionary<string, object?>();
-            foreach (var (name, expression) in definition["vars"] as JsonObject ?? [])
-            {
-                variables[name] = PropertyReader.ReadExpression(expression, scope.With(variables));
-            }
-
-            scope = scope.With(variables);
+            scope = scope.With(scope.Variables(null, definition, cancellationToken));
             var stagger = PropertyReader.ReadNumber(definition["stagger"], scope) ?? 0;
             var cell = new GroupNode { Id = $"{id}[{i}]" };
             cell.Props.SlideStart = placement.Start;
@@ -283,7 +315,7 @@ internal sealed class ElementBuilder(
         return group;
     }
 
-    private static List<object?> RepeatItems(JsonObject definition, Props props, Scope scope)
+    private List<object?> RepeatItems(JsonObject definition, Props props, Scope scope)
     {
         List<object?> items;
         if (definition["items"] is JsonArray literal)
@@ -296,13 +328,22 @@ internal sealed class ElementBuilder(
         }
         else
         {
-            var count = Math.Max(0, (int)(PropertyReader.ReadNumber(definition["count"], scope) ?? 0));
-            items = [.. Enumerable.Range(0, count).Select(index => (object?)(double)index)];
+            var count = PropertyReader.ReadNumber(definition["count"], scope) ?? 0;
+            if (count > MaxElements)
+            {
+                throw new InvalidOperationException($"A repeat's \"count\" must be at most {MaxElements}, not {count}.");
+            }
+
+            items = [.. Enumerable.Range(0, Math.Max(0, (int)count)).Select(index => (object?)(double)index)];
         }
 
         if (definition["where"] is { } where)
         {
-            items = [.. items.Where((item, index) => PropertyReader.ReadCondition(where, scope.With("item", item).With("index", (double)index)))];
+            items = [.. items.Where((item, index) =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return PropertyReader.ReadCondition(where, scope.With("item", item).With("index", (double)index));
+            })];
         }
 
         return props.Numbers.TryGetValue("max", out var max) ? [.. items.Take((int)max)] : items;

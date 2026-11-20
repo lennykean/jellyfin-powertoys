@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -41,10 +42,30 @@ internal static class BindingValue
             double number => number.ToString(CultureInfo.InvariantCulture),
             bool flag => flag ? "true" : "false",
             string text => text,
-            List<object?> list => string.Join(", ", list.Select(Print)),
+            List<object?> list => Join(list, ", ", ", "),
             JsonObject item => item.ToJsonString(),
             _ => value.ToString() ?? string.Empty,
         };
+    }
+
+    public static string Join(IReadOnlyList<object?> values, string separator, string lastSeparator)
+    {
+        var result = new StringBuilder();
+        for (var i = 0; i < values.Count; i++)
+        {
+            if (i > 0)
+            {
+                var between = i == values.Count - 1 ? lastSeparator : separator;
+                TextTemplate.CheckLength((long)result.Length + between.Length);
+                result.Append(between);
+            }
+
+            var text = Print(values[i]);
+            TextTemplate.CheckLength((long)result.Length + text.Length);
+            result.Append(text);
+        }
+
+        return result.ToString();
     }
 
     public static object? FromNode(JsonNode? node)

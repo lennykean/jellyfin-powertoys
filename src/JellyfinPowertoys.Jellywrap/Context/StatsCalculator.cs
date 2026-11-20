@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace JellyfinPowertoys.Jellywrap.Context;
 
-internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaItem, bool> shows)
+internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaItem, bool> isVisible)
 {
     private const double SecondsPerMinute = 60;
     private const double SecondsPerHour = 3600;
@@ -19,6 +19,7 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
     private const int ClassicAge = 25;
 
     private const int TopActorCount = 10;
+    private const int MinSharedViewers = 2;
     private const int MorningStart = 5;
 
     private const int AfternoonStart = 12;
@@ -42,7 +43,7 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
         var allGenres = Genres(plays);
         var genres = allShown ? allGenres : Genres(shown);
         var allBinge = BestBinge(plays, _ => true);
-        var binge = allShown ? allBinge : BestBinge(plays, shows);
+        var binge = allShown ? allBinge : BestBinge(plays, isVisible);
         var allReplayed = MostReplayed(plays);
         var replayed = allShown ? allReplayed : MostReplayed(shown);
         var rhythm = Rhythm(plays);
@@ -50,7 +51,7 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
         var subjects = new PersonaSubjects(
             titles.FirstOrDefault(t => t.Id == allTitles.FirstOrDefault()?.Id),
             titles.FirstOrDefault(t => t.Id == allBinge?.Series),
-            allReplayed is not null && shows(allReplayed) ? ReplayedTitle(allReplayed, shown) : null);
+            allReplayed is not null && isVisible(allReplayed) ? ReplayedTitle(allReplayed, shown) : null);
 
         return new UserStats(
             user.Id,
@@ -155,7 +156,7 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
             commonGround.Id == Guid.Empty ? null : titles.First(t => t.Id == commonGround.Id),
             commonGround.Kids / SecondsPerHour,
             commonGround.Grownups / SecondsPerHour,
-            titles.OrderByDescending(t => t.Viewers).FirstOrDefault(),
+            titles.OrderByDescending(t => t.Viewers).FirstOrDefault(t => t.Viewers >= MinSharedViewers),
             [.. users.Select((user, index) => new LeaderRow(index + 1, user.ToRef(), user.Totals.Hours))],
             new Superlatives(
                 Most(u => u.Totals.Movies),
@@ -168,7 +169,7 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
 
     private List<Play> Shown(IEnumerable<Play> plays)
     {
-        return [.. plays.Where(p => p.Item is { } item && shows(item))];
+        return [.. plays.Where(p => p.Item is { } item && isVisible(item))];
     }
 
     private static string Leader(double kids, double grownups)
@@ -404,13 +405,13 @@ internal sealed class StatsCalculator(ItemIndex itemIndex, int year, Func<MediaI
         }
     }
 
-    private SessionSeries? BestBinge(IReadOnlyList<Play> plays, Func<MediaItem, bool> counts)
+    private SessionSeries? BestBinge(IReadOnlyList<Play> plays, Func<MediaItem, bool> isVisible)
     {
         return Sessions(plays)
             .SelectMany(session => session
-                .Where(p => p.Item is { Kind: ItemKind.Episode, SeriesId: not null } item && counts(item))
+                .Where(p => p.Item is { Kind: ItemKind.Episode, SeriesId: not null } item && isVisible(item))
                 .GroupBy(p => itemIndex.CanonicalId(p.Item!.SeriesId!.Value)))
-            .Select(g => new SessionSeries(g.Key, g.Select(p => p.ItemId).Distinct().Count(), [.. g]))
+            .Select(g => new SessionSeries(g.Key, g.Select(p => itemIndex.CanonicalId(p.ItemId)).Distinct().Count(), [.. g]))
             .OrderByDescending(b => b.Episodes)
             .FirstOrDefault();
     }

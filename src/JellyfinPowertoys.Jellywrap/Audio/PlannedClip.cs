@@ -5,4 +5,4 @@ internal sealed record PlannedClip(
     double In,
     double Duration,
     string Title,
-    string Kind);
+    ClipKind Kind);

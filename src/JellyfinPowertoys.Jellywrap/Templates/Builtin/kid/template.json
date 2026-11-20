@@ -55,7 +55,7 @@
           "maxWidth": 1600,
           "y2": 580,
           "in": "pop",
-          "text": "About {{me.totals.hours | round}} hours, that's like {{me.totals.hours | div:1.5 | number}} movies!"
+          "text": "About {{me.totals.hours | round | plural:\"hour\"}}, that's like {{me.totals.hours | div:1.5 | round | plural:\"movie\"}}!"
         }
       ]
     },
@@ -85,7 +85,7 @@
       "duration": 12,
       "audioGroup": 2,
       "background": "bg",
-      "when": "me.topSeries | count > 0",
+      "when": "me.topSeries | count >= 2",
       "elements": [
         { "id": "base-headline", "type": "text", "font": "body", "size": 100, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "pop", "text": "Your favorite shows" }
       ]
@@ -94,7 +94,7 @@
       "duration": 12,
       "audioGroup": 2,
       "background": "bg",
-      "when": "me.topMovies | count > 0",
+      "when": "me.topMovies | count >= 2",
       "elements": [
         { "id": "base-headline", "type": "text", "font": "body", "size": 100, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "pop", "text": "Your favorite movies" }
       ]
@@ -151,6 +151,7 @@
       "duration": 9,
       "audioGroup": 3,
       "background": "bg",
+      "when": "me.clock.favoritePart != null",
       "elements": [
         {
           "id": "base-headline",

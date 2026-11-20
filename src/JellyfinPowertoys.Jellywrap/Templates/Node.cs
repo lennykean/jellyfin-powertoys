@@ -9,10 +9,11 @@ internal abstract class Node
     protected const double MinVisibleScale = 0.001;
 
     private const double MinVisibleBlur = 0.01;
+    private const int MaxBlurLayers = 3;
 
     public string Id { get; init; } = string.Empty;
 
-    public Props Props { get; init; } = new();
+    public Props Props { get; init; } = new Props();
     public ShapeNode? Clip { get; set; }
 
     protected virtual bool Translates => false;
@@ -61,15 +62,19 @@ internal abstract class Node
             canvas.ClipPath(clip, SKClipOperation.Intersect, antialias: true);
         }
 
+        // Each nested blur is a full offscreen surface, so the deeper ones are not blurred.
+        var outerBlurLayers = painter.BlurLayers;
         var blur = Props.Number("blur", slideTime);
-        if (blur > MinVisibleBlur)
+        if (blur > MinVisibleBlur && outerBlurLayers < MaxBlurLayers)
         {
             using var filter = SKImageFilter.CreateBlur((float)blur / 2, (float)blur / 2);
             using var layer = new SKPaint { ImageFilter = filter };
             canvas.SaveLayer(layer);
+            painter.BlurLayers = outerBlurLayers + 1;
         }
 
         DrawSelf(painter, slideTime, x, y);
+        painter.BlurLayers = outerBlurLayers;
         painter.Alpha = outerAlpha;
         canvas.RestoreToCount(saved);
     }

@@ -13,4 +13,9 @@ internal static class ItemKindExtensions
             _ => "video",
         };
     }
+
+    public static bool IsAudio(this ItemKind kind)
+    {
+        return kind is ItemKind.Song or ItemKind.AudioBook;
+    }
 }

@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class Scope
 {
-    public static readonly Scope Empty = new(null, new Dictionary<string, object?>(), null);
+    public static readonly Scope Empty = new Scope(null, new Dictionary<string, object?>(), null);
 
     private readonly Scope? _parent;
     private readonly Dictionary<string, object?> _names;
@@ -29,9 +30,26 @@ internal sealed class Scope
         return new Scope(this, new Dictionary<string, object?> { [name] = value }, _featured);
     }
 
-    public Scope With(IReadOnlyDictionary<string, object?> values)
+    public Scope With(Dictionary<string, object?> values)
     {
-        return new Scope(this, values.ToDictionary(), _featured);
+        return new Scope(this, values, _featured);
+    }
+
+    public Dictionary<string, object?> Variables(JsonObject? template, JsonObject? slide, CancellationToken cancellationToken)
+    {
+        var variables = new Dictionary<string, object?>();
+        var scope = With(variables);
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (var definitions in new[] { template?["vars"], slide?["vars"] }.OfType<JsonObject>())
+        {
+            foreach (var (name, expression) in definitions)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                variables[name] = PropertyReader.ReadExpression(expression, scope);
+            }
+        }
+
+        return variables;
     }
 
     public Scope Collecting(List<string>? featured)
@@ -54,7 +72,7 @@ internal sealed class Scope
 
     public void Feature(JsonObject? item)
     {
-        if (_featured is not null && item?["id"]?.GetValue<string>() is { } id && item["kind"] is not null && !_featured.Contains(id))
+        if (_featured is not null && PropertyReader.IsString(item?["id"], out var id) && item!["kind"] is not null && !_featured.Contains(id))
         {
             _featured.Add(id);
         }

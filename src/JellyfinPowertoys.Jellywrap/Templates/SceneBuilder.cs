@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 using SkiaSharp;
 
@@ -9,6 +10,8 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class SceneBuilder
 {
+    public const double MaxVideoSeconds = 3600;
+
     private const double DefaultSlideDuration = 8;
     private const double DefaultTransitionDuration = 0.8;
     private const string DefaultTransitionType = "crossfade";
@@ -17,49 +20,89 @@ internal sealed class SceneBuilder
     private const string BackgroundLayer = "background";
     private const string TransitionPreset = "preset";
 
+    private static readonly TimeSpan _buildTimeout = TimeSpan.FromMinutes(1);
+
+    private readonly CancellationToken _cancellationToken;
     private readonly JsonObject _merged;
-    private readonly FontStore _fonts;
+    private readonly TextShaper _shaper;
     private readonly ImageStore _images;
     private readonly List<SKPath> _shapePaths;
     private readonly Palette _palette;
     private readonly PropsBuilder _propsBuilder;
     private readonly ElementBuilder _elementBuilder;
 
-    private SceneBuilder(JsonObject merged, FontStore fonts, ImageStore images, List<SKPath> shapePaths)
+    private SceneBuilder(
+        JsonObject merged,
+        TextShaper shaper,
+        ImageStore images,
+        List<SKPath> shapePaths,
+        CancellationToken cancellationToken)
     {
+        _cancellationToken = cancellationToken;
         _merged = merged;
-        _fonts = fonts;
+        _shaper = shaper;
         _images = images;
         _shapePaths = shapePaths;
         _palette = new Palette(merged["palette"] as JsonObject ?? []);
-        var trackBuilder = new TrackBuilder(merged["presets"] as JsonObject, _palette);
+        var trackBuilder = new TrackBuilder(merged["presets"] as JsonObject, _palette, cancellationToken);
         _propsBuilder = new PropsBuilder(_palette, trackBuilder);
-        _elementBuilder = new ElementBuilder(merged["fallbacks"], fonts, images, _palette, _propsBuilder, trackBuilder, shapePaths);
+        _elementBuilder = new ElementBuilder(
+            merged["fallbacks"],
+            shaper,
+            images,
+            _palette,
+            _propsBuilder,
+            trackBuilder,
+            shapePaths,
+            cancellationToken);
     }
 
-    public static Scene Build(Template template, string kind, JsonObject context)
+    public static Scene Build(Template template, string kind, JsonObject context, CancellationToken cancellationToken)
     {
+        using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutSource.CancelAfter(_buildTimeout);
+        cancellationToken.ThrowIfCancellationRequested();
         var merged = template.MergedFor(kind) ?? throw new InvalidOperationException($"Template {template.Id} has no {kind} video.");
-        var families = (merged["fonts"] as JsonObject ?? []).ToDictionary(family => family.Key, family => FontFiles(family.Value));
-        var fonts = new FontStore(families, file => template.ReadFile(file) ?? throw new InvalidOperationException($"The font file {file} is missing."));
-        var images = new ImageStore(template.ReadFile);
+        var shaper = new TextShaper();
+        var images = new ImageStore(template.ReadFile, ImagePaths(context).ToHashSet());
         var shapePaths = new List<SKPath>();
         try
         {
-            return new SceneBuilder(merged, fonts, images, shapePaths).Build(context);
+            foreach (var (name, files) in merged["fonts"] as JsonObject ?? [])
+            {
+                shaper.LoadFonts(name, FontFiles(files), template, timeoutSource.Token);
+            }
+
+            return new SceneBuilder(merged, shaper, images, shapePaths, timeoutSource.Token).Build(context);
         }
-        catch
+        catch (Exception exception)
         {
-            fonts.Dispose();
+            shaper.Dispose();
             images.Dispose();
             shapePaths.ForEach(path => path.Dispose());
+            if (exception is OperationCanceledException && !cancellationToken.IsCancellationRequested)
+            {
+                throw new TimeoutException($"The template {template.Id} did not build in {_buildTimeout.TotalSeconds:F0} s.", exception);
+            }
+
             throw;
         }
     }
 
-    private static IReadOnlyList<string> FontFiles(JsonNode? files)
+    private static IEnumerable<string> ImagePaths(JsonNode? context)
     {
-        return files is JsonArray chain ? chain.Select(file => file!.GetValue<string>()).ToList() : [files!.GetValue<string>()];
+        return context switch
+        {
+            JsonObject image when PropertyReader.IsString(image["path"], out var path) && image["width"] is not null && image["height"] is not null => [path],
+            JsonObject item => item.SelectMany(property => ImagePaths(property.Value)),
+            JsonArray list => list.SelectMany(ImagePaths),
+            _ => [],
+        };
+    }
+
+    private static IEnumerable<string> FontFiles(JsonNode? files)
+    {
+        return files is JsonArray chain ? chain.Select(file => file!.GetValue<string>()) : [files!.GetValue<string>()];
     }
 
     private Scene Build(JsonObject context)
@@ -70,11 +113,22 @@ internal sealed class SceneBuilder
         {
             var definition = (JsonObject)node!;
             var scope = root.With("slide", SlideInfo(id, 0, 0, 0, 0));
-            scope = scope.With(Variables(scope, _merged, definition));
+            scope = scope.With(scope.Variables(_merged, definition, _cancellationToken));
             if (PropertyReader.ReadCondition(definition["when"], scope))
             {
-                kept.Add((id, definition, PropertyReader.ReadNumber(definition["duration"], scope) ?? DefaultSlideDuration));
+                var duration = PropertyReader.ReadNumber(definition["duration"], scope) ?? DefaultSlideDuration;
+                if (duration < 0)
+                {
+                    throw new InvalidOperationException($"The duration of the slide \"{id}\" is {duration}; a duration cannot be negative.");
+                }
+
+                kept.Add((id, definition, duration));
             }
+        }
+
+        if (kept.Sum(slide => slide.Duration) is var length and > MaxVideoSeconds)
+        {
+            throw new InvalidOperationException($"The video is {length} seconds long; the longest video is {MaxVideoSeconds} seconds.");
         }
 
         var slides = new List<Slide>();
@@ -86,9 +140,9 @@ internal sealed class SceneBuilder
             var featured = new List<string>();
 
             var scope = root.With("slide", SlideInfo(id, i, kept.Count, duration, start));
-            var variables = Variables(scope, _merged, null);
+            var variables = scope.Variables(_merged, null, _cancellationToken);
             scope = scope.With(variables).Collecting(featured);
-            var slideVariables = Variables(scope, null, definition);
+            var slideVariables = scope.Variables(null, definition, _cancellationToken);
             scope = scope.With(slideVariables);
             foreach (var (name, value) in slideVariables)
             {
@@ -119,11 +173,11 @@ internal sealed class SceneBuilder
         }
 
         var video = root.With("slide", SlideInfo("video", 0, 1, start, 0));
-        video = video.With(Variables(video, _merged, null));
+        video = video.With(video.Variables(_merged, null, _cancellationToken));
         var scene = new Scene
         {
             Slides = slides,
-            Fonts = _fonts,
+            Shaper = _shaper,
             Images = _images,
             ShapePaths = _shapePaths,
             Background = _palette.Paint(_merged["background"], video)?.Color ?? SKColors.Black,
@@ -177,20 +231,6 @@ internal sealed class SceneBuilder
         element["type"] = "effect";
         element["id"] ??= $"effect-{element["effect"]}";
         return element;
-    }
-
-    private static Dictionary<string, object?> Variables(Scope scope, JsonObject? template, JsonObject? slide)
-    {
-        var variables = new Dictionary<string, object?>();
-        foreach (var definitions in new[] { template?["vars"], slide?["vars"] }.OfType<JsonObject>())
-        {
-            foreach (var (name, expression) in definitions)
-            {
-                variables[name] = PropertyReader.ReadExpression(expression, scope.With(variables));
-            }
-        }
-
-        return variables;
     }
 
     private Transition BuildTransition(JsonObject definition, Scope scope, double boundary)

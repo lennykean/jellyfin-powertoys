@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
 
@@ -8,6 +8,9 @@ internal sealed class TextTemplate
 {
     private const string HoleOpen = "{{";
     private const string HoleClose = "}}";
+
+    // A text that names itself twice doubles each time it is used.
+    private const int MaxLength = 1_000_000;
 
     private readonly IReadOnlyList<object> _parts;
 
@@ -59,8 +62,24 @@ internal sealed class TextTemplate
         return IsSingleHole ? ((Expression)_parts[0]).Evaluate(scope) : Render(scope);
     }
 
+    public static void CheckLength(long length)
+    {
+        if (length > MaxLength)
+        {
+            throw new InvalidOperationException($"A text of the template is longer than {MaxLength} characters.");
+        }
+    }
+
     public string Render(Scope scope)
     {
-        return string.Concat(_parts.Select(part => part is Expression expression ? BindingValue.Print(expression.Evaluate(scope)) : (string)part));
+        var result = new StringBuilder();
+        foreach (var part in _parts)
+        {
+            var text = part is Expression expression ? BindingValue.Print(expression.Evaluate(scope)) : (string)part;
+            CheckLength((long)result.Length + text.Length);
+            result.Append(text);
+        }
+
+        return result.ToString();
     }
 }

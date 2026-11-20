@@ -32,14 +32,14 @@ internal sealed class TextNode : Node
         return tracking == 0 ? Props.Number("letterSpacing", 0) : Math.Sign(tracking) * Math.Floor(Math.Abs(size * tracking) + 0.5);
     }
 
-    public double Measure(FontStore fonts, string text, double size)
+    public double Measure(TextShaper shaper, string text, double size)
     {
-        return fonts.Shape(Font, size, Spacing(size), UnitMarks.Strip(text)).Width;
+        return shaper.Shape(Font, size, Spacing(size), text.StripUnitMarks()).Width;
     }
 
-    public LaidOutText Layout(FontStore fonts, string text)
+    public LaidOutText Layout(TextShaper shaper, string text)
     {
-        return TextLayout.Layout(text, Fit, (measured, size) => Measure(fonts, measured, size));
+        return TextLayout.Layout(text, Fit, (measured, size) => Measure(shaper, measured, size));
     }
 
     public string Current(double slideTime)
@@ -50,13 +50,13 @@ internal sealed class TextNode : Node
         }
 
         var shown = Template.Render(Scope!.With("value", Value * Math.Clamp(Props.Number("count", slideTime, 1), 0, 1)));
-        return TextCase.Apply(shown, Case ?? string.Empty);
+        return shown.ApplyCase(Case ?? string.Empty);
     }
 
     protected override void DrawSelf(Painter painter, double slideTime, double x, double y)
     {
         var text = Current(slideTime);
-        var laidOut = text == Text && LaidOut is not null ? LaidOut : Layout(painter.Fonts, text);
+        var laidOut = text == Text && LaidOut is not null ? LaidOut : Layout(painter.Shaper, text);
         if (FitOnFinal && LaidOut is not null && !ReferenceEquals(laidOut, LaidOut))
         {
             laidOut = new LaidOutText(LaidOut.Size, [new LaidOutLine(text, LaidOut.Lines[0].Y)]);
@@ -64,7 +64,7 @@ internal sealed class TextNode : Node
 
         var isTyped = Props.Has("chars");
         var typed = isTyped
-            ? (int)Math.Floor(Math.Clamp(Props.Number("chars", slideTime), 0, 1) * (laidOut.Lines.Sum(line => TextElements.Count(line.Text) + 1) - 1))
+            ? (int)Math.Floor(Math.Clamp(Props.Number("chars", slideTime), 0, 1) * (laidOut.Lines.Sum(line => line.Text.TextElementCount() + 1) - 1))
             : 0;
         var color = Props.Paint("color", slideTime) ?? new Paint(SKColors.Black);
         var size = laidOut.Size;
@@ -76,11 +76,11 @@ internal sealed class TextNode : Node
             var shown = line.Text;
             if (isTyped)
             {
-                shown = TextElements.Take(line.Text, typed);
-                typed -= TextElements.Count(line.Text) + 1;
+                shown = line.Text.TakeTextElements(typed);
+                typed -= line.Text.TextElementCount() + 1;
             }
 
-            var width = line.Width ?? Measure(painter.Fonts, line.Text, size);
+            var width = line.Width ?? Measure(painter.Shaper, line.Text, size);
             var left = x - (Anchors.Align(Props.Text("align")) * width);
             var baseline = y + line.Y + boxShift;
             if (hasBox)
@@ -90,7 +90,7 @@ internal sealed class TextNode : Node
 
             if (Words is not null)
             {
-                foreach (var (word, wordX) in line.Words ?? WordsOf(painter.Fonts, line.Text, size))
+                foreach (var (word, wordX) in line.Words ?? WordsOf(painter.Shaper, line.Text, size))
                 {
                     if (wordIndex < Words.Count)
                     {
@@ -113,7 +113,7 @@ internal sealed class TextNode : Node
             else if (Lead is { } lead && shown.StartsWith(lead.Text, StringComparison.Ordinal))
             {
                 DrawRun(painter, lead.Text, left, baseline, size, lead.Paint);
-                DrawRun(painter, shown[lead.Text.Length..], left + Measure(painter.Fonts, lead.Text, size), baseline, size, color);
+                DrawRun(painter, shown[lead.Text.Length..], left + Measure(painter.Shaper, lead.Text, size), baseline, size, color);
             }
             else
             {
@@ -122,10 +122,10 @@ internal sealed class TextNode : Node
         }
     }
 
-    private IEnumerable<(string Word, double X)> WordsOf(FontStore fonts, string line, double size)
+    private IEnumerable<(string Word, double X)> WordsOf(TextShaper shaper, string line, double size)
     {
         var words = line.Split(' ');
-        return words.Select((word, index) => (word, index == 0 ? 0 : Measure(fonts, string.Join(' ', words[..index]) + " ", size)));
+        return words.Select((word, index) => (word, index == 0 ? 0 : Measure(shaper, string.Join(' ', words[..index]) + " ", size)));
     }
 
     private void DrawWord(
@@ -145,7 +145,7 @@ internal sealed class TextNode : Node
             return;
         }
 
-        var width = Measure(painter.Fonts, text, size);
+        var width = Measure(painter.Shaper, text, size);
         var canvas = painter.Canvas;
         var outerAlpha = painter.Alpha;
         canvas.Save();
@@ -179,7 +179,7 @@ internal sealed class TextNode : Node
 
     private void DrawRun(Painter painter, string text, double x, double baseline, double size, Paint color)
     {
-        var shaped = painter.Fonts.Shape(Font, size, Spacing(size), UnitMarks.Strip(text));
+        var shaped = painter.Shaper.Shape(Font, size, Spacing(size), text.StripUnitMarks());
         if (shaped.Blob is null)
         {
             return;
@@ -189,7 +189,7 @@ internal sealed class TextNode : Node
         var baselineMode = Props.Text("baseline");
         if (baselineMode is "middle" or "top" or "bottom")
         {
-            var font = painter.Fonts.Font(Font, size);
+            var font = painter.Shaper.Font(Font, size);
             var metrics = font.Metrics;
             var ascent = font.Size * -metrics.Ascent / (metrics.Descent - metrics.Ascent);
             var descent = font.Size - ascent;

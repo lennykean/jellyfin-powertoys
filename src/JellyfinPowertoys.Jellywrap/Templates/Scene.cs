@@ -13,7 +13,7 @@ internal sealed class Scene : IDisposable
 
     public required IReadOnlyList<Slide> Slides { get; init; }
 
-    public required FontStore Fonts { get; init; }
+    public required TextShaper Shaper { get; init; }
 
     public required ImageStore Images { get; init; }
     public required IReadOnlyList<SKPath> ShapePaths { get; init; }
@@ -48,7 +48,7 @@ internal sealed class Scene : IDisposable
 
     public void Dispose()
     {
-        Fonts.Dispose();
+        Shaper.Dispose();
         Images.Dispose();
         foreach (var path in ShapePaths)
         {

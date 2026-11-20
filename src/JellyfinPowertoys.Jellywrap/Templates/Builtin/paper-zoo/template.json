@@ -510,7 +510,8 @@
         "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
         "amount": "{{mins | then:m,me.totals.hours}}",
         "mw": "{{(m == 1) | then:\"minute!\",\"minutes!\"}}",
-        "unit": "{{mins | then:mw,\"hours —\"}}",
+        "hrw": "{{me.totals.hours | round | noun:\"hour —\",\"hours —\"}}",
+        "unit": "{{mins | then:mw,hrw}}",
         "mv": "{{me.totals.hours | div:1.5 | round}}",
         "mvw": "{{mv | noun:\"movie!\",\"movies!\"}}",
         "cx": "{{mins | then:960,560}}"
@@ -5174,7 +5175,7 @@
         "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
         "hr": "{{me.totals.hours | round}}",
         "sumN": "{{mins | then:m,hr}}",
-        "sumU": "{{mins | then:\"minutes\",\"hours\"}}"
+        "sumU": "{{mins | then:\"minute\",\"hour\"}}{{(sumN == 1) | then:\"\",\"s\"}}"
       },
       "elements": [
         { "id": "base-headline", "remove": true },

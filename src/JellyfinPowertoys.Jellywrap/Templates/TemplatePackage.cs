@@ -10,11 +10,13 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class TemplatePackage(Func<string, byte[]?> readFile)
 {
-    private const string TemplateFile = "template.json";
+    public const string TemplateFile = "template.json";
+
+    private const int MaxFileBytes = 32 * 1024 * 1024;
 
     private static readonly string[] _fileFolders = ["fonts/", "img/"];
 
-    private static readonly JsonDocumentOptions _jsonOptions = new()
+    private static readonly JsonDocumentOptions _jsonOptions = new JsonDocumentOptions()
     {
         CommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
@@ -27,6 +29,20 @@ internal sealed class TemplatePackage(Func<string, byte[]?> readFile)
     public byte[]? ReadFile(string path)
     {
         return readFile(path);
+    }
+
+    public static byte[] ReadAllBytes(string path)
+    {
+        using var stream = File.OpenRead(path);
+        var length = stream.Length;
+        if (length > MaxFileBytes)
+        {
+            throw new InvalidDataException($"The file {path} exceeds {MaxFileBytes / (1024 * 1024)} MB.");
+        }
+
+        var bytes = new byte[(int)length];
+        stream.ReadExactly(bytes);
+        return bytes;
     }
 
     public void Load()

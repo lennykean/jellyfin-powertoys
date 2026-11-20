@@ -20,8 +20,7 @@ internal sealed record MediaItem
     public int? Season { get; init; }
 
     public int? Episode { get; init; }
-    public string? ProviderKey { get; init; }
-    public int? RatingScore { get; init; }
+    public IReadOnlyList<string> CopyKeys { get; init; } = [];
 
     public IReadOnlyList<string> Genres { get; init; } = [];
 

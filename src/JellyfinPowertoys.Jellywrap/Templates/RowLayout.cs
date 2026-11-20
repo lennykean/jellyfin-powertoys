@@ -5,14 +5,14 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal static class RowLayout
 {
-    public static void Place(GroupNode group, FontStore fonts)
+    public static void Place(GroupNode group, TextShaper shaper)
     {
         double Width(Node child)
         {
             return child switch
             {
-                TextNode text => text.LaidOut!.Lines.Select(line => text.Measure(fonts, line.Text, text.LaidOut.Size)).DefaultIfEmpty().Max(),
-                OdometerNode odometer => odometer.Width(fonts),
+                TextNode text => text.LaidOut!.Lines.Select(line => text.Measure(shaper, line.Text, text.LaidOut.Size)).DefaultIfEmpty().Max(),
+                OdometerNode odometer => odometer.Width(shaper),
                 _ => child.Props.Number("width", 0),
             };
         }
@@ -34,7 +34,7 @@ internal static class RowLayout
                 {
                     case TextNode text:
                         text.Fit = text.Fit with { Size = Math.Floor(text.Fit.Size * shrink) };
-                        text.LaidOut = text.Layout(fonts, text.Text);
+                        text.LaidOut = text.Layout(shaper, text.Text);
                         break;
                     case OdometerNode odometer:
                         odometer.Props.Numbers["size"] = Math.Floor(odometer.Props.Number("size", 0) * shrink);

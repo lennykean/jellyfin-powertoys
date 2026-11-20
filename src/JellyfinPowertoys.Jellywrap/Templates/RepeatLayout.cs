@@ -42,7 +42,13 @@ internal static class RepeatLayout
         {
             case "area":
                 {
-                    scale = Math.Min(1, Math.Sqrt(maxColumns * props.Number("rows", 0, 1) / count));
+                    var wantedRows = props.Number("rows", 0, 1);
+                    if (wantedRows <= 0)
+                    {
+                        throw new InvalidOperationException($"A grid's \"rows\" must be above 0, not {wantedRows}.");
+                    }
+
+                    scale = Math.Min(1, Math.Sqrt(maxColumns * wantedRows / count));
                     var perRow = (int)Math.Ceiling((maxColumns / scale) - CeilingTolerance);
                     rows = (int)Math.Ceiling((double)count / perRow);
                     columns = props.Number("balance", 0) != 0 ? (int)Math.Ceiling((double)count / rows) : perRow;
@@ -53,7 +59,7 @@ internal static class RepeatLayout
                 {
                     var box = props.Lists.GetValueOrDefault("fitBox") ?? [Scene.Width, Scene.Height];
                     scale = 0;
-                    for (var candidateRows = 1; candidateRows <= (int)props.Number("maxRows", 0, count); candidateRows++)
+                    for (var candidateRows = 1; candidateRows <= Math.Min(count, props.Number("maxRows", 0, count)); candidateRows++)
                     {
                         var candidateColumns = (int)Math.Ceiling((double)count / candidateRows);
                         var candidateScale = Math.Min(

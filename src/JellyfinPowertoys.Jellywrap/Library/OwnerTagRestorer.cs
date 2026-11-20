@@ -11,7 +11,8 @@ namespace JellyfinPowertoys.Jellywrap.Library;
 
 public sealed class OwnerTagRestorer(
     ILibraryManager libraryManager,
-    JellywrapLibrary library,
+    OwnerFolders ownerFolders,
+    AccessGuard accessGuard,
     ILogger<OwnerTagRestorer> logger) : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)
@@ -32,7 +33,7 @@ public sealed class OwnerTagRestorer(
     private void OnItemChanged(object? sender, ItemChangeEventArgs eventArgs)
     {
         var item = eventArgs.Item;
-        var ownerTag = item.Path is null ? null : library.GetOwnerTag(item.Path);
+        var ownerTag = item.Path is null ? null : ownerFolders.GetOwnerTag(item.Path);
         if (ownerTag is null || item.Tags.Contains(ownerTag))
         {
             return;
@@ -41,5 +42,6 @@ public sealed class OwnerTagRestorer(
         logger.LogInformation("Restoring the Jellywrap tag of {Path}", item.Path);
         item.Tags = [.. item.Tags, ownerTag];
         item.UpdateToRepositoryAsync(ItemUpdateType.MetadataEdit, CancellationToken.None).GetAwaiter().GetResult();
+        accessGuard.ApplyAllAsync().GetAwaiter().GetResult();
     }
 }

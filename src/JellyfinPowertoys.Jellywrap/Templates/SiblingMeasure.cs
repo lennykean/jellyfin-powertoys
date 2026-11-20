@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
 
-internal sealed class SiblingMeasure(List<JsonObject> siblings, FontStore fonts, Func<JsonObject, Placement, Node?> buildElement)
+internal sealed class SiblingMeasure(List<JsonObject> siblings, TextShaper shaper, Func<JsonObject, Placement, Node?> buildElement)
 {
     private readonly Dictionary<string, object?> _measured = [];
     private readonly HashSet<string> _measuring = [];
@@ -22,15 +22,20 @@ internal sealed class SiblingMeasure(List<JsonObject> siblings, FontStore fonts,
             return known;
         }
 
+        if (_measuring.Count > ElementBuilder.MaxDepth)
+        {
+            throw new InvalidOperationException($"The template measures elements deeper than {ElementBuilder.MaxDepth} levels.");
+        }
+
         var definition = Find(siblings, id, placement.Scope);
         var node = definition is null ? null : buildElement(definition, placement);
         var (width, size, lines) = node switch
         {
             TextNode text => (
-                text.LaidOut!.Lines.Select(line => line.Width ?? text.Measure(fonts, line.Text, text.LaidOut.Size)).DefaultIfEmpty().Max(),
+                text.LaidOut!.Lines.Select(line => line.Width ?? text.Measure(shaper, line.Text, text.LaidOut.Size)).DefaultIfEmpty().Max(),
                 text.LaidOut.Size,
                 text.LaidOut.Lines.Count),
-            OdometerNode odometer => (odometer.Width(fonts), odometer.Props.Number("size", 0), 1),
+            OdometerNode odometer => (odometer.Width(shaper), odometer.Props.Number("size", 0), 1),
             null => (0.0, 0.0, 0),
             _ => (node.Props.Number("width", 0), 0.0, 1),
         };

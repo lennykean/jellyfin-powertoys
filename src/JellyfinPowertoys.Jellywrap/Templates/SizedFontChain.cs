@@ -5,7 +5,7 @@ using SkiaSharp;
 
 namespace JellyfinPowertoys.Jellywrap.Templates;
 
-internal sealed class CssFont(IReadOnlyList<FontFace> chain, float size) : IDisposable
+internal sealed class SizedFontChain(IReadOnlyList<FontFace> chain, float size) : IDisposable
 {
     private readonly Dictionary<FontFace, SKFont> _skiaFonts = [];
 

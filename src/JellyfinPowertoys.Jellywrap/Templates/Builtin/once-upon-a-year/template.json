@@ -615,7 +615,7 @@
         "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
         "amount": "{{mins | then:m,me.totals.hours}}",
         "mw": "{{(m == 1) | then:\"minute!\",\"minutes!\"}}",
-        "hw": "hours — that's like {{me.totals.hours | div:1.5 | round}} movies!",
+        "hw": "{{me.totals.hours | round | noun:\"hour\"}} — that's like {{me.totals.hours | div:1.5 | round | plural:\"movie\"}}!",
         "words": "{{mins | then:mw,hw}}"
       },
       "elements": [
@@ -855,8 +855,9 @@
         "eps": "me.totals.episodes > 0",
         "mx": "{{both | then:560,960}}",
         "one": "{{eps | then:me.totals.episodes,me.totals.movies}}",
-        "lone": "{{eps | then:\"episodes!\",\"movies!\"}}",
-        "label": "{{both | then:\"episodes\",lone}}"
+        "epw": "{{me.totals.episodes | noun:\"episode\",\"episodes\"}}{{both | then:\"\",\"!\"}}",
+        "mvw": "{{me.totals.movies | noun:\"movie!\",\"movies!\"}}",
+        "label": "{{eps | then:epw,mvw}}"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -1131,7 +1132,7 @@
           "id": "label2",
           "type": "text",
           "when": "both",
-          "text": "movies!",
+          "text": "{{mvw}}",
           "font": "display",
           "size": 110,
           "color": "plum",

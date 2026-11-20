@@ -7,31 +7,31 @@ internal static class PersonaScorer
 {
     private const double MinMinutes = 300;
 
-    private static readonly Rule _casual = new("casual-viewer", "The Casual Viewer", _ => 0, (_, _) => "You watch when it suits you.");
-    private static readonly Rule _happy = new("happy-watcher", "The Happy Watcher", _ => 0, (_, _) => "So many fun shows!");
+    private static readonly Rule _casual = new Rule("casual-viewer", "The Casual Viewer", _ => 0, (_, _) => "You watch when it suits you.");
+    private static readonly Rule _happy = new Rule("happy-watcher", "The Happy Watcher", _ => 0, (_, _) => "So many fun shows!");
 
     private static readonly Rule[] _adult =
     [
-        new("night-owl", "The Night Owl", m => m.NightShare / 0.35, (_, _) => "Your best viewing happens after dark."),
-        new("early-bird", "The Early Bird", m => m.EarlyShare / 0.20, (_, _) => "You start the day with the screen on."),
-        new("weekend-warrior", "The Weekend Warrior", m => m.WeekendShare / 0.55, (_, _) => "Saturdays and Sundays are prime time."),
-        new("daily-ritualist", "The Daily Ritualist", m => m.Streak / 30.0, (_, _) => "Jellyfin is part of every day."),
-        new("binger", "The Binger", m => m.BingeEpisodes / 5.0, (_, _) => "One more episode? Always.", s => s.BingeSeries),
-        new("superfan", "The Superfan", m => m.TopTitleShare / 0.25, (_, _) => "One title owned your year.", s => s.TopTitle),
-        new("completionist", "The Completionist", m => m.Started >= 20 ? m.CompletedShare / 0.90 : 0, (_, _) => "You finish what you start."),
-        new("sampler", "The Sampler", m => m.Started >= 20 ? m.AbandonedShare / 0.40 : 0, (_, _) => "A little of everything, then on to the next."),
-        new("rewatcher", "The Rewatcher", m => m.RepeatCompletions >= 3 ? m.RepeatShare / 0.15 : 0, (_, _) => "Old favorites never get old.", s => s.MostReplayed),
-        new("time-traveler", "The Time Traveler", m => m.ClassicShare / 0.40, (_, _) => "You live in the classics."),
-        new("trendsetter", "The Trendsetter", m => m.RecentShare / 0.50, (_, _) => "Fresh releases are your thing."),
-        new("genre-loyalist", "The Genre Loyalist", m => m.TopGenreShare / 0.45, (_, _) => "You know exactly what you like."),
-        new("explorer", "The Explorer", m => m.TopGenreShare < 0.25 ? m.GenresOverAnHour / 10.0 : 0, (_, _) => "No genre can hold you."),
-        new("cinephile", "The Cinephile", m => m.MovieShare >= 0.60 ? m.MoviesCompleted / 40.0 : 0, (_, _) => "Movies are your medium."),
-        new("audiophile", "The Audiophile", m => m.MusicMinutes >= 600 ? m.MusicShare / 0.50 : 0, (_, _) => "Your Jellyfin sounds as good as it looks."),
+        new Rule("night-owl", "The Night Owl", m => m.NightShare / 0.35, (_, _) => "Your best viewing happens after dark."),
+        new Rule("early-bird", "The Early Bird", m => m.EarlyShare / 0.20, (_, _) => "You start the day with the screen on."),
+        new Rule("weekend-warrior", "The Weekend Warrior", m => m.WeekendShare / 0.55, (_, _) => "Saturdays and Sundays are prime time."),
+        new Rule("daily-ritualist", "The Daily Ritualist", m => m.Streak / 30.0, (_, _) => "Jellyfin is part of every day."),
+        new Rule("binger", "The Binger", m => m.BingeEpisodes / 5.0, (_, _) => "One more episode? Always.", s => s.BingeSeries),
+        new Rule("superfan", "The Superfan", m => m.TopTitleShare / 0.25, (_, _) => "One title owned your year.", s => s.TopTitle),
+        new Rule("completionist", "The Completionist", m => m.Started >= 20 ? m.CompletedShare / 0.90 : 0, (_, _) => "You finish what you start."),
+        new Rule("sampler", "The Sampler", m => m.Started >= 20 ? m.AbandonedShare / 0.40 : 0, (_, _) => "A little of everything, then on to the next."),
+        new Rule("rewatcher", "The Rewatcher", m => m.RepeatCompletions >= 3 ? m.RepeatShare / 0.15 : 0, (_, _) => "Old favorites never get old.", s => s.MostReplayed),
+        new Rule("time-traveler", "The Time Traveler", m => m.ClassicShare / 0.40, (_, _) => "You live in the classics."),
+        new Rule("trendsetter", "The Trendsetter", m => m.RecentShare / 0.50, (_, _) => "Fresh releases are your thing."),
+        new Rule("genre-loyalist", "The Genre Loyalist", m => m.TopGenreShare / 0.45, (_, _) => "You know exactly what you like."),
+        new Rule("explorer", "The Explorer", m => m.TopGenreShare < 0.25 ? m.GenresOverAnHour / 10.0 : 0, (_, _) => "No genre can hold you."),
+        new Rule("cinephile", "The Cinephile", m => m.MovieShare >= 0.60 ? m.MoviesCompleted / 40.0 : 0, (_, _) => "Movies are your medium."),
+        new Rule("audiophile", "The Audiophile", m => m.MusicMinutes >= 600 ? m.MusicShare / 0.50 : 0, (_, _) => "Your Jellyfin sounds as good as it looks."),
     ];
 
     private static readonly Rule[] _kid =
     [
-        new(
+        new Rule(
             "super-fan",
             "The Super Fan",
             m => m.TopTitleShare / 0.30,
@@ -39,19 +39,17 @@ internal static class PersonaScorer
                 ? $"You loved {subject.Title}! {subject.Completions} episodes!"
                 : "You found a favorite and watched it lots!",
             s => s.TopTitle),
-        new(
+        new Rule(
             "replay-champion",
             "The Replay Champion",
             m => m.RepeatCompletions >= 5 ? m.RepeatShare / 0.25 : 0,
-            (_, subject) => subject is null
-                ? "You watched your favorite again and again!"
-                : $"You watched {(subject.Kind == ItemKind.Episode.ToContextKind() ? $"'{subject.Title}'" : subject.Title)} {subject.Completions} times!",
+            (_, subject) => ReplayChampionOneLiner(subject),
             s => s.MostReplayed),
-        new("movie-night-star", "The Movie Night Star", m => m.MovieShare >= 0.50 ? m.MoviesCompleted / 10.0 : 0, (m, _) => $"{m.MoviesCompleted} movies!"),
-        new("story-explorer", "The Story Explorer", m => m.TopTitleShare < 0.25 ? m.TitlesCompleted / 15.0 : 0, (m, _) => $"{m.TitlesCompleted} different stories!"),
-        new("weekend-watcher", "The Weekend Watcher", m => m.WeekendShare / 0.55, (_, _) => "Weekends are for shows!"),
-        new("breakfast-watcher", "The Breakfast Watcher", m => m.BreakfastShare / 0.25, (_, _) => "Shows with breakfast!"),
-        new("music-star", "The Music Star", m => m.MusicMinutes >= 300 ? m.MusicShare / 0.40 : 0, (_, _) => "You love to sing and dance!"),
+        new Rule("movie-night-star", "The Movie Night Star", m => m.MovieShare >= 0.50 ? m.MoviesCompleted / 10.0 : 0, (m, _) => $"{m.MoviesCompleted} movies!"),
+        new Rule("story-explorer", "The Story Explorer", m => m.TopTitleShare < 0.25 ? m.TitlesCompleted / 15.0 : 0, (m, _) => $"{m.TitlesCompleted} different stories!"),
+        new Rule("weekend-watcher", "The Weekend Watcher", m => m.WeekendShare / 0.55, (_, _) => "Weekends are for shows!"),
+        new Rule("breakfast-watcher", "The Breakfast Watcher", m => m.BreakfastShare / 0.25, (_, _) => "Shows with breakfast!"),
+        new Rule("music-star", "The Music Star", m => m.MusicMinutes >= 300 ? m.MusicShare / 0.40 : 0, (_, _) => "You love to sing and dance!"),
     ];
 
     public static Persona Pick(PersonaMetrics metrics, bool isKid, PersonaSubjects subjects)
@@ -70,6 +68,17 @@ internal static class PersonaScorer
         return best.Score >= 1
             ? Make(best.Rule, best.Score, scores.Skip(1).FirstOrDefault(s => s.Score > 0).Rule?.Name, metrics, subjects)
             : Make(fallback, 0, scores.FirstOrDefault(s => s.Score > 0).Rule?.Name, metrics, subjects);
+    }
+
+    private static string ReplayChampionOneLiner(TitleRef? subject)
+    {
+        if (subject is null)
+        {
+            return "You watched your favorite again and again!";
+        }
+
+        var title = subject.Kind == ItemKind.Episode.ToContextKind() ? $"'{subject.Title}'" : subject.Title;
+        return $"You watched {title} {subject.Completions} times!";
     }
 
     private static Persona Make(Rule rule, double score, string? runnerUp, PersonaMetrics metrics, PersonaSubjects subjects)

@@ -6,5 +6,6 @@ internal sealed record PlaybackRow(
     Guid UserId,
     Guid ItemId,
     bool IsStart,
+    bool IsAudio,
     DateTime Time,
     string Name);

@@ -10,6 +10,10 @@
   "close": { "type": "fade", "duration": 0.8, "ease": "in-out" },
   "card": { "slide": "intro", "time": 5 },
   "vars": {
+    "watchInMinutes": "server.totals.hours < 1",
+    "watchMinutes": "server.totals.hours | mul:60 | round | atLeast:1",
+    "watchAmount": "watchInMinutes | then:watchMinutes,server.totals.hours",
+    "watchUnit": "watchInMinutes | then:\"minute\",\"hour\"",
     "kidSlot": "server.whoOwnsWhen | where:\"shareOfMinutes\",\">=\",0.05 | where:\"kidsShare\",\">=\",0.6 | sortBy:\"kidsShare\" | first",
     "grownSlot": "server.whoOwnsWhen | where:\"shareOfMinutes\",\">=\",0.05 | where:\"kidsShare\",\"<=\",0.4 | sortBy:\"kidsShare\",\"asc\" | first",
     "kidsWin": "groups.moreHoursPerPerson == \"kids\"",
@@ -54,7 +58,7 @@
           "fit": "line",
           "maxWidth": 1700,
           "in": "fade-up",
-          "text": "{{server.totals.hours | number}} hours · {{server.totals.plays | number}} plays · {{server.totals.viewers}} viewers · {{server.totals.titles | number}} titles"
+          "text": "{{watchAmount | round | plural:watchUnit}} · {{server.totals.plays | number}} plays · {{server.totals.viewers}} viewers · {{server.totals.titles | number}} titles"
         }
       ]
     },
@@ -219,7 +223,7 @@
       "duration": 7,
       "audioGroup": 3,
       "background": "bg",
-      "when": "server.commonGround != null || server.mostShared != null",
+      "when": "server.commonGround != null || server.mostShared.viewers >= 2",
       "elements": [
         {
           "id": "base-headline",
@@ -252,7 +256,7 @@
       "duration": 10,
       "audioGroup": 4,
       "background": "bg",
-      "when": "server.superlatives.mostMovies != null || server.superlatives.mostEpisodes != null || server.superlatives.mostRewatches != null || server.superlatives.mostMusic != null",
+      "when": "server.lineup | count > 1 && (server.superlatives.mostMovies != null || server.superlatives.mostEpisodes != null || server.superlatives.mostRewatches != null || server.superlatives.mostMusic != null)",
       "elements": [
         { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "Superlatives" }
       ]
@@ -261,7 +265,7 @@
       "duration": 8,
       "audioGroup": 4,
       "background": "bg",
-      "when": "server.music != null",
+      "when": "server.music.hours >= 1",
       "elements": [
         {
           "id": "base-headline",
@@ -285,6 +289,7 @@
       "duration": "{{server.lineup | count | mul:2.5 | atLeast:8}}",
       "audioGroup": 4,
       "background": "bg",
+      "when": "server.lineup | count > 1",
       "elements": [
         { "id": "base-headline", "type": "text", "font": "body", "size": 88, "color": "ink", "x": 960, "y": 200, "align": "center", "in": "fade-up", "text": "The lineup" }
       ]
@@ -308,7 +313,7 @@
           "maxWidth": 1600,
           "y2": 580,
           "in": "fade-up",
-          "text": "{{server.totals.hours | number}} hours · #1 {{server.topSeries[0].title}} · #1 {{server.topMovies[0].title}}"
+          "text": "{{watchAmount | round | plural:watchUnit}} · #1 {{server.topSeries[0].title}} · #1 {{server.topMovies[0].title}}"
         }
       ]
     },

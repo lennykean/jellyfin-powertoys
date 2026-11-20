@@ -302,7 +302,7 @@
         "od": "mins | then:0,hdec",
         "mu": "mv | noun:\"minute\"",
         "unit": "mins | then:mu,\"hours\"",
-        "hasDays": "(me.totals.days | round) >= 1"
+        "hasDays": "me.totals.days >= 1"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -3713,7 +3713,7 @@
         },
         "totals": {
           "background": "orange",
-          "vars": { "H": "server.totals.hours", "hd": "(H | round:1 < 10) | then:1,0" },
+          "vars": { "hd": "(!watchInMinutes && watchAmount | round:1 < 10) | then:1,0" },
           "elements": [
             { "id": "base-headline", "remove": true },
             {
@@ -3724,13 +3724,13 @@
                 { "id": "hrule", "type": "shape", "shape": "rect", "x": 96, "y": 96, "width": 1728, "height": 4, "fill": "vinyl" },
                 { "id": "hno", "type": "text", "text": "No. {{slide.number | format:\"00\"}}", "x": 96, "y": 156, "size": 40, "font": "nar", "color": "vinyl", "letterSpacing": 3 },
                 { "id": "hlab", "type": "text", "text": "TOTALS", "x": 1824, "y": 156, "size": 40, "font": "nar", "color": "vinyl", "align": "right", "letterSpacing": 3 },
-                { "id": "nw", "type": "text", "text": "{{H | number:hd}}", "x": 0, "y": 0, "size": 440, "font": "blk", "color": "vinyl", "tracking": -0.035, "opacity": 0 },
+                { "id": "nw", "type": "text", "text": "{{watchAmount | number:hd}}", "x": 0, "y": 0, "size": 440, "font": "blk", "color": "vinyl", "tracking": -0.035, "opacity": 0 },
                 {
                   "id": "num",
                   "type": "repeat",
                   "x": 84,
                   "y": 560,
-                  "items": [{ "v": "{{H}}", "d": "{{hd}}", "s": 440, "from": 0.5, "last": 3.0, "b": 0.5, "c": "vinyl" }],
+                  "items": [{ "v": "{{watchAmount}}", "d": "{{hd}}", "s": 440, "from": 0.5, "last": 3.0, "b": 0.5, "c": "vinyl" }],
                   "vars": {
                     "fd": "item.d",
                     "fv": "item.v",
@@ -3896,7 +3896,7 @@
                 {
                   "id": "unit",
                   "type": "text",
-                  "text": "{{H | noun:\"hour\"}}",
+                  "text": "{{watchAmount | round:hd | noun:watchUnit}}",
                   "x": 96,
                   "y": 740,
                   "size": 110,
@@ -5699,7 +5699,8 @@
           "vars": {
             "show": "server.topSeries[0]",
             "movie": "server.topMovies[0]",
-            "hv": "{{server.totals.hours | number}} hours",
+            "hv": "{{server.totals.hours | round | plural:\"hour\"}}",
+            "minutesText": "{{server.totals.hours | minutes}}",
             "tile3": "year",
             "sayK": "kOne | then:kName,\"kids\"",
             "sayW": "kidsWin | then:sayK,\"grown-ups\"",
@@ -5719,7 +5720,7 @@
                 {
                   "id": "rows",
                   "items": [
-                    { "l": "", "v": "{{hv}}", "s": 96, "has": true },
+                    { "l": "", "v": "{{(server.totals.hours < 1) | then:minutesText,hv}}", "s": 96, "has": true },
                     { "l": "out-watched", "v": "{{winner}}", "s": 64, "has": "{{winner != \"\"}}" },
                     { "l": "#1 show", "v": "{{show.title}}", "s": 64, "has": "{{show != null}}" },
                     { "l": "#1 movie", "v": "{{movie.title}}", "s": 64, "has": "{{movie != null}}" }

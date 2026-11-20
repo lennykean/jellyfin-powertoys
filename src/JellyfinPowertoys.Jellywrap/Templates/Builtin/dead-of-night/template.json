@@ -387,7 +387,7 @@
         "od": "mins | then:0,hdec",
         "mu": "mv | noun:\"minute\"",
         "unit": "mins | then:mu,\"hours\"",
-        "hasDays": "(me.totals.days | round) >= 1"
+        "hasDays": "me.totals.days >= 1"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -3737,7 +3737,7 @@
             {
               "id": "hrs",
               "type": "text",
-              "text": "{{hrs | hours:\"number\"}} h",
+              "text": "{{hrs | hours}}",
               "x": 360,
               "y": 470,
               "size": 230,
@@ -3751,6 +3751,7 @@
               "id": "show",
               "type": "group",
               "when": "show != null",
+              "y": "{{(movie == null) | then:160,0}}",
               "children": [
                 {
                   "id": "pp",
@@ -3857,7 +3858,7 @@
             {
               "id": "mv",
               "type": "group",
-              "y": "{{(show == null) | then:-320,0}}",
+              "y": "{{(show == null) | then:-160,0}}",
               "children": [
                 {
                   "id": "movie",
@@ -4120,7 +4121,7 @@
       ]
     },
     "totals": {
-      "vars": { "H": "server.totals.hours", "hd": "(H | round:1 < 10) | then:1,0" },
+      "vars": { "hd": "(!watchInMinutes && watchAmount | round:1 < 10) | then:1,0" },
       "elements": [
         { "id": "base-headline", "remove": true },
         {
@@ -4195,7 +4196,7 @@
               "font": "anton",
               "color": "red",
               "in": { "preset": "flick", "at": 1.0 },
-              "value": "{{H}}",
+              "value": "{{watchAmount}}",
               "animate": [
                 {
                   "prop": "count",
@@ -4220,7 +4221,7 @@
             {
               "id": "hw",
               "type": "text",
-              "text": "{{H | noun:\"HOUR\",\"HOURS\"}}",
+              "text": "{{watchAmount | round:hd | noun:watchUnit | upper}}",
               "x": 200,
               "y": 690,
               "size": 110,
@@ -7636,7 +7637,7 @@
                 {
                   "id": "hrs",
                   "type": "text",
-                  "text": "{{hrs | hours:\"number\"}} h",
+                  "text": "{{hrs | hours}}",
                   "x": 360,
                   "y": 470,
                   "size": 230,

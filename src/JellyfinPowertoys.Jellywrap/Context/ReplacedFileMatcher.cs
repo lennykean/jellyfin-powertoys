@@ -9,13 +9,13 @@ internal static class ReplacedFileMatcher
 {
     private static readonly ItemKind[] _playableKinds = [ItemKind.Movie, ItemKind.Episode, ItemKind.Song, ItemKind.AudioBook, ItemKind.Video];
 
-    private static readonly Regex _played = new(@"^(?:is playing|has finished playing) (.+) on .+$", RegexOptions.Compiled);
+    private static readonly Regex _played = new Regex(@"^(?:is playing|has finished playing) (.+) on .+$", RegexOptions.Compiled);
 
-    private static readonly Regex _anyUserPlayed = new(@"^.+? (?:is playing|has finished playing) (.+) on .+$", RegexOptions.Compiled);
+    private static readonly Regex _anyUserPlayed = new Regex(@"^.+? (?:is playing|has finished playing) (.+) on .+$", RegexOptions.Compiled);
 
-    private static readonly Regex _episodeNumber = new(@"[Ss](\d{1,2})[Ee](\d{1,3})", RegexOptions.Compiled);
+    private static readonly Regex _episodeNumber = new Regex(@"[Ss](\d{1,2})[Ee](\d{1,3})", RegexOptions.Compiled);
 
-    private static readonly Regex _trackNumber = new(@"^\d{1,3}[ .-]+", RegexOptions.Compiled);
+    private static readonly Regex _trackNumber = new Regex(@"^\d{1,3}[ .-]+", RegexOptions.Compiled);
 
     public static IReadOnlyList<PlaybackRow> Match(
         IReadOnlyList<PlaybackRow> rows,
@@ -23,7 +23,23 @@ internal static class ReplacedFileMatcher
         IReadOnlyList<SourceUser> users)
     {
         var liveIds = items.Select(i => i.Id).ToHashSet();
-        var playable = items.Where(i => _playableKinds.Contains(i.Kind)).ToList();
+        var finders = items
+            .Where(i => _playableKinds.Contains(i.Kind))
+            .GroupBy(i => i.Kind.IsAudio())
+            .ToDictionary(sameMedia => sameMedia.Key, sameMedia => Finder([.. sameMedia]));
+        var userNames = users.ToDictionary(u => u.Id, u => u.Name);
+
+        return [.. rows
+            .Select(row => liveIds.Contains(row.ItemId)
+                || LoggedName(row, userNames.GetValueOrDefault(row.UserId)) is not { } name
+                || !finders.TryGetValue(row.IsAudio, out var find)
+                || find(name) is not { } id
+                ? row
+                : row with { ItemId = id })];
+    }
+
+    private static Func<string, Guid?> Finder(IReadOnlyList<MediaItem> playable)
+    {
         var byDisplayName = playable.ToLookup(DisplayName, i => i.Id, StringComparer.OrdinalIgnoreCase);
         var byEpisode = playable
             .Where(i => i is { Kind: ItemKind.Episode, SeriesName: not null, Season: not null, Episode: not null })
@@ -37,7 +53,6 @@ internal static class ReplacedFileMatcher
         var songsByName = playable
             .Where(i => i.Kind == ItemKind.Song)
             .ToLookup(i => i.Name, i => i.Id, StringComparer.OrdinalIgnoreCase);
-        var userNames = users.ToDictionary(u => u.Id, u => u.Name);
 
         Guid? OnlyOne(IEnumerable<Guid> ids)
         {
@@ -68,10 +83,7 @@ internal static class ReplacedFileMatcher
             return name.Contains(" - ", StringComparison.Ordinal) ? null : OnlyOne(songsByName[_trackNumber.Replace(name, string.Empty)]);
         }
 
-        return [.. rows
-            .Select(row => liveIds.Contains(row.ItemId) || LoggedName(row, userNames.GetValueOrDefault(row.UserId)) is not { } name || Find(name) is not { } id
-                ? row
-                : row with { ItemId = id })];
+        return Find;
     }
 
     private static string DisplayName(MediaItem item)

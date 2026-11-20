@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -9,15 +10,29 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal abstract class Expression
 {
-    public abstract object? Evaluate(Scope scope);
+    public object? Evaluate(Scope scope)
+    {
+        // A stack overflow ends the server; this exception only fails the template.
+        RuntimeHelpers.EnsureSufficientExecutionStack();
+        var result = EvaluateCore(scope);
+        if (result is string text)
+        {
+            TextTemplate.CheckLength(text.Length);
+        }
+
+        return result;
+    }
+
     public static Expression Parse(string text)
     {
         return new Parser(text).ParseAll();
     }
 
+    protected abstract object? EvaluateCore(Scope scope);
+
     private sealed class Literal(object? value) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             return value;
         }
@@ -25,7 +40,7 @@ internal abstract class Expression
 
     private sealed class Path(string root, IReadOnlyList<object> steps) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             var value = scope.Get(root);
             JsonObject? parent = null;
@@ -57,7 +72,7 @@ internal abstract class Expression
 
     private sealed class Not(Expression inner) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             return !BindingValue.Truthy(inner.Evaluate(scope));
         }
@@ -65,7 +80,7 @@ internal abstract class Expression
 
     private sealed class Logic(Expression left, Expression right, bool and) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             var leftHolds = BindingValue.Truthy(left.Evaluate(scope));
             return and ? leftHolds && BindingValue.Truthy(right.Evaluate(scope)) : leftHolds || BindingValue.Truthy(right.Evaluate(scope));
@@ -74,7 +89,7 @@ internal abstract class Expression
 
     private sealed class Comparison(Expression left, string comparison, Expression right) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             return BindingValue.Matches(left.Evaluate(scope), comparison, right.Evaluate(scope));
         }
@@ -82,7 +97,7 @@ internal abstract class Expression
 
     private sealed class Piped(Expression input, Filter filter, IReadOnlyList<Expression> arguments) : Expression
     {
-        public override object? Evaluate(Scope scope)
+        protected override object? EvaluateCore(Scope scope)
         {
             return filter.Apply(input.Evaluate(scope), [.. arguments.Select(argument => argument.Evaluate(scope))]);
         }
@@ -90,9 +105,13 @@ internal abstract class Expression
 
     private sealed class Parser(string text)
     {
+        private const int MaxOperations = 200;
+        private const int MaxShownLength = 80;
+
         private static readonly string[] _comparisons = ["==", "!=", "<=", ">=", "<", ">"];
 
         private int _position;
+        private int _operations;
 
         public Expression ParseAll()
         {
@@ -111,6 +130,7 @@ internal abstract class Expression
             var expression = And();
             while (Take("||"))
             {
+                CountOperation();
                 expression = new Logic(expression, And(), and: false);
             }
 
@@ -122,6 +142,7 @@ internal abstract class Expression
             var expression = Unary();
             while (Take("&&"))
             {
+                CountOperation();
                 expression = new Logic(expression, Unary(), and: true);
             }
 
@@ -130,7 +151,13 @@ internal abstract class Expression
 
         private Expression Unary()
         {
-            return Peek("!=") || !Take("!") ? Compare() : new Not(Unary());
+            if (Peek("!=") || !Take("!"))
+            {
+                return Compare();
+            }
+
+            CountOperation();
+            return new Not(Unary());
         }
 
         private Expression Compare()
@@ -152,6 +179,7 @@ internal abstract class Expression
             var expression = Primary();
             while (!Peek("||") && Take("|"))
             {
+                CountOperation();
                 var name = Name() ?? throw Error("a filter name is missing after \"|\"");
                 var filter = Filters.Find(name) ?? throw Error($"there is no filter \"{name}\"");
                 var arguments = new List<Expression>();
@@ -185,6 +213,7 @@ internal abstract class Expression
         {
             if (Take("("))
             {
+                CountOperation();
                 var expression = Or();
                 return Take(")") ? expression : throw Error("\")\" is missing");
             }
@@ -324,9 +353,19 @@ internal abstract class Expression
             }
         }
 
+        // Every operation nests the expression one level deeper, for the parser and for Evaluate.
+        private void CountOperation()
+        {
+            if (++_operations > MaxOperations)
+            {
+                throw Error($"the expression has more than {MaxOperations} operations");
+            }
+        }
+
         private FormatException Error(string reason)
         {
-            return new FormatException($"In \"{text}\": {reason}.");
+            var shown = text.Length > MaxShownLength ? $"{text.TakeTextElements(MaxShownLength)}…" : text;
+            return new FormatException($"In \"{shown}\": {reason}.");
         }
     }
 }

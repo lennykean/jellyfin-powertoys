@@ -9,6 +9,8 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class BulbsNode(EffectParameters parameters) : Node
 {
+    public const int MaxCount = 2000;
+
     private const double Radius = 14;
     private const double DimAlpha = 0.3;
     private const double ChaseRate = 6;
@@ -73,8 +75,8 @@ internal sealed class BulbsNode(EffectParameters parameters) : Node
                     var width = Props.Number("width", slideTime);
                     var height = Props.Number("height", slideTime);
                     var gap = Props.Number("gap", slideTime, Gap);
-                    var across = gap > 0 ? Math.Max(0, (int)Rounding.HalfUp(width / gap)) : 0;
-                    var down = gap > 0 ? Math.Max(0, (int)Rounding.HalfUp(height / gap)) : 0;
+                    var across = gap > 0 ? (int)Math.Clamp((width / gap).RoundHalfUp(), 0, MaxCount) : 0;
+                    var down = gap > 0 ? (int)Math.Clamp((height / gap).RoundHalfUp(), 0, MaxCount) : 0;
                     return
                     [
                         .. Enumerable.Range(0, across).Select(i => (x + (i * width / across), y)),
@@ -88,7 +90,7 @@ internal sealed class BulbsNode(EffectParameters parameters) : Node
                 return [(x, y)];
             default:
                 {
-                    var count = Math.Max(0, (int)Props.Number("count", slideTime, Count));
+                    var count = (int)Math.Clamp(Props.Number("count", slideTime, Count), 0, MaxCount);
                     var startX = Props.Number("x1", slideTime);
                     var endX = Props.Number("x2", slideTime);
                     return [.. Enumerable.Range(0, count).Select(i => (startX + ((endX - startX) * i / (count - 1)), y))];

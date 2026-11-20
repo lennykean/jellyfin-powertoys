@@ -15,7 +15,6 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
 {
     internal const int MatchedEpisodes = 3;
     private const int TriedStretches = 4;
-    private const double MaxScan = 150;
     private const double ScanLeadIn = 1;
     private const double MaxCredits = 150;
     private const double MinCreditsLength = 120;
@@ -26,24 +25,23 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
     private const double MaxFingerprint = 600;
     private const double ChromaprintStep = 0.1238;
 
-    private static readonly Regex _themeChapter = new(
+    private static readonly Regex _themeChapter = new Regex(
         @"^(opening( credits| titles| theme)?|intro|op|theme( song)?|main titles?|title sequence)$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
-    private static readonly Regex _creditsChapter = new(
+    private static readonly Regex _creditsChapter = new Regex(
         @"^((end|closing) )?credits$|^ending|^ed$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
-    internal async Task<Clip?> ThemeAsync(
+    internal async Task<Clip?> ThemeSongAsync(
         Guid titleId,
         string title,
-        IReadOnlyList<ThemeSong> themeSongs,
-        IReadOnlyList<MediaItem> episodes,
+        MediaItem series,
         CancellationToken cancellationToken)
     {
-        foreach (var song in themeSongs)
+        foreach (var song in series.ThemeSongs)
         {
-            var source = new ClipSource(titleId, title, ClipKind.Theme, "theme song", song.Path, song.Runtime);
+            var source = new ClipSource(titleId, title, ClipKind.Theme, series.Id, "theme song", song.Path, song.Runtime, IsKnownMusic: true);
             var clip = await MakeAsync(source, 0, song.Runtime, cancellationToken);
             if (clip is not null)
             {
@@ -51,16 +49,7 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
             }
         }
 
-        return await MatchedAsync(titleId, title, ClipKind.Theme, episodes, cancellationToken);
-    }
-
-    internal Task<Clip?> SeriesCreditsAsync(
-        Guid titleId,
-        string title,
-        IReadOnlyList<MediaItem> episodes,
-        CancellationToken cancellationToken)
-    {
-        return MatchedAsync(titleId, title, ClipKind.Credits, episodes, cancellationToken);
+        return null;
     }
 
     internal async Task<Clip?> MovieCreditsAsync(Guid titleId, string title, MediaItem movie, CancellationToken cancellationToken)
@@ -89,7 +78,7 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
             return Drop(title, ClipKind.Credits, $"the marked credits start {length - start:F0} s before the end of the file (logo or end card)");
         }
 
-        var source = new ClipSource(titleId, title, ClipKind.Credits, "credits start", movie.Path, length);
+        var source = new ClipSource(titleId, title, ClipKind.Credits, movie.Id, "credits start", movie.Path, length, IsKnownMusic: false);
         return await MakeAsync(source, start, Math.Min(MaxCredits, length - start), cancellationToken);
     }
 
@@ -100,7 +89,7 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
             return null;
         }
 
-        return await MakeAsync(new ClipSource(song.Id, song.Name, ClipKind.Song, "song", path, length), 0, length, cancellationToken);
+        return await MakeAsync(new ClipSource(song.Id, song.Name, ClipKind.Song, song.Id, "song", path, length, IsKnownMusic: true), 0, length, cancellationToken);
     }
 
     private static (double Start, double End) Window(ClipKind kind, double length, (double Start, double End)? marked)
@@ -125,7 +114,7 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
             index + 1 < markers.Chapters.Count ? markers.Chapters[index + 1].Start : length));
     }
 
-    private async Task<Clip?> MatchedAsync(
+    internal async Task<Clip?> MatchedAsync(
         Guid titleId,
         string title,
         ClipKind kind,
@@ -155,9 +144,9 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
         var first = searched[0];
         var runsPerOther = searched
             .Skip(1)
-            .Select(other => Chromaprint.Runs(first.Fingerprint, other.Fingerprint, ChromaprintStep, Clip.MinLength))
+            .Select(other => first.Fingerprint.MatchingRuns(other.Fingerprint, ChromaprintStep, Clip.MinLength))
             .ToList();
-        var stretches = Chromaprint.Common(runsPerOther, Clip.MinLength);
+        var stretches = runsPerOther.CommonStretches(Clip.MinLength);
         if (stretches.Count == 0)
         {
             return Drop(title, kind, $"no stretch of {Clip.MinLength} s or more repeats across {MatchedEpisodes} episodes");
@@ -168,9 +157,11 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
             titleId,
             title,
             kind,
+            episodes[0].Id,
             $"matched across {MatchedEpisodes} episodes",
             episodes[0].Path!,
-            episodes[0].Runtime ?? 0);
+            episodes[0].Runtime ?? 0,
+            IsKnownMusic: false);
         foreach (var (stretchStart, stretchEnd) in stretches.Take(TriedStretches))
         {
             var clip = await MakeAsync(source, first.Start + stretchStart, stretchEnd - stretchStart, cancellationToken);
@@ -187,11 +178,14 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
     {
         var length = episode.Runtime ?? 0;
         var markers = await markerReader.ReadAsync(episode.Id);
+        if (markers.Segments.TryGetValue(kind == ClipKind.Theme ? "Intro" : "Outro", out var segment))
+        {
+            return Window(kind, length, segment);
+        }
+
         var chapterName = kind == ClipKind.Theme ? _themeChapter : _creditsChapter;
-        (double Start, double End)? marked = markers.Segments.TryGetValue(kind == ClipKind.Theme ? "Intro" : "Outro", out var segment)
-            ? segment
-            : Chapters(markers, length).Where(c => chapterName.IsMatch(c.Name)).Select(c => ((double, double)?)(c.Start, c.End)).FirstOrDefault();
-        return Window(kind, length, marked);
+        var chapter = Chapters(markers, length).Where(c => chapterName.IsMatch(c.Name)).Select(c => ((double, double)?)(c.Start, c.End)).FirstOrDefault();
+        return Window(kind, length, chapter);
     }
 
     private async Task<Clip?> MakeAsync(ClipSource source, double start, double length, CancellationToken cancellationToken)
@@ -201,27 +195,30 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
         IReadOnlyList<LoudnessFrame> frames;
         try
         {
-            frames = await probe.LoudnessAsync(source.Path, Math.Max(0, start - ScanLeadIn), start + Math.Min(length, MaxScan), cancellationToken);
+            frames = await probe.LoudnessAsync(source.Path, Math.Max(0, start - ScanLeadIn), start + length, cancellationToken);
         }
         catch (InvalidOperationException exception)
         {
             return Unreadable(source.Title, source.Kind, source.Path, exception);
         }
 
-        var (musicStart, musicLength) = Loudness.TrimSilence(frames, start, length);
+        var (musicStart, musicLength) = frames.TrimSilence(start, length);
         if (musicLength < Clip.MinLength)
         {
             return Drop(source.Title, source.Kind, $"only {musicLength:F0} s of sound in the {source.Method} span");
         }
 
-        var (isMusic, measured) = Loudness.MusicLike(frames, musicStart, musicLength);
-        if (!isMusic)
+        if (!source.IsKnownMusic)
         {
-            return Drop(source.Title, source.Kind, $"not music ({measured}) in the {source.Method} span");
+            var (isMusic, measured) = frames.MusicLike(musicStart, musicLength);
+            if (!isMusic)
+            {
+                return Drop(source.Title, source.Kind, $"not music ({measured}) in the {source.Method} span");
+            }
         }
 
         logger.LogDebug("{Title} {Kind}: ok: {Method}, {Length:F0} s from {Start:F0} s", source.Title, source.Kind.ToName(), source.Method, musicLength, musicStart);
-        return new Clip(source.TitleId, source.Title, source.Kind, source.Path, musicStart, musicLength);
+        return new Clip(source.TitleId, source.Title, source.Kind, source.SourceId, source.Path, musicStart, musicLength);
     }
 
     private Clip? Drop(string title, ClipKind kind, string reason)
@@ -236,5 +233,13 @@ public sealed class ClipFinder(ItemMarkerReader markerReader, AudioProbe probe, 
         return null;
     }
 
-    private sealed record ClipSource(Guid TitleId, string Title, ClipKind Kind, string Method, string Path, double Runtime);
+    private sealed record ClipSource(
+        Guid TitleId,
+        string Title,
+        ClipKind Kind,
+        Guid SourceId,
+        string Method,
+        string Path,
+        double Runtime,
+        bool IsKnownMusic);
 }

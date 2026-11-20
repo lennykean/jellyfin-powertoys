@@ -13,6 +13,8 @@ internal sealed record TextFit
     private const double WrapStep = 4;
     private const double DefaultMinSizeRatio = 0.5;
     private const double BlockMinSizeRatio = 1 / 3.0;
+    private const double MaxSize = 2000;
+    private const double MinStep = 0.5;
     public required string Mode { get; init; }
 
     public double Size { get; init; }
@@ -52,9 +54,16 @@ internal sealed record TextFit
             return props.Numbers.TryGetValue(property, out var number) ? number : null;
         }
 
-        double? ShrinkStep(string property)
+        // The fit loops walk from a size down to a smallest size in steps, so these limits bound them.
+        double? Limited(string property, double min, double max)
         {
-            return Number(property) is null or > 0 ? Number(property) : throw new InvalidOperationException($"A text's \"{property}\" must be above 0.");
+            if (Number(property) is not { } number || (number >= min && number <= max))
+            {
+                return Number(property);
+            }
+
+            var range = double.IsPositiveInfinity(max) ? $"at least {min}" : $"from {min} to {max}";
+            throw new InvalidOperationException($"A text's \"{property}\" must be {range}, not {number}.");
         }
 
         TextFit? singleFit = null;
@@ -80,23 +89,29 @@ internal sealed record TextFit
         }
 
         var mode = props.Text("fit");
+        var defaultLineHeight = mode switch
+        {
+            "box" => BoxLineHeight,
+            "wrap" => WrapLineHeight,
+            _ => DefaultLineHeight,
+        };
         return new TextFit
         {
             Mode = mode ?? "none",
-            Size = Number("size") ?? DefaultSize,
+            Size = Limited("size", 0, MaxSize) ?? DefaultSize,
             MaxWidth = Number("maxWidth") ?? double.PositiveInfinity,
             MaxHeight = Number("maxHeight") ?? double.PositiveInfinity,
-            MinSize = Number("minSize"),
-            WrappedSize = Number("size2") ?? 0,
-            WrappedMinSize = Number("min2"),
-            Lines = (int)(Number("lines") ?? 1),
-            LineHeight = Number("lineHeight") ?? (mode is "box" ? BoxLineHeight : mode is "wrap" ? WrapLineHeight : DefaultLineHeight),
+            MinSize = Limited("minSize", 0, MaxSize),
+            WrappedSize = Limited("size2", 0, MaxSize) ?? 0,
+            WrappedMinSize = Limited("min2", 0, MaxSize),
+            Lines = (int)(Limited("lines", 1, int.MaxValue) ?? 1),
+            LineHeight = Number("lineHeight") ?? defaultLineHeight,
             LinePitch = Number("linePitch"),
             RoundLineHeight = (Number("roundLineHeight") ?? 1) != 0,
-            Step = ShrinkStep("step") ?? (mode is "wrap" ? WrapStep : DefaultStep),
-            Shrink = ShrinkStep("shrink"),
+            Step = Limited("step", MinStep, double.PositiveInfinity) ?? (mode is "wrap" ? WrapStep : DefaultStep),
+            Shrink = Limited("shrink", MinStep, double.PositiveInfinity),
             Balance = (Number("balance") ?? 1) != 0,
-            MinSizeRatio = Number("minRatio") ?? (mode is "block" ? BlockMinSizeRatio : DefaultMinSizeRatio),
+            MinSizeRatio = Limited("minRatio", 0, double.PositiveInfinity) ?? (mode is "block" ? BlockMinSizeRatio : DefaultMinSizeRatio),
             Shift = Number("shift") ?? 0,
             VerticalAlign = props.Text("valign") ?? (mode is "block" ? "middle" : "top"),
             Y = (Number("y") ?? originY) - originY,

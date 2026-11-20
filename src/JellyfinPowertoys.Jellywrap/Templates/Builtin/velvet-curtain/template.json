@@ -283,7 +283,7 @@
         "od": "mins | then:0,hdec",
         "mu": "mv | noun:\"minute\"",
         "unit": "mins | then:mu,\"hours\"",
-        "hasDays": "(me.totals.days | round) >= 1"
+        "hasDays": "me.totals.days >= 1"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -361,7 +361,7 @@
           "pivot": [960, 860],
           "in": { "preset": "fu", "at": 3.4 },
           "children": [
-            { "id": "t", "type": "text", "text": "that's {{me.totals.days | round}} days.", "x": 960, "y": 870, "size": 66, "font": "fi", "color": "gold", "align": "center" }
+            { "id": "t", "type": "text", "text": "that's {{me.totals.days | days}}.", "x": 960, "y": 870, "size": 66, "font": "fi", "color": "gold", "align": "center" }
           ]
         }
       ]
@@ -2365,7 +2365,7 @@
           "when": "hrs != null",
           "pivot": [960, 300],
           "in": { "preset": "fu", "at": 1.2 },
-          "children": [{ "id": "t", "type": "text", "text": "{{hrs | hours:\"number\"}} h", "x": 960, "y": 330, "size": 150, "font": "fd", "color": "oxblood", "align": "center" }]
+          "children": [{ "id": "t", "type": "text", "text": "{{hrs | hours}}", "x": 960, "y": 330, "size": 150, "font": "fd", "color": "oxblood", "align": "center" }]
         },
         {
           "id": "dia1",
@@ -2378,6 +2378,7 @@
           "id": "show",
           "type": "group",
           "when": "show != null",
+          "y": "{{(movie == null) | then:78,0}}",
           "pivot": [960, 488],
           "in": { "preset": "fu", "at": 1.8 },
           "children": [
@@ -2415,6 +2416,7 @@
           "id": "movie",
           "type": "group",
           "when": "movie != null",
+          "y": "{{(show == null) | then:-78,0}}",
           "pivot": [960, 643],
           "in": { "preset": "fu", "at": 2.4 },
           "children": [
@@ -2577,13 +2579,13 @@
       "slides": {
         "intro": {
           "elements": [
-            { "id": "line1", "children": [{ "id": "t", "text": "{{server.possessive}}" }] },
+            { "id": "line1", "children": [{ "id": "t", "text": "{{server.possessive}}", "fit": "title", "size2": 80, "y2": 492 }] },
             { "id": "line2", "children": [{ "id": "t", "text": "{{year}}" }] }
           ]
         },
         "totals": {
           "background": "velvet",
-          "vars": { "H": "server.totals.hours", "hd": "(H | round:1 < 10) | then:1,0" },
+          "vars": { "hd": "(!watchInMinutes && watchAmount | round:1 < 10) | then:1,0" },
           "elements": [
             { "id": "base-headline", "remove": true },
             { "id": "marquee-frame", "type": "image", "src": "img/marquee-frame.svg", "x": 52, "y": 52, "width": 1816, "height": 976, "fit": "fill" },
@@ -2607,7 +2609,7 @@
                 {
                   "id": "n",
                   "type": "odometer",
-                  "value": "{{H}}",
+                  "value": "{{watchAmount}}",
                   "decimals": "{{hd}}",
                   "x": 960,
                   "y": 480,
@@ -2632,7 +2634,7 @@
               "type": "group",
               "pivot": [960, 570],
               "in": { "preset": "fu", "at": 1.2 },
-              "children": [{ "id": "t", "type": "text", "text": "{{H | noun:\"hour\"}}", "x": 960, "y": 580, "size": 72, "font": "fb", "color": "ivory", "align": "center" }]
+              "children": [{ "id": "t", "type": "text", "text": "{{watchAmount | mul:10 | add:0.5 | floor | div:10 | noun:watchUnit}}", "x": 960, "y": 580, "size": 72, "font": "fb", "color": "ivory", "align": "center" }]
             },
             {
               "id": "counts",
@@ -4272,7 +4274,9 @@
                   "font": "fd",
                   "color": "gold",
                   "align": "center",
-                  "fit": "line",
+                  "fit": "title",
+                  "size2": 64,
+                  "y2": 658,
                   "maxWidth": 860
                 }
               ]

@@ -18,8 +18,9 @@ internal sealed class TemplateValidator
 
     private static readonly string[] _trackLists = ["in", "out", "idle", "animate"];
     private static readonly string[] _propertyGroups = ["box", "border"];
-    private static readonly string[] _shrinkSteps = ["step", "shrink"];
     private static readonly string[] _transitionUses = ["transition", "open", "close"];
+    private static readonly string[] _gridPairs = ["pitch", "cell", "fitBox"];
+    private static readonly string[] _gradientPoints = ["from", "to"];
     private readonly List<string> _errors = [];
     private readonly JsonObject _template;
     private readonly JsonObject _fonts;
@@ -107,11 +108,15 @@ internal sealed class TemplateValidator
                 {
                     if (_readFile(text) is not { } bytes)
                     {
-                        _errors.Add($"{location}: the file {text} is missing");
+                        _errors.Add($"{location}: the file {text} is missing, or it is in a package that the template does not extend");
                     }
                     else if (text.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
                     {
                         CheckSvg(SvgArt.ReadText(bytes), $"{location} ({text})");
+                    }
+                    else if (ImageStore.IsTooLarge(bytes))
+                    {
+                        _errors.Add($"{location}: the image {text} has more than {ImageStore.MaxMegapixels} megapixels");
                     }
                 }
 
@@ -123,9 +128,9 @@ internal sealed class TemplateValidator
     {
         try
         {
-            XDocument.Parse(svg);
             if (TextTemplate.HasHoles(svg))
             {
+                XDocument.Parse(svg);
                 TextTemplate.Parse(svg);
             }
             else if (SvgArt.Load(svg) is not { } picture)
@@ -155,18 +160,33 @@ internal sealed class TemplateValidator
             Try($"$.palette.{name}", () => _palette.Color(name));
         }
 
+        var nestedTooDeep = PresetsNestedTooDeep();
         foreach (var (name, preset) in _template["presets"] as JsonObject ?? [])
         {
             if (preset is not JsonArray)
             {
                 _errors.Add($"$.presets.{name}: a preset must be a list of tracks");
             }
-            else if (UsesPreset(name, name, []))
+            else if (nestedTooDeep.Contains(name))
             {
-                _errors.Add($"$.presets.{name}: the preset uses itself");
+                _errors.Add($"$.presets.{name}: the preset uses itself, or its presets are nested deeper than {TrackBuilder.MaxPresetDepth} levels");
             }
 
             CheckTracks(preset, $"$.presets.{name}");
+        }
+
+        if (_template["fallbacks"] is { } fallbacks and not JsonObject)
+        {
+            _errors.Add($"$.fallbacks: must be an object of element lists, not {fallbacks.ToJsonString()}");
+        }
+
+        if (_template["card"] is { } card and not JsonObject)
+        {
+            _errors.Add($"$.card: must be an object, not {card.ToJsonString()}");
+        }
+        else
+        {
+            CheckIsText(_template["card"]?["slide"], "$.card.slide");
         }
 
         CheckVars(_template["vars"], "$.vars");
@@ -198,6 +218,7 @@ internal sealed class TemplateValidator
             }
 
             CheckCondition(slide["when"], $"{location}.when");
+            CheckRange(slide["duration"], $"{location}.duration", 0, SceneBuilder.MaxVideoSeconds);
             CheckVars(slide["vars"], $"{location}.vars");
             CheckPaint(slide["background"], $"{location}.background");
             CheckElements(slide["elements"], $"{location}.elements");
@@ -206,9 +227,18 @@ internal sealed class TemplateValidator
         }
     }
 
-    private bool UsesPreset(string preset, string target, HashSet<string> followed)
+    private HashSet<string> PresetsNestedTooDeep()
     {
-        return followed.Add(preset) && PresetNames(_presets[preset]).Any(name => name == target || UsesPreset(name, target, followed));
+        // After each round a depth is right up to one level more; a preset that uses itself never stops growing.
+        var depths = _presets.ToDictionary(preset => preset.Key, _ => 1);
+        for (var round = 0; round < TrackBuilder.MaxPresetDepth; round++)
+        {
+            depths = depths.ToDictionary(
+                preset => preset.Key,
+                preset => 1 + PresetNames(_presets[preset.Key]).Select(name => depths.GetValueOrDefault(name)).DefaultIfEmpty().Max());
+        }
+
+        return [.. depths.Where(preset => preset.Value > TrackBuilder.MaxPresetDepth).Select(preset => preset.Key)];
     }
 
     private void CheckTransition(JsonNode? node, string location)
@@ -223,6 +253,8 @@ internal sealed class TemplateValidator
             _errors.Add($"{location}: unknown transition {preset.ToJsonString()}");
         }
 
+        CheckIsText(definition["type"], $"{location}.type");
+        CheckIsText(definition["incoming"], $"{location}.incoming");
         CheckEase(definition["ease"], $"{location}.ease");
         CheckProperties(definition, location);
         CheckElements(definition["elements"], $"{location}.elements");
@@ -236,6 +268,8 @@ internal sealed class TemplateValidator
             if (effects[i] is JsonObject effect)
             {
                 CheckCondition(effect["when"], $"{location}[{i}].when");
+                CheckIsText(effect["id"], $"{location}[{i}].id");
+                CheckIsText(effect["layer"], $"{location}[{i}].layer");
                 CheckProperties(effect, $"{location}[{i}]");
                 CheckEffect(effect["type"], effect, $"{location}[{i}]");
             }
@@ -275,6 +309,14 @@ internal sealed class TemplateValidator
             return;
         }
 
+        CheckIsText(element["id"], $"{location}.id");
+        CheckIsText(element["before"], $"{location}.before");
+        CheckIsText(element["after"], $"{location}.after");
+        if (element["remove"] is { } remove && remove.GetValueKind() is not (JsonValueKind.True or JsonValueKind.False))
+        {
+            _errors.Add($"{location}.remove: must be true or false, not {remove.ToJsonString()}");
+        }
+
         CheckCondition(element["when"], $"{location}.when");
         CheckProperties(element, location);
         switch (type)
@@ -282,16 +324,18 @@ internal sealed class TemplateValidator
             case "text":
                 CheckText(element, location);
                 break;
+            case "shape":
+                CheckShape(element, location);
+                break;
             case "image":
-                CheckExpression(element["title"], $"{location}.title");
-                CheckElements(element["fallback"], $"{location}.fallback");
-                CheckClip(element["clip"], $"{location}.clip");
+                CheckImage(element, location);
                 break;
             case "group":
                 CheckElements(element["children"], $"{location}.children");
                 CheckClip(element["clip"], $"{location}.clip");
                 break;
             case "repeat":
+                CheckRepeat(element, location);
                 CheckExpression(element["items"], $"{location}.items");
                 CheckCondition(element["where"], $"{location}.where");
                 CheckVars(element["vars"], $"{location}.vars");
@@ -331,12 +375,12 @@ internal sealed class TemplateValidator
         }
 
         CheckFont(element["font"], location);
-        foreach (var (owner, ownerLocation) in new[] { (element, location), (element["single"] as JsonObject ?? [], $"{location}.single") })
+        CheckIsText(element["case"], $"{location}.case");
+        CheckIsText(element["fitOn"], $"{location}.fitOn");
+        Try(location, () => TextFit.FromProps(NumbersOf(element), null, Scope.Empty, 0));
+        if (element["single"] is JsonObject single)
         {
-            foreach (var step in _shrinkSteps.Where(step => owner[step]?.GetValueKind() == JsonValueKind.Number && owner[step]!.GetValue<double>() <= 0))
-            {
-                _errors.Add($"{ownerLocation}.{step}: the {step} must be above 0");
-            }
+            Try($"{location}.single", () => TextFit.FromProps(NumbersOf(single), null, Scope.Empty, 0));
         }
 
         if (element["words"] is JsonObject words)
@@ -355,6 +399,63 @@ internal sealed class TemplateValidator
         }
     }
 
+    private static Props NumbersOf(JsonObject definition)
+    {
+        var props = new Props();
+        foreach (var (property, value) in definition)
+        {
+            if (value is JsonValue number && number.GetValueKind() == JsonValueKind.Number)
+            {
+                props.Numbers[property] = number.GetValue<double>();
+            }
+        }
+
+        return props;
+    }
+
+    private void CheckShape(JsonObject shape, string location)
+    {
+        CheckIsText(shape["shape"], $"{location}.shape");
+        CheckIsText(shape["d"], $"{location}.d");
+    }
+
+    private void CheckImage(JsonObject element, string location)
+    {
+        if (element["src"] is { } source)
+        {
+            CheckIsText(source, $"{location}.src");
+            if (PropertyReader.IsString(source, out var file)
+                && !TextTemplate.HasHoles(file)
+                && !file.StartsWith(Template.PackagePrefix, StringComparison.Ordinal))
+            {
+                _errors.Add($"{location}.src: the image \"{file}\" must be a file in the \"img\" folder of the package, such as \"img/{Path.GetFileName(file)}\"");
+            }
+        }
+
+        if (element["fallback"] is JsonValue fallback && !PropertyReader.IsString(fallback, out _))
+        {
+            _errors.Add($"{location}.fallback: must be a list of elements or the name of a fallback, not {fallback.ToJsonString()}");
+        }
+
+        CheckExpression(element["title"], $"{location}.title");
+        CheckElements(element["fallback"], $"{location}.fallback");
+        CheckClip(element["clip"], $"{location}.clip");
+    }
+
+    private void CheckRepeat(JsonObject element, string location)
+    {
+        CheckRange(element["count"], $"{location}.count", double.NegativeInfinity, ElementBuilder.MaxElements);
+        foreach (var pair in _gridPairs.Where(pair => element[pair] is JsonArray { Count: < 2 }))
+        {
+            _errors.Add($"{location}.{pair}: must be [x, y], not {element[pair]!.ToJsonString()}");
+        }
+
+        if (element["rows"] is JsonValue rows && rows.GetValueKind() == JsonValueKind.Number && rows.GetValue<double>() <= 0)
+        {
+            _errors.Add($"{location}.rows: must be above 0");
+        }
+    }
+
     private void CheckFont(JsonNode? font, string location)
     {
         if (font is not null && (!PropertyReader.IsString(font, out var name) || (!TextTemplate.HasHoles(name) && !_fonts.ContainsKey(name))))
@@ -368,6 +469,7 @@ internal sealed class TemplateValidator
         if (node is JsonObject clip)
         {
             CheckProperties(clip, location);
+            CheckShape(clip, location);
         }
     }
 
@@ -444,6 +546,7 @@ internal sealed class TemplateValidator
             _errors.Add($"{location}: a track needs a \"prop\"");
         }
 
+        CheckIsText(track["clock"], $"{location}.clock");
         CheckEase(track["ease"], $"{location}.ease");
         CheckTime(track["start"], $"{location}.start");
         CheckTime(track["end"], $"{location}.end");
@@ -455,8 +558,18 @@ internal sealed class TemplateValidator
         }
 
         var keys = track["keys"] as JsonArray ?? [];
+        for (var i = 0; i < keys.Count; i++)
+        {
+            CheckKeyframe(keys[i], Props.IsPaint(property), $"{location}.keys[{i}]");
+        }
+
         if (track["wave"] is JsonObject wave)
         {
+            if (wave["grow"] is JsonArray { Count: < 2 } grow)
+            {
+                _errors.Add($"{location}.wave.grow: must be [from, to], not {grow.ToJsonString()}");
+            }
+
             foreach (var (time, index) in (wave["grow"] as JsonArray ?? []).Select((time, index) => (time, index)))
             {
                 CheckTime(time, $"{location}.wave.grow[{index}]");
@@ -472,13 +585,6 @@ internal sealed class TemplateValidator
         else if (keys.Count == 0)
         {
             _errors.Add($"{location}: a track needs keys, a wave or a rate");
-        }
-        else
-        {
-            for (var i = 0; i < keys.Count; i++)
-            {
-                CheckKeyframe(keys[i], Props.IsPaint(property), $"{location}.keys[{i}]");
-            }
         }
     }
 
@@ -523,7 +629,7 @@ internal sealed class TemplateValidator
         {
             _errors.Add($"{location}: an easing must be a name, not {node.ToJsonString()}");
         }
-        else if (!TextTemplate.HasHoles(name))
+        else
         {
             Try(location, () => Ease.Parse(name));
         }
@@ -531,9 +637,27 @@ internal sealed class TemplateValidator
 
     private void CheckPaint(JsonNode? node, string location)
     {
-        if (node is not null && !HasBindings(node))
+        if (node is null)
+        {
+            return;
+        }
+
+        CheckIsText((node as JsonObject)?["type"], $"{location}.type");
+        if (!HasBindings(node))
         {
             Try(location, () => _palette.Paint(node, Scope.Empty));
+        }
+        else if (node is JsonObject gradient)
+        {
+            if ((gradient["stops"] as JsonArray ?? []).Any(stop => stop is JsonArray { Count: < Palette.StopParts }))
+            {
+                _errors.Add($"{location}.stops: a gradient stop must be [offset, color]");
+            }
+
+            foreach (var point in _gradientPoints.Where(point => gradient[point] is not JsonArray { Count: >= Palette.PointNumbers }))
+            {
+                _errors.Add($"{location}: a gradient needs \"{point}\": [x, y]");
+            }
         }
     }
 
@@ -560,6 +684,26 @@ internal sealed class TemplateValidator
         if (PropertyReader.IsString(node, out var text) && !TextTemplate.HasHoles(text))
         {
             Try(location, () => Expression.Parse(text));
+        }
+    }
+
+    private void CheckIsText(JsonNode? node, string location)
+    {
+        if (node is not null && !PropertyReader.IsString(node, out _))
+        {
+            _errors.Add($"{location}: must be a text, not {node.ToJsonString()}");
+        }
+    }
+
+    private void CheckRange(JsonNode? node, string location, double min, double max)
+    {
+        if (node is JsonValue value
+            && value.GetValueKind() == JsonValueKind.Number
+            && value.GetValue<double>() is var number
+            && !(number >= min && number <= max))
+        {
+            var range = double.IsNegativeInfinity(min) ? $"at most {max}" : $"from {min} to {max}";
+            _errors.Add($"{location}: must be {range}, not {number}");
         }
     }
 

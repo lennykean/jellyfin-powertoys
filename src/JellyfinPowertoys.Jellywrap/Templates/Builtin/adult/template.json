@@ -89,7 +89,7 @@
       "duration": 8,
       "audioGroup": 1,
       "background": "bg",
-      "when": "(me.mix.tv | round:2) < 1 && (me.mix.movies | round:2) < 1 && (me.mix.music | round:2) < 1",
+      "when": "(me.mix.tv | add:me.mix.movies | add:me.mix.music) > 0 && (me.mix.tv | round:2) < 1 && (me.mix.movies | round:2) < 1 && (me.mix.music | round:2) < 1",
       "elements": [
         {
           "id": "base-headline",
@@ -151,7 +151,7 @@
       "duration": 8,
       "audioGroup": 2,
       "background": "bg",
-      "when": "me.topActors | count > 0",
+      "when": "me.topActors[0].hours >= 1",
       "elements": [
         {
           "id": "base-headline",
@@ -218,6 +218,7 @@
       "duration": 7,
       "audioGroup": 3,
       "background": "bg",
+      "when": "me.busiest.dayHours >= 1",
       "elements": [
         {
           "id": "base-headline",
@@ -265,6 +266,7 @@
       "duration": 7,
       "audioGroup": 3,
       "background": "bg",
+      "when": "(me.newVsClassic.recentShare | round:2) > 0",
       "elements": [
         {
           "id": "base-headline",
@@ -288,7 +290,7 @@
       "duration": 10,
       "audioGroup": 4,
       "background": "bg",
-      "when": "me.music != null",
+      "when": "me.music.hours >= 1",
       "elements": [
         {
           "id": "base-headline",

@@ -34,9 +34,9 @@ internal static class TransitionDrawer
     private const double PageEdgeWidth = 3;
     private const double PageEdgeAlpha = 0.8;
 
-    private static readonly SKColor _switchGlow = new(0xFF, 0xFA, 0xEE);
-    private static readonly SKColor _pageShade = new(0x4B, 0x1D, 0x5E);
-    private static readonly SKColor _pageEdge = new(0xFF, 0xFD, 0xF8);
+    private static readonly SKColor _switchGlow = new SKColor(0xFF, 0xFA, 0xEE);
+    private static readonly SKColor _pageShade = new SKColor(0x4B, 0x1D, 0x5E);
+    private static readonly SKColor _pageEdge = new SKColor(0xFF, 0xFD, 0xF8);
 
     public static void DrawBetween(Painter painter, Transition transition, Slide outgoing, double slideTime, Slide incoming)
     {
@@ -74,11 +74,8 @@ internal static class TransitionDrawer
                 {
                     outgoing.Draw(painter, slideTime);
                     var (directionX, directionY) = Direction(props.Text("direction"));
-                    var revealed = directionX != 0
-                        ? SKRect.Create((float)(directionX > 0 ? Scene.Width * (1 - eased) : 0), 0, (float)(Scene.Width * eased), Scene.Height)
-                        : SKRect.Create(0, (float)(directionY > 0 ? Scene.Height * (1 - eased) : 0), Scene.Width, (float)(Scene.Height * eased));
                     canvas.Save();
-                    canvas.ClipRect(revealed, SKClipOperation.Intersect, antialias: true);
+                    canvas.ClipRect(Revealed(directionX, directionY, eased), SKClipOperation.Intersect, antialias: true);
                     incoming.Draw(painter, incomingTime);
                     canvas.Restore();
                     break;
@@ -136,10 +133,22 @@ internal static class TransitionDrawer
             default:
                 drawContent();
                 var color = transition.Props.Paint("color", videoTime)?.Color ?? SKColors.Black;
-                var cover = (byte)Rounding.HalfUp(byte.MaxValue * (1 - progress));
+                var cover = (byte)(byte.MaxValue * (1 - progress)).RoundHalfUp();
                 painter.Canvas.DrawRect(Frame(), painter.Fill(new Paint(color.WithAlpha((byte)(cover * color.Alpha / byte.MaxValue)))));
                 break;
         }
+    }
+
+    private static SKRect Revealed(double directionX, double directionY, double eased)
+    {
+        if (directionX != 0)
+        {
+            var left = directionX > 0 ? Scene.Width * (1 - eased) : 0;
+            return SKRect.Create((float)left, 0, (float)(Scene.Width * eased), Scene.Height);
+        }
+
+        var top = directionY > 0 ? Scene.Height * (1 - eased) : 0;
+        return SKRect.Create(0, (float)top, Scene.Width, (float)(Scene.Height * eased));
     }
 
     private static SKRect Frame()

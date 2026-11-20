@@ -4,19 +4,19 @@ using MediaBrowser.Common.Configuration;
 
 namespace JellyfinPowertoys.Jellywrap;
 
-internal static class JellywrapPaths
+internal static class ApplicationPathsExtensions
 {
-    public static string Library(IApplicationPaths applicationPaths)
+    public static string GetJellywrapLibraryPath(this IApplicationPaths applicationPaths)
     {
         return Path.Combine(applicationPaths.DataPath, "jellywrap", "library");
     }
 
-    public static string Work(IApplicationPaths applicationPaths)
+    public static string GetJellywrapWorkPath(this IApplicationPaths applicationPaths)
     {
         return Path.Combine(applicationPaths.DataPath, "jellywrap", "work");
     }
 
-    public static string Templates(IApplicationPaths applicationPaths, string? customTemplateFolder)
+    public static string GetJellywrapTemplatesPath(this IApplicationPaths applicationPaths, string? customTemplateFolder)
     {
         return string.IsNullOrWhiteSpace(customTemplateFolder)
             ? Path.Combine(applicationPaths.DataPath, "jellywrap", "templates")

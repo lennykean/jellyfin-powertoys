@@ -32,9 +32,7 @@ internal sealed class ImageNode : Node
             canvas.ClipPath(clip, SKClipOperation.Intersect, antialias: true);
         }
 
-        var (sourceWidth, sourceHeight) = Image is { } image
-            ? (image.Width, image.Height)
-            : Art is { } art ? (art.CullRect.Width, art.CullRect.Height) : (0f, 0f);
+        var (sourceWidth, sourceHeight) = SourceSize();
         if (sourceWidth > 0 && sourceHeight > 0)
         {
             var full = SKRect.Create(sourceWidth, sourceHeight);
@@ -76,6 +74,21 @@ internal sealed class ImageNode : Node
             using var outline = Shape?.Geometry(slideTime) ?? Rect(left, top, width, height, Props.Number("borderOffset", slideTime));
             canvas.DrawPath(outline, painter.Stroke(border, borderWidth, join: StrokeStyle.Join(Props.Text("lineJoin"))));
         }
+    }
+
+    private (float Width, float Height) SourceSize()
+    {
+        if (Image is { } image)
+        {
+            return (image.Width, image.Height);
+        }
+
+        if (Art is { } art)
+        {
+            return (art.CullRect.Width, art.CullRect.Height);
+        }
+
+        return (0, 0);
     }
 
     private static SKPath Rect(double x, double y, double width, double height, double outset)

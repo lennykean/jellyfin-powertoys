@@ -13,13 +13,13 @@ internal sealed class WrapYear
         IReadOnlyList<WrapContext> users,
         ItemIndex itemIndex,
         IReadOnlyList<Play> plays,
-        IReadOnlyDictionary<Guid, Func<MediaItem, bool>> rules)
+        IReadOnlyDictionary<Guid, IReadOnlySet<Guid>?> visibleByUser)
     {
         Server = server;
         Users = users;
         ItemIndex = itemIndex;
         Plays = plays;
-        Rules = rules;
+        VisibleByUser = visibleByUser;
     }
 
     public WrapContext? Server { get; }
@@ -27,20 +27,24 @@ internal sealed class WrapYear
 
     public ItemIndex ItemIndex { get; }
     public IReadOnlyList<Play> Plays { get; }
-    public IReadOnlyDictionary<Guid, Func<MediaItem, bool>> Rules { get; }
+    public IReadOnlyDictionary<Guid, IReadOnlySet<Guid>?> VisibleByUser { get; }
     public static WrapYear Build(WrapSource source)
     {
         var itemIndex = new ItemIndex(source.Items);
         var knownUsers = source.Users.Select(u => u.Id).ToHashSet();
-        var plays = PlayPairer.Pair([.. source.Activity.Where(r => knownUsers.Contains(r.UserId))], itemIndex, source.TimeZone);
+        var now = source.GeneratedAt.UtcDateTime;
+        var plays = PlayPairer.Pair(
+            [.. source.Activity.Where(r => knownUsers.Contains(r.UserId))],
+            itemIndex,
+            source.TimeZone,
+            now);
         var start = TimeZoneInfo.ConvertTimeToUtc(new DateTime(source.Year, 1, 1), source.TimeZone);
         var end = TimeZoneInfo.ConvertTimeToUtc(new DateTime(source.Year + 1, 1, 1), source.TimeZone);
-        var now = source.GeneratedAt.UtcDateTime;
         var window = plays.Where(p => p.Start >= start && p.Start < end && p.Start <= now).ToList();
         var included = source.Users.Where(u => window.Any(p => p.UserId == u.Id)).ToList();
         if (included.Count == 0)
         {
-            return new WrapYear(null, [], itemIndex, [], new Dictionary<Guid, Func<MediaItem, bool>>());
+            return new WrapYear(null, [], itemIndex, [], new Dictionary<Guid, IReadOnlySet<Guid>?>());
         }
 
         var byUser = window.ToLookup(p => p.UserId);
@@ -48,9 +52,9 @@ internal sealed class WrapYear
         var firstRow = source.Activity.Min(r => r.Time);
         var dataStart = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(firstRow > start ? firstRow : start, source.TimeZone));
 
-        (IReadOnlyList<UserStats> Users, GroupStats Groups, ServerStats Stats) ServerFor(Func<MediaItem, bool> shows)
+        (IReadOnlyList<UserStats> Users, GroupStats Groups, ServerStats Stats) ServerFor(Func<MediaItem, bool> isVisible)
         {
-            var calculator = new StatsCalculator(itemIndex, source.Year, shows);
+            var calculator = new StatsCalculator(itemIndex, source.Year, isVisible);
             var inServerOrder = included
                 .Select(u => calculator.User(u, IsKid(u), [.. byUser[u.Id]], [.. priorByUser[u.Id]]))
                 .ToList();
@@ -75,40 +79,16 @@ internal sealed class WrapYear
         }
 
         var unrestricted = ServerFor(_ => true);
-        var rules = included.ToDictionary(u => u.Id, u => RuleFor(u, itemIndex));
         var contexts = unrestricted.Users
             .Join(included, u => u.Id, u => u.Id, (_, u) => u)
-            .Select(u => Context(IsKid(u) || u.Visible is not null ? ServerFor(rules[u.Id]) : unrestricted, u.Id))
+            .Select(u => Context(u.Visible is not null ? ServerFor(item => u.Visible.Contains(item.Id)) : unrestricted, u.Id))
             .ToList();
-        return new WrapYear(Context(unrestricted, null), contexts, itemIndex, window, rules);
+        return new WrapYear(Context(unrestricted, null), contexts, itemIndex, window, included.ToDictionary(u => u.Id, u => u.Visible));
     }
 
     private static bool IsKid(SourceUser user)
     {
         return user.IsKidOverride ?? user.MaxParentalRating is < AdultRating;
-    }
-
-    private static Func<MediaItem, bool> RuleFor(SourceUser user, ItemIndex itemIndex)
-    {
-        bool Visible(MediaItem item)
-        {
-            return user.Visible?.Contains(item.Id) ?? true;
-        }
-
-        if (!IsKid(user))
-        {
-            return Visible;
-        }
-
-        var limit = user.MaxParentalRating ?? AdultRating - 1;
-        bool Rated(MediaItem item)
-        {
-            return item.RatingScore <= limit;
-        }
-
-        return item => Visible(item)
-            && (item.Kind == ItemKind.Song
-                || (Rated(item) && (item.SeriesId is not { } seriesId || itemIndex.Get(seriesId) is not { } series || Rated(series))));
     }
 
     private static Comparisons Compare(UserStats me, IReadOnlyList<UserStats> users, GroupStats groups, ServerStats server)

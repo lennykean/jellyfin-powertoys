@@ -8,6 +8,7 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class ShapeNode : Node
 {
+    private const int MaxStarPoints = 360;
     private const double StarPoints = 5;
     private const double StarInnerRatio = 0.48;
 
@@ -54,7 +55,7 @@ internal sealed class ShapeNode : Node
                 break;
             case "star":
                 {
-                    var points = (int)Props.Number("points", slideTime, StarPoints);
+                    var points = (int)Math.Clamp(Props.Number("points", slideTime, StarPoints), 0, MaxStarPoints);
                     var outerRadius = Props.Number("radius", slideTime);
                     var innerRadius = outerRadius * Props.Number("inner", slideTime, StarInnerRatio);
                     var firstAngle = (Props.Number("angle", slideTime) * Math.PI / 180) - (Math.PI / 2);

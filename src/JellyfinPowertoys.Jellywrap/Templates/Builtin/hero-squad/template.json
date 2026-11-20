@@ -472,7 +472,8 @@
         "m": "{{me.totals.hours | mul:60 | round | atLeast:1}}",
         "amount": "{{mins | then:m,me.totals.hours | round}}",
         "mw": "{{(m == 1) | then:\"minute!\",\"minutes!\"}}",
-        "unit": "{{mins | then:mw,\"hours —\"}}",
+        "hrw": "{{me.totals.hours | round | noun:\"hour —\",\"hours —\"}}",
+        "unit": "{{mins | then:mw,hrw}}",
         "movies": "{{me.totals.hours | div:1.5 | round}}"
       },
       "elements": [
@@ -730,7 +731,7 @@
                 {
                   "id": "t",
                   "type": "text",
-                  "text": "that's like {{movies}} movies!",
+                  "text": "that's like {{movies}} {{movies | noun:\"movie\"}}!",
                   "font": "label",
                   "size": 92,
                   "color": "navy",
@@ -753,8 +754,9 @@
         "eps": "me.totals.episodes > 0",
         "bx": "{{both | then:520,960}}",
         "one": "{{eps | then:me.totals.episodes,me.totals.movies}}",
-        "lone": "{{eps | then:\"episodes!\",\"movies!\"}}",
-        "label": "{{both | then:\"episodes\",lone}}"
+        "epw": "{{me.totals.episodes | noun:\"episode\",\"episodes\"}}{{both | then:\"\",\"!\"}}",
+        "mvw": "{{me.totals.movies | noun:\"movie!\",\"movies!\"}}",
+        "label": "{{eps | then:epw,mvw}}"
       },
       "elements": [
         { "id": "base-headline", "remove": true },
@@ -1017,7 +1019,7 @@
             {
               "id": "t",
               "type": "text",
-              "text": "movies!",
+              "text": "{{mvw}}",
               "font": "hero",
               "case": "upper",
               "size": 100,

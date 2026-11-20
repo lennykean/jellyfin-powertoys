@@ -1,23 +1,3 @@
 {
-  "[csharp]": {
-    "editor.defaultFormatter": "anysphere.csharp"
-  },
-  "editor.rulers": [180],
-  "cSpell.words": [
-    "boxset",
-    "boxsets",
-    "buildtransitive",
-    "contentfiles",
-    "emby",
-    "jellyfin",
-    "lennykean",
-    "mediaplayer",
-    "mediatype",
-    "powertoys",
-    "powertoysvideoplayer",
-    "Registrator",
-    "Repacker",
-    "serverid",
-    "Trickplay"
-  ]
+  "editor.rulers": [180]
 }

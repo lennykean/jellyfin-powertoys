@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
 
 using SkiaSharp;
 
@@ -11,14 +12,21 @@ namespace JellyfinPowertoys.Jellywrap.Templates;
 
 internal sealed class TrackBuilder
 {
+    public const int MaxPresetDepth = 8;
+
+    private const int MaxTracks = 100000;
     private const string EndTime = "end";
 
     private readonly JsonObject _presets;
     private readonly Palette _palette;
     private readonly HashSet<string> _presetsInUse = [];
-    public TrackBuilder(JsonObject? templatePresets, Palette palette)
+    private readonly CancellationToken _cancellationToken;
+    private int _built;
+
+    public TrackBuilder(JsonObject? templatePresets, Palette palette, CancellationToken cancellationToken)
     {
         _palette = palette;
+        _cancellationToken = cancellationToken;
         _presets = (JsonObject)Presets.Builtin.DeepClone();
         foreach (var (name, preset) in templatePresets ?? [])
         {
@@ -45,6 +53,7 @@ internal sealed class TrackBuilder
                 AddPreset(props, name.GetValue<string>(), use, placement, shift + delay, fromEnd);
                 break;
             case JsonObject definition:
+                CountBuilt(1);
                 var track = BuildTrack(definition, placement with { Shift = shift });
                 if (!props.Tracks.TryGetValue(track.Property, out var tracks))
                 {
@@ -54,6 +63,15 @@ internal sealed class TrackBuilder
 
                 tracks.Add(track);
                 break;
+        }
+    }
+
+    private void CountBuilt(int count)
+    {
+        _built += count;
+        if (_built > MaxTracks)
+        {
+            throw new InvalidOperationException($"The template builds more than {MaxTracks} tracks and keyframes combined.");
         }
     }
 
@@ -76,6 +94,7 @@ internal sealed class TrackBuilder
 
     private void AddPreset(Props props, string name, JsonObject? use, Placement placement, double shift, bool fromEnd)
     {
+        _cancellationToken.ThrowIfCancellationRequested();
         var arguments = new Dictionary<string, object?>();
         foreach (var (argument, value) in use?["args"] as JsonObject ?? [])
         {
@@ -94,13 +113,18 @@ internal sealed class TrackBuilder
             throw new InvalidOperationException($"The preset \"{name}\" uses itself.");
         }
 
+        if (_presetsInUse.Count > MaxPresetDepth)
+        {
+            throw new InvalidOperationException($"The preset \"{name}\" is nested deeper than {MaxPresetDepth} levels.");
+        }
+
         if (fromEnd)
         {
             var lastTime = tracks
                 .OfType<JsonObject>()
                 .SelectMany(track => track["keys"] as JsonArray ?? [])
                 .Max(keyframe => ReadTime(KeyframeParts(keyframe).Time, presetPlacement)) ?? 0;
-            shift = placement.Duration - lastTime;
+            shift += placement.Duration - lastTime;
         }
 
         AddTracks(props, tracks, presetPlacement, shift, fromEnd: false);
@@ -109,9 +133,12 @@ internal sealed class TrackBuilder
 
     private static (JsonNode? Time, JsonNode? Value, JsonNode? Ease) KeyframeParts(JsonNode? keyframe)
     {
-        return keyframe is JsonArray array
-            ? (array[0], array[1], array.Count > 2 ? array[2] : null)
-            : (keyframe?["t"], keyframe?["v"], keyframe?["ease"]);
+        if (keyframe is JsonArray array)
+        {
+            return (array[0], array[1], array.Count > 2 ? array[2] : null);
+        }
+
+        return (keyframe?["t"], keyframe?["v"], keyframe?["ease"]);
     }
 
     private static double? ReadTime(JsonNode? node, Placement placement)
@@ -146,12 +173,14 @@ internal sealed class TrackBuilder
 
         if (definition["rate"] is { } rate)
         {
-            if (start > end)
+            return new Track
             {
-                throw new InvalidOperationException($"The \"{property}\" track starts after its end.");
-            }
-
-            return new Track { Property = property, Rate = PropertyReader.ReadNumber(rate, scope) ?? 0, VideoClock = videoClock, Start = start, End = end };
+                Property = property,
+                Rate = PropertyReader.ReadNumber(rate, scope) ?? 0,
+                VideoClock = videoClock,
+                Start = start,
+                End = Math.Max(start, end),
+            };
         }
 
         var isColor = Props.IsPaint(property);
@@ -185,8 +214,10 @@ internal sealed class TrackBuilder
     {
         var defaultEase = definition["ease"]?.GetValue<string>();
         var relative = false;
-        var keyframes = new List<Keyframe>();
-        foreach (var keyframe in definition["keys"] as JsonArray ?? [])
+        var keys = definition["keys"] as JsonArray ?? [];
+        CountBuilt(keys.Count);
+        var keyframes = new List<Keyframe>(keys.Count);
+        foreach (var keyframe in keys)
         {
             var (timeNode, valueNode, easeNode) = KeyframeParts(keyframe);
             var time = (ReadTime(timeNode, placement) ?? 0) + (videoClock ? 0 : placement.Shift);
@@ -205,12 +236,19 @@ internal sealed class TrackBuilder
             }
 
             relative |= isRelative;
-            var number = text is null
-                ? PropertyReader.ReadNumber(valueNode, placement.Scope) ?? 0
-                : double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0;
-            keyframes.Add(new Keyframe(time, number, SKColors.Black, ease));
+            keyframes.Add(new Keyframe(time, KeyframeNumber(text, valueNode, placement.Scope), SKColors.Black, ease));
         }
 
         return (keyframes, relative);
+    }
+
+    private static double KeyframeNumber(string? text, JsonNode? valueNode, Scope scope)
+    {
+        if (text is null)
+        {
+            return PropertyReader.ReadNumber(valueNode, scope) ?? 0;
+        }
+
+        return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0;
     }
 }

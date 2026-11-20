@@ -21,7 +21,7 @@ A collection of plugins to enhance Jellyfin media server with additional feature
 
 | Jellyfin version | Source branch    | Plugin release line |
 | ---------------- | ---------------- | ------------------- |
-| 12.1             | `main`           | `1.4.x.x`           |
+| 12               | `main`           | `1.4.x.x`           |
 | 10.11.9          | `jellyfin-10.11` | `1.3.x.x`           |
 | 10.9             | `jellyfin-10.9`  | `1.1.x.x`           |
 

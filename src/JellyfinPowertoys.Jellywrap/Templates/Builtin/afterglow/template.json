@@ -226,7 +226,7 @@
         "isMin": "me.totals.hours < 1",
         "mins": "me.totals.hours | mul:60 | round | atLeast:1",
         "days": "me.totals.days | round",
-        "hasDays": "days >= 1",
+        "hasDays": "me.totals.days >= 1",
         "minUnit": "mins | noun:\"minute\"",
         "hourUnit": "me.totals.hours | noun:\"hour\"",
         "unit": "{{isMin | then:minUnit,hourUnit}}"
@@ -1699,6 +1699,15 @@
           "children": [
             { "id": "lead", "type": "text", "text": "You spent", "x": 120, "y": 330, "size": 60, "font": "m8", "color": "aqua", "letterSpacing": 1 },
             {
+              "id": "finalHours",
+              "type": "text",
+              "text": "{{me.topActors[0].hours | mul:10 | add:0.5 | floor | div:10 | hours:\"number\"}}",
+              "size": 280,
+              "font": "s8",
+              "tracking": -0.015,
+              "opacity": 0
+            },
+            {
               "id": "hrs",
               "type": "text",
               "value": "{{me.topActors[0].hours}}",
@@ -1706,6 +1715,9 @@
               "x": 112,
               "y": 620,
               "size": 280,
+              "fit": "step",
+              "maxWidth": "{{measure.finalHours.width | atMost:730}}",
+              "minSize": 48,
               "font": "s8",
               "color": "amber",
               "tracking": -0.015,
@@ -2563,6 +2575,18 @@
           "in": { "preset": "rise", "at": 1.0, "args": { "dph": 0.8 } },
           "children": [
             {
+              "id": "twoLines",
+              "type": "text",
+              "text": "{{replayedName}}",
+              "size": 57,
+              "font": "s8",
+              "fit": "split",
+              "maxWidth": 900,
+              "minSize": 1,
+              "tracking": -0.015,
+              "opacity": 0
+            },
+            {
               "id": "title",
               "type": "text",
               "text": "{{replayedName}}",
@@ -2571,8 +2595,11 @@
               "size": 170,
               "font": "s8",
               "color": "star",
-              "fit": "split",
+              "fit": "{{(measure.twoLines.size < 57) | then:\"box\",\"split\"}}",
               "maxWidth": 900,
+              "maxHeight": 350,
+              "valign": "middle",
+              "minRatio": 0.25,
               "minSize": 57,
               "linePitch": 170,
               "tracking": -0.015,
@@ -3231,7 +3258,7 @@
                 {
                   "id": "hours",
                   "type": "text",
-                  "text": "{{me.totals.hours | hours:\"number\"}} h",
+                  "text": "{{me.totals.hours | hours}}",
                   "x": 760,
                   "y": 340,
                   "size": 120,
@@ -3521,7 +3548,6 @@
         },
         "totals": {
           "background": null,
-          "vars": { "H": "server.totals.hours" },
           "elements": [
             { "id": "base-headline", "remove": true },
             {
@@ -3685,7 +3711,7 @@
                     {
                       "id": "hours",
                       "type": "text",
-                      "value": "{{H}}",
+                      "value": "{{watchAmount}}",
                       "text": "{{value | number}}",
                       "x": 0,
                       "y": 130,
@@ -3719,7 +3745,7 @@
                 {
                   "id": "unit",
                   "type": "text",
-                  "text": "{{H | noun:\"hour\"}}",
+                  "text": "{{watchAmount | round | noun:watchUnit}}",
                   "x": 960,
                   "y": 760,
                   "size": 88,
@@ -5286,7 +5312,7 @@
                   "when": "server.topMovies | count > 0",
                   "children": [{ "id": "movie-poster", "src": "{{server.topMovies[0].poster}}", "title": "{{server.topMovies[0].title}}" }]
                 },
-                { "id": "hours-g", "children": [{ "id": "hours", "text": "{{server.totals.hours | hours:\"number\"}} h" }] },
+                { "id": "hours-g", "children": [{ "id": "hours", "text": "{{server.totals.hours | hours}}" }] },
                 { "id": "show", "when": "server.topSeries | count > 0", "children": [{ "id": "t", "text": "{{server.topSeries[0].title}}" }] },
                 { "id": "movie", "when": "server.topMovies | count > 0", "children": [{ "id": "t", "text": "{{server.topMovies[0].title}}" }] },
                 { "id": "genre-g", "when": "server.topGenres | count > 0", "children": [{ "id": "genre", "text": "{{server.topGenres[0].name}}" }] },
